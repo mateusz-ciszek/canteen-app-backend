@@ -10,6 +10,7 @@ module.exports = router;
 // GET - Returns all existing orders
 router.get('/', (req, res, next) => {
 	Order.find().select('product quantity _id')
+	.populate('product', '_id name price')
 	.exec().then(orders => {
 		console.log(orders);
 		res.status(200).json(orders);
@@ -43,6 +44,7 @@ router.post('/', (req, res, next) => {
 // GET - Returns order with given ID if it exists
 router.get('/:orderId', (req, res, next) => {
 	Order.findById(req.params.orderId).select('_id product quantity')
+	.populate('product', '_id name price')
 	.exec().then(order => {
 		if (!order) {
 			return res.status(404).json({
