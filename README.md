@@ -1,7 +1,7 @@
 # Backend dla aplikacji Canteen
 
 ## Wykorzystane technologie
-Serwer został utworzony w technologi NodeJS z wykorzystaniem frameworka ExpressJS. Jako bazę danych wybraliśmy MongoDB Atlas.
+Serwer został utworzony w technologi [Node.js](https://nodejs.org/en/) z wykorzystaniem frameworka [Express](http://expressjs.com/). Jako bazę danych wybraliśmy [MongoDB Atlas](https://www.mongodb.com/).
 
 ## Instalacja i uruchamianie
 ```bash
