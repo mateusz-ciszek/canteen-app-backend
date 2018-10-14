@@ -6,7 +6,6 @@ const app = express();
 
 module.exports = app;
 
-// const dataSource = require('./data/dataSource');
 const productRoutes = require('./api/routes/products');
 const ordersRoutes = require('./api/routes/orders');
 
@@ -18,6 +17,7 @@ mongoose.connect(
 
 // Wyświetlanie logów dotyczących otrzymywanych żądań
 app.use(morgan('dev'));
+app.use('/uploads', express.static('uploads'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -32,12 +32,6 @@ app.use((req, res, next) => {
 	}
 	next();
 });
-
-// Dopisywanie źródła danych do req każdego żądania
-// app.use((req, res, next) => {
-//     req.dataSource = dataSource;
-//     next();
-// });
 
 // Główne ścieżki API
 app.use('/products', productRoutes);
