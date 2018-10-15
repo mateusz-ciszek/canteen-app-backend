@@ -8,6 +8,7 @@ module.exports = app;
 
 const productRoutes = require('./api/routes/products');
 const ordersRoutes = require('./api/routes/orders');
+const usersRoutes = require('./api/routes/user');
 
 // Połączenie z bazą danych Mongo Atlas
 mongoose.connect(
@@ -36,6 +37,7 @@ app.use((req, res, next) => {
 // Główne ścieżki API
 app.use('/products', productRoutes);
 app.use('/orders', ordersRoutes);
+app.use('/user', usersRoutes);
 
 /**
  * Obsługa błędów
