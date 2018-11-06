@@ -49,6 +49,7 @@ router.post('/login', (req, res, next) => {
 		}
 		
 		bcrypt.compare(req.body.password, user.password, (err, result) => {
+			const jwtKey = process.env.JWT_KEY || 'secret';
 			if (err) {
 				return res.status(401).json({
 					message: 'Auth failed',
@@ -60,7 +61,7 @@ router.post('/login', (req, res, next) => {
 					email: user.email,
 					id: user._id,
 				}, 
-				process.env.JWT_KEY, { expiresIn: "1h" });
+				jwtKey, { expiresIn: "1h" });
 				return res.status(200).json({
 					message: 'Auth successful',
 					token,
