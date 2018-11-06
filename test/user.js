@@ -71,6 +71,7 @@ describe('User', function() {
 					res.body.token = res.body.token ? '' : null;
 				})
 				.expect(200, {
+					// FIXME uzgodnić jakie dane mają być zwracane i uzupełnić
 					message: 'Auth successful',
 					token: '',
 				}, done);
