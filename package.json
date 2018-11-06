@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "start": "nodemon server.js"
   },
   "author": "",
@@ -20,6 +20,9 @@
     "request": "^2.88.0"
   },
   "devDependencies": {
-    "nodemon": "^1.18.4"
+    "faker": "^4.1.0",
+    "mocha": "^5.2.0",
+    "nodemon": "^1.18.4",
+    "supertest": "^3.3.0"
   }
 }
