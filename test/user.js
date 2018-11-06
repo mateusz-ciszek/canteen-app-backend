@@ -17,15 +17,17 @@ describe('User', function() {
 
 	describe('#login', function() {
 		let { email, password, hash } = fakeUserData();
+		const endpoint = '/user/login';
+		const authFailesResponse = {
+			message: 'Auth failed',
+		};
 
 		before('add fake user to db', function() {
-			const doc = new User({
+			return new User({
 				_id: new mongoose.Types.ObjectId(),
 				email,
 				password: hash,
-			});
-
-			return doc.save();
+			}).save();
 		});
 
 		after('remove fake user from db', function() {
@@ -34,41 +36,38 @@ describe('User', function() {
 
 		it('sending empty request should return 401', function(done) {
 			request(app)
-				.post('/user/login')
-				.expect(401, {
-					message: 'Auth failed',
-				}, done);
+				.post(endpoint)
+				.expect(401, authFailesResponse, done);
 		});
 
 		it('sending request with wrong email should return 401', function(done) {
 			request(app)
-				.post('/user/login')
+				.post(endpoint)
 				.send({
 					email: email + Math.random().toString(36).substring(7),
 					password,
 				})
-				.expect(401, {
-					message: 'Auth failed',
-				}, done);
+				.expect(401, authFailesResponse, done);
 		});
 
 		it('sending request with wrong password should return 401', function(done) {
 			request(app)
-				.post('/user/login')
+				.post(endpoint)
 				.send({
 					email,
 					password: Math.random().toString(36).substring(7),
 				})
-				.expect(401, {
-					message: 'Auth failed',
-				}, done);
+				.expect(401, authFailesResponse, done);
 		});
 
 		it('sending proper request should return 200', function(done) {
 			request(app)
-				.post('/user/login')
+				.post(endpoint)
 				.send({ email, password })
 				.expect(function(res) {
+					// Na ten moment nie obchodzi mnie czy token jest poprawny, 
+					// tylko czy jest zwracany jakikolwiek
+					// TODO Test czy jest zwracany poprawny token
 					res.body.token = res.body.token ? '' : null;
 				})
 				.expect(200, {
