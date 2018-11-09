@@ -2,8 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 
-const Order = require('../models/order');
-const Product = require('../models/product');
+const Order = require('../../models/example/order');
+const Product = require('../../models/example/product');
 
 module.exports = router;
 
