@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
+const checkAuth = require('../middleware/check-auth');
 
 const Menu = require('../models/menu');
 const Food = require('../models/food');
@@ -55,7 +56,7 @@ router.get('/', (req, res, next) => {
 /**
  * POST - Zapytanie dodajęce nowe menu do bazy
  */
-router.post('/', async (req, res, next) => {
+router.post('/', checkAuth, async (req, res, next) => {
 	const foodsReq = req.body.foods;
 	let foodIds = [];
 	if (foodsReq && foodsReq.length) {
@@ -77,7 +78,7 @@ router.post('/', async (req, res, next) => {
 /**
  * POST - Dodaj nowy posiłek do menu
  */
-router.post('/:menuId/food', (req, res, next) => {
+router.post('/:menuId/food', checkAuth, (req, res, next) => {
 	const menuId = req.params.menuId;
 	Menu.findById(menuId, async function(err, result) {
 		if (err) {
