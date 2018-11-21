@@ -40,7 +40,7 @@ router.post('/', async (req, res, next) => {
 		const saved = await new Order({
 			_id: mongoose.Types.ObjectId(),
 			// user: req.userData._id,
-			user: user._id,
+			user: req.body._id || user._id,
 			items: items.map(item => item._id),
 			totalPrice: items.map(item => item.price).reduce((previousValue, currentValue) => previousValue + currentValue),
 		}).save();
