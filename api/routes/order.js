@@ -35,9 +35,12 @@ router.post('/', async (req, res, next) => {
 
 	const items = await saveOrderItems(req.body);
 	try {
+		const User = require('../models/user');
+		const user = await User.findOne().select('id').exec();
 		const saved = await new Order({
 			_id: mongoose.Types.ObjectId(),
-			user: req.userData._id,
+			// user: req.userData._id,
+			user: user._id,
 			items: items.map(item => item._id),
 			totalPrice: items.map(item => item.price).reduce((previousValue, currentValue) => previousValue + currentValue),
 		}).save();
