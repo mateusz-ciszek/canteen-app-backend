@@ -35,7 +35,7 @@ const upload = multer({
 });
 const router = express.Router();
 
-const Product = require('../models/product');
+const Product = require('../../models/example/product');
 
 module.exports = router;
 

@@ -6,8 +6,8 @@ const app = express();
 
 module.exports = app;
 
-const productRoutes = require('./api/routes/products');
-const ordersRoutes = require('./api/routes/orders');
+const productRoutes = require('./api/routes/example/products');
+const ordersRoutes = require('./api/routes/example/orders');
 const usersRoutes = require('./api/routes/user');
 
 // Połączenie z bazą danych Mongo Atlas
@@ -35,8 +35,9 @@ app.use((req, res, next) => {
 });
 
 // Główne ścieżki API
-app.use('/products', productRoutes);
-app.use('/orders', ordersRoutes);
+// TODO Usunąć przykładowe endpointy
+app.use('/example/products', productRoutes);
+app.use('/example/orders', ordersRoutes);
 app.use('/user', usersRoutes);
 
 /**
