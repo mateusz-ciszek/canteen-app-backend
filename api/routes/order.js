@@ -66,6 +66,25 @@ router.get('/', checkAuth, async (req, res, next) => {
 	res.status(200).json(orders);
 });
 
+/**
+ * GET - Zatwierdzanie odbioru zamówienia
+ */
+router.get('/pickedup/:orderId', checkAuth, async (req, res, next) => {
+	const id = req.params.orderId;
+	try {
+		let order = await Order.findById(id).exec();
+		if (order.pickupDate) {
+			res.status(409).json({ error: 'Pick up date already set' });
+		} else {
+			order.pickupDate = new Date();
+			await order.save();
+			res.status(200).json();
+		}
+	} catch (err) {
+		res.status(500).json({ error: err });
+	}
+});
+
 // TODO Wydzielić do osobnego pliku
 async function saveOrderItems(items) {
 	const savedItems = [];
