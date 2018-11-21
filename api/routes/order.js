@@ -71,7 +71,7 @@ router.get('/', async (req, res, next) => {
 /**
  * GET - Zatwierdzanie odbioru zamówienia
  */
-router.get('/pickedup/:orderId', checkAuth, async (req, res, next) => {
+router.get('/pickedup/:orderId', async (req, res, next) => {
 	const id = req.params.orderId;
 	try {
 		let order = await Order.findById(id).exec();
