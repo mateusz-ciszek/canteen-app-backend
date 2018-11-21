@@ -23,13 +23,21 @@ router.post('/signup', (req, res, next) => {
 						_id: new mongoose.Types.ObjectId(),
 						email: req.body.email,
 						password: hash,
-						firstName: req.body.firstName,
-						lastName: req.body.lastName,
-						admin: req.body.admin,
-					});
+						firstName: req.body.email,
+					});  const user = new User({
+                                                _id: new mongoose.Types.ObjectId(),
+                                                email: req.body.email,
+                                                password: hash,
+                                                firstName: req.body.email,
+                                        });
+
 					user.save().then(result => {
 						console.log(result);
-						res.status(201).json({
+						r  user.save().then(result => {
+                                                console.log(result);
+                                                res.status(201).json({
+                                                        message: 'User created',
+                                                        user: resules.status(201).json({
 							message: 'User created',
 							user: result,
 						});
