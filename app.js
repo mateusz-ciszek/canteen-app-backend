@@ -11,6 +11,7 @@ const ordersRoutes = require('./api/routes/example/orders');
 const usersRoutes = require('./api/routes/user');
 const menuRoutes = require('./api/routes/menu');
 const foodRoutes = require('./api/routes/food');
+const orderRoutes = require('./api/routes/order');
 
 // Połączenie z bazą danych Mongo Atlas
 mongoose.connect(
@@ -43,6 +44,7 @@ app.use('/example/orders', ordersRoutes);
 app.use('/user', usersRoutes);
 app.use('/menu', menuRoutes);
 app.use('/food', foodRoutes);
+app.use('/order', orderRoutes);
 
 /**
  * Obsługa błędów

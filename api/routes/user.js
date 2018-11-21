@@ -62,7 +62,7 @@ router.post('/login', (req, res, next) => {
 			if (result) {
 				const token = jwt.sign({
 					email: user.email,
-					id: user._id,
+					_id: user._id,
 				}, 
 				jwtKey, { expiresIn: "1h" });
 				return res.status(200).json({
