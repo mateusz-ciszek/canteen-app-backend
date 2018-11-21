@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
-const checkAuth = require('../middleware/check-auth');
 
 const Order = require('../models/order');
 const OrderItem = require('../models/orderItem');
@@ -29,7 +28,7 @@ module.exports = router;
 /**
  * POST - Składanie nowego zamówienia
  */
-router.post('/', checkAuth, async (req, res, next) => {
+router.post('/', async (req, res, next) => {
 	if (!req.body.length) {
 		return res.status(400).json({ error: 'Empty order is not allowed' });
 	}
@@ -53,7 +52,7 @@ router.post('/', checkAuth, async (req, res, next) => {
 /**
  * GET - Pobierz wszystkie zamówienia
  */
-router.get('/', checkAuth, async (req, res, next) => {
+router.get('/', async (req, res, next) => {
 	const orders = await Order.find()
 		.select('id user items totalPrice')
 		.populate({
