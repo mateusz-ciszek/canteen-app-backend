@@ -20,15 +20,12 @@ module.exports = router;
  */
 router.get('/:foodId', (req, res, next) => {
 	const id = req.params.foodId;
-	Food.findById(id, function(err, result) {
-		if (err) {
-			return res.status(500).json({ error: err });
-		}
-
-		if (!result) {
-			return res.status(404).json({ message: 'Food not found' });
-		}
-
-		res.status(200).json(result);
-	});
+	Food.findById(id)
+		.select('id name price additions description')
+		.populate({
+			path: 'additions',
+			select: 'id name price',
+		}).exec().then(result => {
+			res.status(200).json(result);
+		});
 });
