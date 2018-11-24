@@ -59,7 +59,11 @@ router.get('/', checkAuth, async (req, res, next) => {
 		.populate({
 			path: 'items',
 			populate: {
-				path: 'additions',
+				path: 'additions food',
+				populate: {
+					path: 'foodAddition additions',
+					// populate: 'foodAddition',
+				},
 			},
 		}).exec();
 
