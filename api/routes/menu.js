@@ -12,7 +12,7 @@ module.exports = router;
 /**
  * GET - Zwraca listę wszystkich menu z posiłkami
  * i dodatkami do nich
- * 
+ *
  * Przykładowa odpowiedź:
  * [
  *   {
@@ -46,7 +46,7 @@ router.get('/', (req, res, next) => {
 				select: 'id name price',
 			},
 		}).exec().then(result => {
-			res.status(200).json(result);
+			res.status(200).json({ menus: result });
 		}).catch(err => {
 			res.status(500).json({ error: err });
 		});
