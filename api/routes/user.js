@@ -64,8 +64,7 @@ router.post('/login', (req, res, next) => {
 					email: user.email,
 					_id: user._id,
 					admin: !!user.admin,
-				}, 
-				jwtKey, { expiresIn: "1h" });
+				}, jwtKey);
 				return res.status(200).json({
 					message: 'Auth successful',
 					token,
