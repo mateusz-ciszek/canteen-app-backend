@@ -99,6 +99,16 @@ router.post('/:menuId/food', checkAuth, (req, res, next) => {
 	});
 });
 
+router.delete('/:menuId', checkAuth, (req, res, next) => {
+	const id = req.params.menuId;
+	Menu.findByIdAndDelete(id, (err, result) => {
+		if (err) {
+			return res.status(500).json({ error: err });
+		}
+		res.status(200).json();
+	});
+});
+
 
 // TODO Wydzielić te metody do osobnego pliku
 async function saveFoods(foods) {
