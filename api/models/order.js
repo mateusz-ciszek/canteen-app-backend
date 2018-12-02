@@ -7,6 +7,7 @@ const orderSchema = mongoose.Schema({
 	orderDate: { type: Date, required: true, default: Date.now() },
 	totalPrice: { type: Number, required: true },
 	pickupDate: { type: Date, required: false },
+	state: { type: String, required: true },
 });
 
 module.exports = mongoose.model('Order', orderSchema);
