@@ -26,6 +26,12 @@ module.exports = router;
 // 	],
 // };
 
+const OrderState = Object.freeze({
+	'SAVED': 'SAVED', 
+	'READY': 'READY', 
+	'SERVED': 'SERVED',
+});
+
 /**
  * POST - Składanie nowego zamówienia
  */
@@ -41,6 +47,7 @@ router.post('/', checkAuth, async (req, res, next) => {
 			user: req.userData._id,
 			items: items.map(item => item._id),
 			totalPrice: items.map(item => item.price).reduce((previousValue, currentValue) => previousValue + currentValue),
+			state: OrderState.SAVED,
 		}).save();
 	} catch (err) {
 		console.log(err);
@@ -54,8 +61,10 @@ router.post('/', checkAuth, async (req, res, next) => {
  * GET - Pobierz wszystkie zamówienia
  */
 router.get('/', checkAuth, async (req, res, next) => {
-	const orders = await Order.find()
-		.select('id user items totalPrice')
+	const stateFilter = req.body.state ? req.body.state : Object.keys(OrderState);
+
+	const orders = await Order.find({ state: stateFilter })
+		.select('id user items totalPrice state')
 		.populate({
 			path: 'items',
 			populate: {
@@ -81,6 +90,7 @@ router.get('/pickedup/:orderId', checkAuth, async (req, res, next) => {
 			res.status(409).json({ error: 'Pick up date already set' });
 		} else {
 			order.pickupDate = new Date();
+			order.state = OrderState.SERVED;
 			await order.save();
 			res.status(200).json();
 		}
