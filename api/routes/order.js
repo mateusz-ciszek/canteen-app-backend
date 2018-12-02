@@ -76,7 +76,7 @@ router.get('/', checkAuth, async (req, res, next) => {
 			},
 		}).exec();
 
-	res.status(200).json(orders);
+	res.status(200).json({ orders: orders });
 });
 
 /**
