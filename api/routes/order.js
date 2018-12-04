@@ -26,8 +26,8 @@ module.exports = router;
 // };
 
 const OrderState = Object.freeze({
-	'SAVED': 'SAVED', 
-	'READY': 'READY', 
+	'SAVED': 'SAVED',
+	'READY': 'READY',
 	'SERVED': 'SERVED',
 });
 
@@ -63,7 +63,7 @@ router.post('/', async (req, res, next) => {
  * GET - Pobierz wszystkie zamówienia
  */
 router.get('/', async (req, res, next) => {
-	const stateFilter = req.body.state ? req.body.state : Object.keys(OrderState);
+	const stateFilter = req.query.state ? req.query.state : Object.keys(OrderState);
 
 	const orders = await Order.find({ state: stateFilter })
 		.select('id user items totalPrice state')
@@ -78,7 +78,7 @@ router.get('/', async (req, res, next) => {
 			},
 		}).exec();
 
-	res.status(200).json(orders);
+	res.status(200).json({ orders: orders });
 });
 
 /**
