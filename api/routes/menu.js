@@ -98,7 +98,7 @@ router.post('/:menuId/food', (req, res, next) => {
 	});
 });
 
-router.delete('/:menuId', checkAuth, (req, res, next) => {
+router.delete('/:menuId', (req, res, next) => {
 	const id = req.params.menuId;
 	Menu.findByIdAndDelete(id, (err, result) => {
 		if (err) {
