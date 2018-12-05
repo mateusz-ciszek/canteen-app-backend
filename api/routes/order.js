@@ -83,6 +83,34 @@ router.get('/', async (req, res, next) => {
 });
 
 /**
+ * Modyfikacja statusu zamówienia, zwraca zaktualizowane zamówienie
+ */
+router.patch('/:orderId', async (req, res, next) => {
+	const id = req.params.orderId;
+	const state = req.body.state;
+	if (!Object.keys(OrderState).find(item => item === state)) {
+		return res.status(400).json({ error: 'Invalid state' });
+	}
+	Order.findByIdAndUpdate(id, { state }).exec().then(async result => {
+		result = await Order.findById(id)
+			.select('id items user totalPrice state')
+			.populate({
+				path: 'items user',
+				select: 'id email firstName lastName',
+				populate: {
+					path: 'additions food',
+					populate: {
+						path: 'foodAddition additions',
+					},
+				},
+			});
+		res.status(200).json({ order: result });
+	}).catch(err => {
+		res.status(500).json({ error: err });	
+	});
+});
+
+/**
  * GET - Zatwierdzanie odbioru zamówienia
  */
 router.get('/pickedup/:orderId', async (req, res, next) => {
