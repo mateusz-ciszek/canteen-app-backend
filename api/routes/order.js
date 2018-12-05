@@ -40,7 +40,7 @@ router.post('/', async (req, res, next) => {
 	// 	return res.status(400).json({ error: 'Empty order is not allowed' });
 	// }
 
-	const items = await saveOrderItems(req.body);
+	const items = await saveOrderItems(req.body.items);
 	try {
 		const User = require('../models/user');
 		const user = await User.findOne().select('id').exec();
@@ -108,7 +108,7 @@ async function saveOrderItems(items) {
 	for (const item of items) {
 		const additions = await saveOrderItemsAdditions(item.additions);
 		const additionsSumPrice = additions.map(item => (item.quantity || 1) * item.price)
-				.reduce((previousValue, currentValue) => previousValue + currentValue);
+				.reduce((previousValue, currentValue) => previousValue + currentValue, 0);
 		const food = await Food.findById(item._id).exec();
 		const saved = await new OrderItem({
 			_id: mongoose.Types.ObjectId(),
