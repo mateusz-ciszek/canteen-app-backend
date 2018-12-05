@@ -106,15 +106,15 @@ async function saveOrderItems(items) {
 	const savedItems = [];
 	for (const item of items) {
 		const additions = await saveOrderItemsAdditions(item.additions);
-		const additionsSumPrice = additions.map(item => item.quantity * item.price)
+		const additionsSumPrice = additions.map(item => (item.quantity || 1) * item.price)
 				.reduce((previousValue, currentValue) => previousValue + currentValue);
 		const food = await Food.findById(item._id).exec();
 		const saved = await new OrderItem({
 			_id: mongoose.Types.ObjectId(),
 			food: item._id,
-			quantity: item.quantity,
+			quantity: item.quantity || 1,
 			additions: additions.map(item => item._id),
-			price: food.price * item.quantity + additionsSumPrice,
+			price: food.price * (item.quantity || 1) + additionsSumPrice,
 		}).save();
 		savedItems.push(saved);
 	}
@@ -128,7 +128,7 @@ async function saveOrderItemsAdditions(additions) {
 		const saved = await new OrderItemAddition({
 			_id: mongoose.Types.ObjectId(),
 			foodAddition: item._id,
-			quantity: item.quantity,
+			quantity: item.quantity || 1,
 			price: addition.price * item.quantity,
 		}).save();
 		savedAdditions.push(saved);
