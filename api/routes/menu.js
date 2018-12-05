@@ -51,9 +51,21 @@ router.get('/', (req, res, next) => {
 		});
 });
 
+/**
+ * GET - Pobierz menu o podanym ID
+ */
+router.get('/:menuId', (req, res, next) => {
+	const id = req.params.menuId;
+	Menu.findById(id).exec().then(result => {
+		res.status(200).json({ menu: result });
+	}).catch(err => {
+		res.status(500).json({ error: err });
+	});
+});
+
 // FIXME uzupełnić o przykładowe zapytanie i odpowiedź
 /**
- * POST - Zapytanie dodajęce nowe menu do bazy
+ * POST - Zapytanie dodające nowe menu do bazy
  */
 router.post('/', async (req, res, next) => {
 	const foodsReq = req.body.foods;
