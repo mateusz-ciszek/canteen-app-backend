@@ -35,9 +35,10 @@ const OrderState = Object.freeze({
  * POST - Składanie nowego zamówienia
  */
 router.post('/', async (req, res, next) => {
-	if (!req.body.length) {
-		return res.status(400).json({ error: 'Empty order is not allowed' });
-	}
+	// TODO dodać wstępną walidację
+	// if (!req.body.length) {
+	// 	return res.status(400).json({ error: 'Empty order is not allowed' });
+	// }
 
 	const items = await saveOrderItems(req.body);
 	try {
