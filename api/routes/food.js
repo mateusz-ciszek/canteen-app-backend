@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const router = express.Router();
 
 const Food = require('../models/food');
+const Menu = require('../models/menu');
 
 module.exports = router;
 
@@ -28,4 +29,19 @@ router.get('/:foodId', (req, res, next) => {
 		}).exec().then(result => {
 			res.status(200).json(result);
 		});
+});
+
+/**
+ * DELETE - Usuń posiłek o podanym ID
+ */
+router.delete('/:foodId', async (req, res, next) => {
+	const id = req.params.foodId;
+	console.log(`Food ID: ${id}`);
+	try {
+		await Menu.updateMany({ foods: id }, { $pull: { foods: id } }).exec();
+		const food = await Food.findByIdAndDelete(id);
+		res.status(200).json({ removed: food });
+	} catch(err) {
+		res.status(500).json({ error: err });
+	}
 });

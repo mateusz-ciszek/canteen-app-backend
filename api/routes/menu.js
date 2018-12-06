@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
-const checkAuth = require('../middleware/check-auth');
 
 const Menu = require('../models/menu');
 const Food = require('../models/food');
@@ -12,7 +11,7 @@ module.exports = router;
 /**
  * GET - Zwraca listę wszystkich menu z posiłkami
  * i dodatkami do nich
- * 
+ *
  * Przykładowa odpowiedź:
  * [
  *   {
@@ -46,17 +45,29 @@ router.get('/', (req, res, next) => {
 				select: 'id name price',
 			},
 		}).exec().then(result => {
-			res.status(200).json(result);
+			res.status(200).json({ menus: result });
 		}).catch(err => {
 			res.status(500).json({ error: err });
 		});
 });
 
+/**
+ * GET - Pobierz menu o podanym ID
+ */
+router.get('/:menuId', (req, res, next) => {
+	const id = req.params.menuId;
+	Menu.findById(id).exec().then(result => {
+		res.status(200).json({ menu: result });
+	}).catch(err => {
+		res.status(500).json({ error: err });
+	});
+});
+
 // FIXME uzupełnić o przykładowe zapytanie i odpowiedź
 /**
- * POST - Zapytanie dodajęce nowe menu do bazy
+ * POST - Zapytanie dodające nowe menu do bazy
  */
-router.post('/', checkAuth, async (req, res, next) => {
+router.post('/', async (req, res, next) => {
 	const foodsReq = req.body.foods;
 	let foodIds = [];
 	if (foodsReq && foodsReq.length) {
@@ -78,7 +89,7 @@ router.post('/', checkAuth, async (req, res, next) => {
 /**
  * POST - Dodaj nowy posiłek do menu
  */
-router.post('/:menuId/food', checkAuth, (req, res, next) => {
+router.post('/:menuId/food', (req, res, next) => {
 	const menuId = req.params.menuId;
 	Menu.findById(menuId, async function(err, result) {
 		if (err) {
@@ -96,6 +107,16 @@ router.post('/:menuId/food', checkAuth, (req, res, next) => {
 			}
 		});
 		res.status(201).send();
+	});
+});
+
+router.delete('/:menuId', (req, res, next) => {
+	const id = req.params.menuId;
+	Menu.findByIdAndDelete(id, (err, result) => {
+		if (err) {
+			return res.status(500).json({ error: err });
+		}
+		res.status(200).json();
 	});
 });
 

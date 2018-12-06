@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
-const checkAuth = require('../middleware/check-auth');
 
 const Order = require('../models/order');
 const OrderItem = require('../models/orderItem');
@@ -27,24 +26,29 @@ module.exports = router;
 // };
 
 const OrderState = Object.freeze({
-	'SAVED': 'SAVED', 
-	'READY': 'READY', 
+	'SAVED': 'SAVED',
+	'READY': 'READY',
 	'SERVED': 'SERVED',
+	'REJECTED': 'REJECTED',
 });
 
 /**
  * POST - Składanie nowego zamówienia
  */
-router.post('/', checkAuth, async (req, res, next) => {
-	if (!req.body.length) {
-		return res.status(400).json({ error: 'Empty order is not allowed' });
-	}
+router.post('/', async (req, res, next) => {
+	// TODO dodać wstępną walidację
+	// if (!req.body.length) {
+	// 	return res.status(400).json({ error: 'Empty order is not allowed' });
+	// }
 
-	const items = await saveOrderItems(req.body);
+	const items = await saveOrderItems(req.body.items);
 	try {
+		const User = require('../models/user');
+		const user = await User.findOne().select('id').exec();
 		const saved = await new Order({
 			_id: mongoose.Types.ObjectId(),
-			user: req.userData._id,
+			// user: req.userData._id,
+			user: req.body._id || user._id,
 			items: items.map(item => item._id),
 			totalPrice: items.map(item => item.price).reduce((previousValue, currentValue) => previousValue + currentValue),
 			state: OrderState.SAVED,
@@ -60,8 +64,8 @@ router.post('/', checkAuth, async (req, res, next) => {
 /**
  * GET - Pobierz wszystkie zamówienia
  */
-router.get('/', checkAuth, async (req, res, next) => {
-	const stateFilter = req.body.state ? req.body.state : Object.keys(OrderState);
+router.get('/', async (req, res, next) => {
+	const stateFilter = req.query.state ? req.query.state : Object.keys(OrderState);
 
 	const orders = await Order.find({ state: stateFilter })
 		.select('id user items totalPrice state')
@@ -76,13 +80,41 @@ router.get('/', checkAuth, async (req, res, next) => {
 			},
 		}).exec();
 
-	res.status(200).json(orders);
+	res.status(200).json({ orders: orders });
+});
+
+/**
+ * Modyfikacja statusu zamówienia, zwraca zaktualizowane zamówienie
+ */
+router.patch('/:orderId', async (req, res, next) => {
+	const id = req.params.orderId;
+	const state = req.body.state;
+	if (!Object.keys(OrderState).find(item => item === state)) {
+		return res.status(400).json({ error: 'Invalid state' });
+	}
+	Order.findByIdAndUpdate(id, { state }).exec().then(async result => {
+		result = await Order.findById(id)
+			.select('id items user totalPrice state')
+			.populate({
+				path: 'items user',
+				select: 'id email firstName lastName',
+				populate: {
+					path: 'additions food',
+					populate: {
+						path: 'foodAddition additions',
+					},
+				},
+			});
+		res.status(200).json({ order: result });
+	}).catch(err => {
+		res.status(500).json({ error: err });	
+	});
 });
 
 /**
  * GET - Zatwierdzanie odbioru zamówienia
  */
-router.get('/pickedup/:orderId', checkAuth, async (req, res, next) => {
+router.get('/pickedup/:orderId', async (req, res, next) => {
 	const id = req.params.orderId;
 	try {
 		let order = await Order.findById(id).exec();
@@ -104,15 +136,15 @@ async function saveOrderItems(items) {
 	const savedItems = [];
 	for (const item of items) {
 		const additions = await saveOrderItemsAdditions(item.additions);
-		const additionsSumPrice = additions.map(item => item.quantity * item.price)
-				.reduce((previousValue, currentValue) => previousValue + currentValue);
+		const additionsSumPrice = additions.map(item => (item.quantity || 1) * item.price)
+				.reduce((previousValue, currentValue) => previousValue + currentValue, 0);
 		const food = await Food.findById(item._id).exec();
 		const saved = await new OrderItem({
 			_id: mongoose.Types.ObjectId(),
 			food: item._id,
-			quantity: item.quantity,
+			quantity: item.quantity || 1,
 			additions: additions.map(item => item._id),
-			price: food.price * item.quantity + additionsSumPrice,
+			price: food.price * (item.quantity || 1) + additionsSumPrice,
 		}).save();
 		savedItems.push(saved);
 	}
@@ -126,7 +158,7 @@ async function saveOrderItemsAdditions(additions) {
 		const saved = await new OrderItemAddition({
 			_id: mongoose.Types.ObjectId(),
 			foodAddition: item._id,
-			quantity: item.quantity,
+			quantity: item.quantity || 1,
 			price: addition.price * item.quantity,
 		}).save();
 		savedAdditions.push(saved);
