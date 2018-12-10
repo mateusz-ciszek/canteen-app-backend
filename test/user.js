@@ -16,7 +16,7 @@ const User = require('../api/models/user');
 describe('User', function() {
 
 	describe('#login', function() {
-		let { email, password, hash } = fakeUserData();
+		let { email, password, hash, firstName, lastName } = fakeUserData();
 		const endpoint = '/user/login';
 		const authFailesResponse = {
 			message: 'Auth failed',
@@ -27,6 +27,9 @@ describe('User', function() {
 				_id: new mongoose.Types.ObjectId(),
 				email,
 				password: hash,
+				firstName,
+				lastName,
+				admin: false,
 			}).save();
 		});
 
@@ -88,6 +91,8 @@ function fakeUserData() {
 			.catch(error => done(error));
 	} while (emailAlreadyExists);
 	const password = faker.internet.password();
+	const firstName = faker.name.firstName;
+	const lastName = faker.name.lastName;
 	const hash = bcrypt.hashSync(password, 10);
-	return { email, password, hash };
+	return { email, password, hash, firstName, lastName };
 }

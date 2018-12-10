@@ -20,7 +20,6 @@ describe('Menu', function() {
 				.get(endpoint)
 				.expect(200, done)
 				.expect(function(res) {
-					console.log(res.body.menus);
 					const menus = res.body.menus;
 					menus.should.be.an('array');
 					if (menus.length) {
