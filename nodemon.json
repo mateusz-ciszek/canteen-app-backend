@@ -2,7 +2,7 @@
 	"env": {
 		"MONGO_ATLAS_USER": "admin-dev",
 		"MONGO_ATLAS_PW": "admin-dev",
-		"MONGO_ATLAS_DB_NAME": "test",
+		"MONGO_ATLAS_DB_NAME": "dev",
 		"PORT": "51010",
 		"JWT_KEY": "secret"
 	}
