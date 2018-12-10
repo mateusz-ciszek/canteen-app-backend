@@ -20,9 +20,11 @@ describe('Menu', function() {
 				.get(endpoint)
 				.expect(200, done)
 				.expect(function(res) {
-					res.body.should.be.an('array');
-					if (res.body.length) {
-						const menu = res.body[0];
+					console.log(res.body.menus);
+					const menus = res.body.menus;
+					menus.should.be.an('array');
+					if (menus.length) {
+						const menu = menus[0];
 						menu.should.have.property('_id').that.is.a('string');
 						menu.should.have.property('name').that.is.a('string');
 						menu.should.have.property('foods').that.is.an('array');
