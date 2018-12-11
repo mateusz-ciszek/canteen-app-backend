@@ -2,36 +2,45 @@ const mocha = require('mocha');
 const request = require('supertest');
 const app = require('../app');
 const faker = require('faker');
-const mongoose = require('mongoose');
+const dbHelper = require('./helper/dbHelper');
 const bcrypt = require('bcrypt');
-
-// Połączenie z bazą danych Mongo Atlas
-mongoose.connect(
-	`mongodb+srv://admin-dev:admin-dev@canteen-application-dev-hkbxg.mongodb.net/test?retryWrites=true`,
-	{ useNewUrlParser: true }
-);
+let mongoose;
 
 const User = require('../api/models/user');
 
 describe('User', function() {
 
+	before('connecto to mongoDB', function(done) {
+		dbHelper.connect().then(result => {
+			mongoose = result;
+			done();
+		});
+	});
+
+	after('disconnect from mongoDB', function(done) {
+		dbHelper.disconnect().then(() => done());
+	});
+
 	describe('#login', function() {
-		let { email, password, hash } = fakeUserData();
+		let { email, password, hash, firstName, lastName } = fakeUserData();
 		const endpoint = '/user/login';
 		const authFailesResponse = {
 			message: 'Auth failed',
 		};
 
-		before('add fake user to db', function() {
-			return new User({
+		before('add fake user to db', async function() {
+			return await new User({
 				_id: new mongoose.Types.ObjectId(),
 				email,
 				password: hash,
+				firstName,
+				lastName,
+				admin: false,
 			}).save();
 		});
 
-		after('remove fake user from db', function() {
-			return User.findOneAndDelete({ email, password: hash }).exec();
+		after('remove fake user from db', async function() {
+			return await User.findOneAndDelete({ email, password: hash }).exec();
 		});
 
 		it('sending empty request should return 401', function(done) {
@@ -88,6 +97,8 @@ function fakeUserData() {
 			.catch(error => done(error));
 	} while (emailAlreadyExists);
 	const password = faker.internet.password();
+	const firstName = faker.name.firstName;
+	const lastName = faker.name.lastName;
 	const hash = bcrypt.hashSync(password, 10);
-	return { email, password, hash };
+	return { email, password, hash, firstName, lastName };
 }
