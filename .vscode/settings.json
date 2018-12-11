@@ -1,0 +1,7 @@
+{
+	"mocha.files.ignore": [
+		"**/.git/**/*",
+		"**/node_modules/**/*",
+		"**/test/helper/**/*"
+],
+}

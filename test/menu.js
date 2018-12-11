@@ -1,16 +1,22 @@
 const mocha = require('mocha');
 const request = require('supertest');
 const app = require('../app');
-const mongoose = require('mongoose');
 const should = require('chai').should();
-
-// Połączenie z bazą danych Mongo Atlas
-mongoose.connect(
-	`mongodb+srv://admin-dev:admin-dev@canteen-application-dev-hkbxg.mongodb.net/test?retryWrites=true`,
-	{ useNewUrlParser: true }
-);
+const dbHelper = require('./helper/dbHelper');
+let mongoose;
 
 describe('Menu', function() {
+
+	before('connecto to mongoDB', function(done) {
+		dbHelper.connect().then(result => {
+			mongoose = result;
+			done();
+		});
+	});
+
+	after('disconnect from mongoDB', function(done) {
+		dbHelper.disconnect().then(() => done());
+	});
 
 	describe('#menu', function() {
 		const endpoint = '/menu';
@@ -18,7 +24,7 @@ describe('Menu', function() {
 		it('empty get request should return array of menus', function(done) {
 			request(app)
 				.get(endpoint)
-				.expect(200, done)
+				.expect(200)
 				.expect(function(res) {
 					const menus = res.body.menus;
 					menus.should.be.an('array');
@@ -28,7 +34,7 @@ describe('Menu', function() {
 						menu.should.have.property('name').that.is.a('string');
 						menu.should.have.property('foods').that.is.an('array');
 					}
-				}, done);
+				}).end(done);
 		});
 
 	});
