@@ -130,6 +130,19 @@ router.get('/pickedup/:orderId', async (req, res, next) => {
 	}
 });
 
+/**
+ * GET - Download order details
+ */
+router.get('/:orderId', async (req, res, next) => {
+	const id = req.params.orderId;
+	Order.findById(id).select('_id items state user totalPrice orderDate').populate({
+		path: 'items user',
+		populate: 'items',
+		select: 'email firstName lastName',
+	}).then(order => res.status(200).json(order))
+		.catch(err => res.status(500).json({ error: err }));
+});
+
 // TODO Wydzielić do osobnego pliku
 async function saveOrderItems(items) {
 	console.log(items);
