@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
+const checkAuth = require('../middleware/check-auth');
 
 const Order = require('../models/order');
 const OrderItem = require('../models/orderItem');
@@ -35,7 +36,7 @@ const OrderState = Object.freeze({
 /**
  * POST - Składanie nowego zamówienia
  */
-router.post('/', async (req, res, next) => {
+router.post('/', checkAuth, async (req, res, next) => {
 	// TODO dodać wstępną walidację
 	// if (!req.body.length) {
 	// 	return res.status(400).json({ error: 'Empty order is not allowed' });
@@ -43,12 +44,9 @@ router.post('/', async (req, res, next) => {
 
 	const items = await saveOrderItems(req.body.items);
 	try {
-		const User = require('../models/user');
-		const user = await User.findOne().select('id').exec();
-		const saved = await new Order({
+		await new Order({
 			_id: mongoose.Types.ObjectId(),
-			// user: req.userData._id,
-			user: req.body._id || user._id,
+			user: req.userData._id,
 			items: items.map(item => item._id),
 			totalPrice: items.map(item => item.price).reduce((previousValue, currentValue) => previousValue + currentValue),
 			state: OrderState.SAVED,
@@ -70,7 +68,7 @@ router.get('/', async (req, res, next) => {
 	const orders = await Order.find({ state: stateFilter })
 		.select('id user items totalPrice state')
 		.populate({
-			path: 'items',
+			path: 'items user',
 			populate: {
 				path: 'additions food',
 				populate: {
@@ -78,6 +76,7 @@ router.get('/', async (req, res, next) => {
 					// populate: 'foodAddition',
 				},
 			},
+			select: 'firstName lastName	email',
 		}).exec();
 
 	res.status(200).json({ orders: orders });
@@ -133,6 +132,7 @@ router.get('/pickedup/:orderId', async (req, res, next) => {
 
 // TODO Wydzielić do osobnego pliku
 async function saveOrderItems(items) {
+	console.log(items);
 	const savedItems = [];
 	for (const item of items) {
 		const additions = await saveOrderItemsAdditions(item.additions);
