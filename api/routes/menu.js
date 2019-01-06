@@ -56,7 +56,10 @@ router.get('/', (req, res, next) => {
  */
 router.get('/:menuId', (req, res, next) => {
 	const id = req.params.menuId;
-	Menu.findById(id).exec().then(result => {
+	Menu.findById(id).populate({
+		path: 'foods',
+		select: '_id name price description additions',
+	}).exec().then(result => {
 		res.status(200).json({ menu: result });
 	}).catch(err => {
 		res.status(500).json({ error: err });
