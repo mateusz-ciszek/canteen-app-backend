@@ -137,8 +137,15 @@ router.get('/:orderId', async (req, res, next) => {
 	const id = req.params.orderId;
 	Order.findById(id).select('_id items state user totalPrice orderDate').populate({
 		path: 'items user',
-		populate: 'items',
-		select: 'email firstName lastName',
+		select: 'email firstName lastName name food quantity additions price',
+		populate: {
+			path: 'food additions',
+			select: '_id name price',
+			populate: {
+				path: 'foodAddition',
+				select: 'name price',
+			},
+		},
 	}).then(order => res.status(200).json(order))
 		.catch(err => res.status(500).json({ error: err }));
 });
