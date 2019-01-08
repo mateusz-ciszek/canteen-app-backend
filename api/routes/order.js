@@ -46,7 +46,7 @@ router.post('/', checkAuth, async (req, res, next) => {
 	try {
 		await new Order({
 			_id: mongoose.Types.ObjectId(),
-			user: req.userData._id,
+			user: req.context.userId,
 			items: items.map(item => item._id),
 			totalPrice: items.map(item => item.price).reduce((previousValue, currentValue) => previousValue + currentValue),
 			state: OrderState.SAVED,
