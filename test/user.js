@@ -1,46 +1,32 @@
 const mocha = require('mocha');
 const request = require('supertest');
 const app = require('../app');
-const faker = require('faker');
 const dbHelper = require('./helper/dbHelper');
-const bcrypt = require('bcrypt');
-let mongoose;
-
-const User = require('../api/models/user');
+const userHelper = require('./helper/userHelper');
 
 describe('User', function() {
-
-	before('connecto to mongoDB', function(done) {
-		dbHelper.connect().then(result => {
-			mongoose = result;
-			done();
-		});
+	before('connecto to mongoDB', async function() {
+		await dbHelper.connect();
 	});
 
-	after('disconnect from mongoDB', function(done) {
-		dbHelper.disconnect().then(() => done());
+	after('disconnect from mongoDB', async function() {
+		await dbHelper.disconnect();
 	});
 
 	describe('#login', function() {
-		let { email, password, hash, firstName, lastName } = fakeUserData();
+		let fakeUser, email, password, firstName, lastName;
 		const endpoint = '/user/login';
 		const authFailesResponse = {
 			message: 'Auth failed',
 		};
 
 		before('add fake user to db', async function() {
-			return await new User({
-				_id: new mongoose.Types.ObjectId(),
-				email,
-				password: hash,
-				firstName,
-				lastName,
-				admin: false,
-			}).save();
+			({ email, password, firstName, lastName } = await userHelper.fakeUserData());
+			fakeUser = await userHelper.addUser(email, password, firstName, lastName);
 		});
 
 		after('remove fake user from db', async function() {
-			return await User.findOneAndDelete({ email, password: hash }).exec();
+			await userHelper.deleteUser(fakeUser);
 		});
 
 		it('sending empty request should return 401', function(done) {
@@ -87,18 +73,3 @@ describe('User', function() {
 		});
 	});
 });
-
-function fakeUserData() {
-	let email, emailAlreadyExists;
-	do {
-		email = faker.internet.email();
-		User.findOne({ email }).exec()
-			.then(user => emailAlreadyExists = !!user)
-			.catch(error => done(error));
-	} while (emailAlreadyExists);
-	const password = faker.internet.password();
-	const firstName = faker.name.firstName;
-	const lastName = faker.name.lastName;
-	const hash = bcrypt.hashSync(password, 10);
-	return { email, password, hash, firstName, lastName };
-}
