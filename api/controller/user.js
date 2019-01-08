@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const userHelper = require('../helper/userHelper');
@@ -28,5 +29,26 @@ module.exports = {
 
 		res.status(201).json();
 	},
+
+	async loginUser(req, res, next) {
+		const { email, password } = req.body;
+		const user = await User.findOne({ email }).exec();
+		if (!user) {
+			return res.status(401).json({ message: 'Auth failed' });
+		}
+
+		const passwordMatch = await bcrypt.compare(password, user.password);
+		if (!passwordMatch) {
+			return res.status(401).json({ message: 'Auth failed' });
+		}
+
+		const jwtKey = process.env.JWT_KEY || 'secret';
+		const token = jwt.sign({
+			email,
+			_id: user._id,
+			admin: !!user.admin,
+		}, jwtKey);
+		res.status(200).json({ token });
+	}
 }
 

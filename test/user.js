@@ -2,6 +2,7 @@ const mocha = require('mocha');
 const request = require('supertest');
 const app = require('../app');
 const should = require('chai').should();
+const jwt = require('jsonwebtoken');
 const dbHelper = require('./helper/dbHelper');
 const userHelper = require('./helper/userHelper');
 
@@ -156,7 +157,7 @@ describe('User', function() {
 	describe('#login', function() {
 		let fakeUser, email, password, firstName, lastName;
 		const url = `${endpoint}/login`;
-		const authFailesResponse = {
+		const authFailedResponse = {
 			message: 'Auth failed',
 		};
 
@@ -169,47 +170,46 @@ describe('User', function() {
 			await userHelper.deleteUser(fakeUser);
 		});
 
-		it('sending empty request should return 401', function(done) {
-			request(app)
-				.post(url)
-				.expect(401, authFailesResponse, done);
+		it('should get 401 when sending empty request', async function() {
+			return request(app)
+					.post(url)
+					.expect(401, authFailedResponse)
+					.then();
 		});
 
-		it('sending request with wrong email should return 401', function(done) {
-			request(app)
-				.post(url)
-				.send({
-					email: email + Math.random().toString(36).substring(7),
-					password,
-				})
-				.expect(401, authFailesResponse, done);
+		it('should get 401 when sendding request with wrong email', async function() {
+			return request(app)
+					.post(url)
+					.send({
+						email: email + Math.random().toString(36).substring(7),
+						password,
+					})
+					.expect(401, authFailedResponse)
+					.then();
 		});
 
-		it('sending request with wrong password should return 401', function(done) {
-			request(app)
-				.post(url)
-				.send({
-					email,
-					password: Math.random().toString(36).substring(7),
-				})
-				.expect(401, authFailesResponse, done);
+		it('should get 401 when sending request with wrong password', async function() {
+			return request(app)
+					.post(url)
+					.send({
+						email,
+						password: Math.random().toString(36).substring(7),
+					})
+					.expect(401, authFailedResponse)
+					.then();
 		});
 
-		it('sending proper request should return 200', function(done) {
-			request(app)
-				.post(url)
-				.send({ email, password })
-				.expect(function(res) {
-					// Na ten moment nie obchodzi mnie czy token jest poprawny, 
-					// tylko czy jest zwracany jakikolwiek
-					// TODO Test czy jest zwracany poprawny token
-					res.body.token = res.body.token ? '' : null;
-				})
-				.expect(200, {
-					// FIXME uzgodnić jakie dane mają być zwracane i uzupełnić
-					message: 'Auth successful',
-					token: '',
-				}, done);
+		it('should get 200 and valid token when sending proper request', async function() {
+			return request(app)
+					.post(url)
+					.send({ email, password })
+					.expect(response => {
+						response.body.should.be.an('object').that.have.property('token').that.is.a('string');
+						const decodedEmail = jwt.decode(response.body.token)['email'];
+						decodedEmail.should.equal(email);
+					})
+					.expect(200)
+					.then();
 		});
 	});
 });
