@@ -22,8 +22,8 @@ module.exports = {
 			emailAlreadyExists = !!user;
 		} while (emailAlreadyExists);
 		const password = faker.internet.password();
-		const firstName = faker.name.firstName;
-		const lastName = faker.name.lastName;
+		const firstName = faker.name.firstName();
+		const lastName = faker.name.lastName();
 		return { email, password, firstName, lastName };
 	},
 

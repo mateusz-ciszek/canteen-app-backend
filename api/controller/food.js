@@ -25,7 +25,6 @@ module.exports = {
 
 	deleteFood(req, res, next) {
 		const id = req.params.foodId;
-		console.log(`Food ID: ${id}`);
 		Menu.updateMany({ foods: id }, { $pull: { foods: id } }).exec()
 			.then(() => {
 				// FIXME do not remove, make it disabled

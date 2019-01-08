@@ -2,7 +2,7 @@ const User = require('../models/user');
 
 module.exports = {
 	async isEmailAvailable(email) {
-		return !User.findOne({ email }).exec();
+		return !await User.findOne({ email }).exec();
 	},
 
 	validateRegisterRequest(email, password, firstName, lastName) {
@@ -10,7 +10,7 @@ module.exports = {
 
 		if (!email) {
 			errors.push('Email is required');
-		} else if (testEmailRegex(email)) {
+		} else if (!isValidEmail(email)) {
 			errors.push('Malformed email');
 		}
 
@@ -28,7 +28,7 @@ module.exports = {
 
 		if (!lastName) {
 			errors.push('Last name is required');
-		} else if (lastName < 3) {
+		} else if (lastName.length < 3) {
 			errors.push('Last name have to be at least 3 characters long');
 		}
 
@@ -36,7 +36,8 @@ module.exports = {
 	},
 }
 
-function testEmailRegex(email) {
-	const regex = new RegExp('/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/');
+function isValidEmail(email) {
+	const regex = new RegExp('[a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z'
+			+ '0-9](?:[a-z0-9-]*[a-z0-9])?');
 	return regex.test(email);
 }

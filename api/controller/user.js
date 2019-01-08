@@ -16,8 +16,6 @@ module.exports = {
 			return res.status(409).json({ message: 'Mail already used' });
 		}
 
-		console.log({ email, password, firstName, lastName });
-
 		const hash = await bcrypt.hash(password, 10);
 		await new User({
 			_id: new mongoose.Types.ObjectId(),
