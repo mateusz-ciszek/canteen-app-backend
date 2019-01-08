@@ -1,3 +1,6 @@
+const mongoose = require('mongoose');
+const faker = require('faker');
+
 const Menu = require('../../api/models/menu');
 const Food = require('../../api/models/food');
 
@@ -16,11 +19,26 @@ module.exports = {
 		return menu.foods[0]._id;
 	},
 
-	async insertFakeFood(data) {
+	async insertFakeFood() {
 		const menu = await Menu.findOne().exec();
 		if (!menu) {
 			throw 'No menus in database';
 		}
-		await new Food(data).save();
-	}
+		const fakeFood = randomFood();
+		await new Food(fakeFood).save();
+		fakeFood._id = fakeFood._id.toString();
+		fakeFood.price = +fakeFood.price;
+		return fakeFood;
+	},
+}
+
+function randomFood() {
+	const price = +faker.commerce.price(0, 60);
+	return {
+		_id: mongoose.Types.ObjectId(),
+		name: faker.commerce.productName(),
+		price,
+		description: 'Unbelivably tasteful',
+		additions: [],
+	};
 }

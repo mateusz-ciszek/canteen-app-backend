@@ -27,6 +27,12 @@ describe('Food', function() {
 	});
 
 	describe('#food', function() {
+		let fakeFoodData;
+
+		before('insert fake food', async function() {
+			fakeFoodData = await foodHelper.insertFakeFood(fakeFoodData);
+		});
+
 		it('should fetch food details', async function() {
 			const id = await foodHelper.getFoodId();
 			const url = `${endpoint}/${id}`;
@@ -76,17 +82,7 @@ describe('Food', function() {
 		});
 
 		it('should get 200 after succesfully deleting food', async function() {
-			const id = mongoose.Types.ObjectId();
-			const fakeFoodData = {
-				_id: id,
-				name: 'Fake food',
-				price: 42,
-				description: 'Unbelivably tasteful',
-				additions: [],
-			};
-			await foodHelper.insertFakeFood(fakeFoodData);
-			fakeFoodData._id = fakeFoodData._id.toString();
-			const url = `${endpoint}/${id}`;
+			const url = `${endpoint}/${fakeFoodData._id}`;
 			return request(app)
 				.delete(url)
 				.set('Authorization', `Bearer ${adminToken}`)
