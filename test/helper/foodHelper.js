@@ -30,6 +30,20 @@ module.exports = {
 		fakeFood.price = +fakeFood.price;
 		return fakeFood;
 	},
+
+	getEmptyCreateFoodRequest() {
+		return {
+			additions: [{}],
+		};
+	},
+
+	getMalformedCreateFoodRequest() {
+		return {
+			name: 'b',
+			price: -5,
+			additions: [{ name: 'c', price: -5 }],
+		};
+	},
 }
 
 function randomFood() {
