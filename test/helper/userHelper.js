@@ -42,6 +42,13 @@ module.exports = {
 	async deleteUser(user) {
 		return await User.findOneAndDelete({ email: user.email }).exec();
 	},
+
+	async getRandomExistingEmail() {
+		const count = await User.count().exec();
+		const random = Math.floor(Math.random() * count);
+		const user = await User.findOne().skip(random).exec();
+		return user.email;
+	}
 }
 
 async function getToken(isAdmin) {

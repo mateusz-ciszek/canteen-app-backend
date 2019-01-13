@@ -18,11 +18,15 @@ describe('User', function() {
 	});
 
 	describe('#register', function() {
-		let originalRegisterData, validRegisterData;
+		let originalRegisterData, validRegisterData, existingEmail;
 		const url = `${endpoint}/signup`;
 
 		before('prepare valid register data', async function() {
 			originalRegisterData = await userHelper.fakeUserData();
+		});
+
+		before('get existing email from database', async function() {
+			existingEmail = await userHelper.getRandomExistingEmail();
 		});
 
 		beforeEach('restore valid register data', function() {
@@ -42,8 +46,7 @@ describe('User', function() {
 					.expect(response => {
 						response.body.should.be.an('array').and.have.lengthOf(1);
 						response.body[0].should.be.a('string').and.equal('Email is required');
-					})
-					.then();
+					});
 		});
 
 		it('should get 400 with malformed email', async function() {
@@ -55,8 +58,7 @@ describe('User', function() {
 					.expect(response => {
 						response.body.should.be.an('array').and.have.lengthOf(1);
 						response.body[0].should.be.a('string').and.equal('Malformed email');
-					})
-					.then();
+					});
 		});
 
 		it('should get 400 with empty password', async function() {
@@ -68,8 +70,7 @@ describe('User', function() {
 					.expect(response => {
 						response.body.should.be.an('array').and.have.lengthOf(1);
 						response.body[0].should.be.a('string').and.equal('Password is required');
-					})
-					.then();
+					});
 		});
 
 		it('should get 400 with too short password', async function() {
@@ -81,8 +82,7 @@ describe('User', function() {
 					.expect(response => {
 						response.body.should.be.an('array').and.have.lengthOf(1);
 						response.body[0].should.be.a('string').and.equal('Password have to be at least 8 characters long');
-					})
-					.then();
+					});
 		});
 
 		it('should get 400 with empty first name', async function() {
@@ -94,8 +94,7 @@ describe('User', function() {
 					.expect(response => {
 						response.body.should.be.an('array').and.have.lengthOf(1);
 						response.body[0].should.be.a('string').and.equal('First name is required');
-					})
-					.then();
+					});
 		});
 
 		it('should get 400 with too short first name', async function() {
@@ -107,8 +106,7 @@ describe('User', function() {
 					.expect(response => {
 						response.body.should.be.an('array').and.have.lengthOf(1);
 						response.body[0].should.be.a('string').and.equal('First name have to be at least 3 characters long');
-					})
-					.then();
+					});
 		});
 
 		it('should get 400 with empty last name', async function() {
@@ -120,8 +118,7 @@ describe('User', function() {
 					.expect(response => {
 						response.body.should.be.an('array').and.have.lengthOf(1);
 						response.body[0].should.be.a('string').and.equal('Last name is required');
-					})
-					.then();
+					});
 		});
 
 		it('should get 400 with too short last name', async function() {
@@ -133,24 +130,15 @@ describe('User', function() {
 					.expect(response => {
 						response.body.should.be.an('array').and.have.lengthOf(1);
 						response.body[0].should.be.a('string').and.equal('Last name have to be at least 3 characters long');
-					})
-					.then();
-		});
-
-		it('should get 201 with valid request', async function() {
-			return request(app)
-					.post(url)
-					.send(validRegisterData)
-					.expect(201)
-					.then();
+					});
 		});
 
 		it('should get 409 with duplicate email', async function() {
+			validRegisterData.email = existingEmail;
 			return request(app)
 					.post(url)
 					.send(validRegisterData)
-					.expect(409, { message: 'Mail already used' })
-					.then();
+					.expect(409, { message: 'Mail already used' });
 		});
 	});
 
@@ -173,8 +161,7 @@ describe('User', function() {
 		it('should get 401 when sending empty request', async function() {
 			return request(app)
 					.post(url)
-					.expect(401, authFailedResponse)
-					.then();
+					.expect(401, authFailedResponse);
 		});
 
 		it('should get 401 when sendding request with wrong email', async function() {
@@ -184,8 +171,7 @@ describe('User', function() {
 						email: email + Math.random().toString(36).substring(7),
 						password,
 					})
-					.expect(401, authFailedResponse)
-					.then();
+					.expect(401, authFailedResponse);
 		});
 
 		it('should get 401 when sending request with wrong password', async function() {
@@ -195,8 +181,7 @@ describe('User', function() {
 						email,
 						password: Math.random().toString(36).substring(7),
 					})
-					.expect(401, authFailedResponse)
-					.then();
+					.expect(401, authFailedResponse);
 		});
 
 		it('should get 200 and valid token when sending proper request', async function() {
@@ -208,8 +193,7 @@ describe('User', function() {
 						const decodedEmail = jwt.decode(response.body.token)['email'];
 						decodedEmail.should.equal(email);
 					})
-					.expect(200)
-					.then();
+					.expect(200);
 		});
 	});
 });

@@ -30,21 +30,19 @@ describe('Menu', function() {
 			adminToken = await userHelper.getAdminToken();
 		});
 
-		it('empty get request should return array of menus', async function() {
-			return request(app)
-				.get(endpoint)
-				.expect(200)
-				.expect(response => {
-					const menus = response.body.menus;
-					menus.should.be.an('array');
-					if (menus.length) {
-						const menu = menus[0];
-						menu.should.have.property('_id').that.is.a('string');
-						menu.should.have.property('name').that.is.a('string');
-						menu.should.have.property('foods').that.is.an('array');
-					}
-				});
+		describe('#get', function() {
+			it('should get 200 and array of menus', async function() {
+				return request(app)
+					.get(endpoint)
+					.expect(200)
+					.expect(response => {
+						const menus = response.body.menus;
+						menus.should.be.an('array');
+					});
+			});
 		});
+
+		
 
 		describe('#create', function() {
 			const emptyRequest = menuHelper.getEmptyCreateMenuRequest();
