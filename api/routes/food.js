@@ -1,9 +1,8 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const router = express.Router();
-
-const Food = require('../models/food');
-const Menu = require('../models/menu');
+const controller = require('../controller/food');
+const checkAuth = require('../middleware/check-auth');
+const checkIfAdmin = require('../middleware/check-role').isAdmin;
 
 module.exports = router;
 
@@ -19,29 +18,9 @@ module.exports = router;
  *   description: ""
  * }
  */
-router.get('/:foodId', (req, res, next) => {
-	const id = req.params.foodId;
-	Food.findById(id)
-		.select('id name price additions description')
-		.populate({
-			path: 'additions',
-			select: 'id name price',
-		}).exec().then(result => {
-			res.status(200).json(result);
-		});
-});
+router.get('/:foodId', controller.getFood);
 
 /**
  * DELETE - Usuń posiłek o podanym ID
  */
-router.delete('/:foodId', async (req, res, next) => {
-	const id = req.params.foodId;
-	console.log(`Food ID: ${id}`);
-	try {
-		await Menu.updateMany({ foods: id }, { $pull: { foods: id } }).exec();
-		const food = await Food.findByIdAndDelete(id);
-		res.status(200).json({ removed: food });
-	} catch(err) {
-		res.status(500).json({ error: err });
-	}
-});
+router.delete('/:foodId', checkAuth, checkIfAdmin, controller.deleteFood);

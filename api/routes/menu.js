@@ -1,10 +1,9 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const router = express.Router();
 
-const Menu = require('../models/menu');
-const Food = require('../models/food');
-const FoodAddition = require('../models/foodAddition');
+const controller = require('../controller/menu');
+const checkAuth = require('../middleware/check-auth');
+const checkIfAdmin = require('../middleware/check-role').isAdmin;
 
 module.exports = router;
 
@@ -35,133 +34,26 @@ module.exports = router;
  *   }
  * ]
  */
-router.get('/', (req, res, next) => {
-	Menu.find().select('id name foods')
-		.populate({
-			path: 'foods',
-			select: 'id name price description additions',
-			populate: {
-				path: 'additions',
-				select: 'id name price',
-			},
-		}).exec().then(result => {
-			res.status(200).json({ menus: result });
-		}).catch(err => {
-			res.status(500).json({ error: err });
-		});
-});
+router.get('/', controller.getAllMenus);
 
 /**
  * GET - Pobierz menu o podanym ID
  */
-router.get('/:menuId', (req, res, next) => {
-	const id = req.params.menuId;
-	Menu.findById(id).populate({
-		path: 'foods',
-		select: '_id name price description additions',
-	}).exec().then(result => {
-		res.status(200).json({ menu: result });
-	}).catch(err => {
-		res.status(500).json({ error: err });
-	});
-});
+router.get('/:menuId', controller.getManuDetails);
 
-// FIXME uzupełnić o przykładowe zapytanie i odpowiedź
 /**
  * POST - Zapytanie dodające nowe menu do bazy
  */
-router.post('/', async (req, res, next) => {
-	const foodsReq = req.body.foods;
-	let foodIds = [];
-	if (foodsReq && foodsReq.length) {
-		foodIds = await saveFoods(foodsReq);
-	}
+router.post('/', checkAuth, checkIfAdmin, controller.createMenu);
 
-	new Menu({
-		_id: mongoose.Types.ObjectId(),
-		name: req.body.name,
-		foods: foodIds,
-	}).save().then(result => {
-		res.status(201).json({ result });
-	}).catch(err => {
-		res.status(500).json({ error: err });
-	});
-});
-
-// FIXME Uzupełnić o przykładowe zapytanie i odpowiedź
 /**
  * POST - Dodaj nowy posiłek do menu
  */
-router.post('/:menuId/food', (req, res, next) => {
-	const menuId = req.params.menuId;
-	Menu.findById(menuId, async function(err, result) {
-		if (err) {
-			res.status(404).json({
-				error: err,
-				message: 'Menu does not exist',
-			});
-		}
+router.post('/:menuId/food', checkAuth, checkIfAdmin, controller.addFood);
 
-		const food = await saveFood(req.body);
-		result.foods.push(food._id);
-		await result.save(function(err) {
-			if (err) {
-				return res.status(500).json({ error: err });
-			}
-		});
-		res.status(201).send();
-	});
-});
-
-router.delete('/:menuId', (req, res, next) => {
-	const id = req.params.menuId;
-	Menu.findByIdAndDelete(id, (err, result) => {
-		if (err) {
-			return res.status(500).json({ error: err });
-		}
-		res.status(200).json();
-	});
-});
-
-
-// TODO Wydzielić te metody do osobnego pliku
-async function saveFoods(foods) {
-	const ids = [];
-	for (const food of foods) {
-		const saved = await saveFood(food);
-		ids.push(saved._id);
-	}
-	return ids;
-}
-
-async function saveFood(food) {
-	let additionIds = [];
-	if (food.additions && food.additions.length) {
-		additionIds = await saveFoodAdditions(food.additions);
-	}
-
-	// TODO dodać zapisywanie grafiki posiłku jeśli zostanie przesłana
-	const savedFood = await new Food({
-		_id: mongoose.Types.ObjectId(),
-		name: food.name,
-		price: food.price,
-		description: food.description,
-		additions: additionIds,
-	}).save();
-	return savedFood;
-}
-
-async function saveFoodAdditions(additions) {
-	const ids = [];
-	if (additions) {
-		for (const add of additions) {
-			const saved = await new FoodAddition({
-				_id: mongoose.Types.ObjectId(),
-				name: add.name,
-				price: add.price,
-			}).save();
-			ids.push(saved._id);
-		}
-	}
-	return ids;
-}
+/**
+ * DELETE - Remove menu with all its contents
+ * 
+ * Warning! This can't be undone!
+ */
+router.delete('/:menuId', checkAuth, checkIfAdmin, controller.deleteMenu);
