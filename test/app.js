@@ -1,6 +1,7 @@
 const mocha = require('mocha');
 const request = require('supertest');
 const app = require('../app');
+const should = require('chai').should();
 
 describe('Miscellaneous', function() {
 	it('request at non existent endpoint should return 404', function(done) {

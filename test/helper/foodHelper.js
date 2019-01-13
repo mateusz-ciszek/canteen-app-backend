@@ -44,6 +44,10 @@ module.exports = {
 			additions: [{ name: 'c', price: -5 }],
 		};
 	},
+
+	 async getFoodWithAddition() {
+		return await Food.findOne({ additions: { $exists: true, $ne: [] } }).exec();
+	},
 }
 
 function randomFood() {
