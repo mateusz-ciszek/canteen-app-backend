@@ -11,18 +11,7 @@ module.exports = {
 	async saveOrderItems(items) {
 		const savedItems = [];
 		for (const item of items) {
-			const additions = await saveOrderItemAdditions(item.additions);
-			const additionsSumPrice = additions.map(item => item.quantity * item.price)
-					.reduce((previousValue, currentValue) => previousValue + currentValue, 0);
-			const food = await Food.findById(item._id).exec();
-			const saved = await new OrderItem({
-				_id: mongoose.Types.ObjectId(),
-				food: item._id,
-				quantiy: item.quantity,
-				additions: additions.map(item => item._id),
-				price: food.price * item.quantity + additionsSumPrice,
-			}).save();
-			savedItems.push(saved);
+			savedItems.push(await saveItem(item));
 		}
 		return savedItems;
 	},
@@ -46,19 +35,37 @@ module.exports = {
 	},
 }
 
+async function saveItem(item) {
+	const additions = await saveOrderItemAdditions(item.additions);
+	const additionsSumPrice = additions.map(item => item.quantity * item.price)
+			.reduce((accumulated, current) => accumulated + current, 0);
+
+	const food = await Food.findById(item._id).exec();
+	return await new OrderItem({ 
+		_id: mongoose.Types.ObjectId(),
+		food: item._id,
+		quantity: item.quantity,
+		additions: additions.map(item => item._id),
+		price: food.price * item.quantity + additionsSumPrice,
+	}).save();
+};
+
 async function saveOrderItemAdditions(additions) {
 	const savedAdditions = [];
-	for (const item of additions) {
-		const addition = await FoodAddition.findById(item._id).exec();
-		const saved = await new OrderItemAddition({
-			_id: mongoose.Types.ObjectId(),
-			foodAddition: item._id,
-			quantity: item.quantity,
-			price: addition.price * item.quantity,
-		}).save();
-		savedAdditions.push(saved);
+	for (const addition of additions) {
+		savedAdditions.push(await saveAddition(addition));
 	}
 	return savedAdditions;
+};
+
+async function saveAddition(item) {
+	const addition = await FoodAddition.findById(item._id).exec();
+	return await new OrderItemAddition({
+		_id: mongoose.Types.ObjectId(),
+		foodAddition: item._id,
+		quantity: item.quantity,
+		price: addition.price * item.quantity,
+	}).save();
 };
 
 function validateOrderItem(item) {
