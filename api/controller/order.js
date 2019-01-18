@@ -3,7 +3,6 @@ const orderHelper = require('../helper/orderHelper');
 const OrderState = require('../models/OrderState');
 const mongooseHelper = require('../helper/mongooseErrorHelper');
 const stateHelper = require('../helper/orderStateHelper');
-const foodHelper = require('../helper/foodHelper');
 
 const Order = require('../models/order');
 
@@ -14,10 +13,7 @@ module.exports = {
 			return res.status(400).json(errors);
 		}
 
-		const items = [];
-		for (const item of req.body.items) {
-			items.push(await foodHelper.getFoodDetails(item._id));
-		}
+		const items = await orderHelper.saveOrderItems(req.body.items);
 
 		const price = items.map(item => item.price)
 			.reduce((previousValue, currentValue) => previousValue + currentValue);
