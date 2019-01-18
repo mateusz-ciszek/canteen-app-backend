@@ -21,6 +21,10 @@ module.exports = {
 		return savedFood;
 	},
 
+	async getFoodDetails(foodId) {
+		return await Food.findById(foodId).exec();
+	},
+
 	validateCreateFoodRequest(food) {
 		const errors = [];
 
