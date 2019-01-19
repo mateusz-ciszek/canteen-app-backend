@@ -21,7 +21,7 @@ module.exports = {
 
 	async getManuDetails(req, res, next) {
 		const id = req.params['menuId'];
-		const menu = Menu.findById(id).populate({
+		const menu = await Menu.findById(id).populate({
 			path: 'foods',
 			select: '_id name price description additions',
 		}).exec();
