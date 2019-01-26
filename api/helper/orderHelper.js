@@ -75,7 +75,7 @@ function validateOrderItem(item) {
 		errors.push('Food item _id is required');
 	} else if (typeof(item._id) !== 'string') {
 		errors.push('Food item _id have to be of type string');
-	} else if (!mongooseHelper.isOfObjectIdLength(item._id)) {
+	} else if (!mongooseHelper.isValidObjectId(item._id)) {
 		errors.push('Food item _id is not valid');
 	}
 
@@ -109,7 +109,7 @@ function validateOrderItemAddition(addition) {
 		errors.push('Food item addition _id is required');
 	} else if (typeof(addition._id) !== 'string') {
 		errors.push('Food item addition _id have to be of type string');
-	} else if (!mongooseHelper.isOfObjectIdLength(addition._id)) {
+	} else if (!mongooseHelper.isValidObjectId(addition._id)) {
 		errors.push('Food item addition _id is not valid');
 	}
 

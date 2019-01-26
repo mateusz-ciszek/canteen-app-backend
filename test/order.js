@@ -226,12 +226,14 @@ describe('Order', function() {
 							food.should.have.property('_id').that.is.a('string').and.is.not.null;
 							food.should.have.property('name').that.is.a('string').and.is.not.null;
 							food.should.have.property('price').that.is.a('number').and.is.not.lessThan(0);
-							order.should.have.property('orderDate');
-							const date = new Date(order.orderDate);
-							date.should.be.a('date');
+							order.should.have.property('createdDate');
+							order.should.have.property('history').that.is.an('array').and.have.lengthOf.above(0);
 							order.should.have.property('_id').that.is.a('string').and.is.not.null;
 							order.should.have.property('totalPrice').that.is.a('number').and.is.greaterThan(0);
-							order.should.have.property('state').that.is.a('string').and.is.not.null;
+							order.should.have.property('currentState').that.is.not.null;
+							order.currentState.should.have.property('state').that.is.a('string').and.is.not.null;
+							order.currentState.should.have.property('enteredBy').that.is.a('string').and.is.not.null;
+							order.currentState.should.have.property('enteredDate').that.is.a('string').and.is.not.null;
 							order.should.have.property('user');
 							order.user.should.have.property('_id').that.is.a('string').and.is.not.null;
 							order.user.should.have.property('email').that.is.a('string').and.is.not.null;
