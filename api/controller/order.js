@@ -108,6 +108,9 @@ module.exports = {
 				}, {
 					path: 'user',
 					select: 'email firstName lastName',
+				}, {
+					path: 'history.enteredBy',
+					select: '_id firstName lastName email',
 				}]).exec();
 		} catch (err) {
 			if (mongooseHelper.isObjectIdCastException(err)) {
