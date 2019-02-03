@@ -1,5 +1,8 @@
 module.exports = Object.freeze({
 	'SAVED': 'SAVED',
+	'PAID': 'PAID',
+	'SENT_TO_PREPARATION': 'SENT_TO_PREPARATION',
+	'IN_PREPARATION': 'IN_PREPARATION',
 	'READY': 'READY',
 	'SERVED': 'SERVED',
 	'REJECTED': 'REJECTED',

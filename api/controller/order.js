@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const orderHelper = require('../helper/orderHelper');
-const OrderState = require('../models/OrderState');
+const OrderState = require('../models/orderState');
 const mongooseHelper = require('../helper/mongooseErrorHelper');
 const stateHelper = require('../helper/orderStateHelper');
+const states = require('../models/states');
 
 const Order = require('../models/order');
 
@@ -16,15 +17,22 @@ module.exports = {
 		const items = await orderHelper.saveOrderItems(req.body.items);
 
 		const price = items.map(item => item.price)
-			.reduce((previousValue, currentValue) => previousValue + currentValue);
+				.reduce((previousValue, currentValue) => previousValue + currentValue);
 
 		try {
+			const state = new OrderState({
+				state: states.SAVED,
+				enteredBy: req.context.userId,
+			});
 			await new Order({
 				_id: mongoose.Types.ObjectId(),
 				user: req.context.userId,
 				items: items.map(item => item._id),
 				totalPrice: price,
-				state: OrderState.SAVED,
+				history: [state],
+				comment: req.body.comment,
+				currentState: state,
+				createdDate: new Date(),
 			}).save();
 		} catch (err) {
 			console.log(err);
@@ -34,21 +42,28 @@ module.exports = {
 	},
 
 	async getOrders(req, res, next) {
-		const stateFilter = req.query.state ? req.query.state : Object.keys(OrderState);
+		const stateFilter = req.query.state ? req.query.state : Object.keys(states);
 
-		const orders = await Order.find({ state: stateFilter })
-			.select('id user items totalPrice state')
-			.populate({
-				path: 'items user',
-				populate: {
-					path: 'additions food',
-					populate: {
-						path: 'foodAddition additions',
-						// populate: 'foodAddition',
-					},
-				},
-				select: 'firstName lastName	email',
-			}).exec();
+		const orders = await Order.find({ 'currentState.state': stateFilter })
+				.select('_id user items totalPrice currentState')
+				.populate([{
+					path: 'user',
+					select: '_id firstName lastName email',
+				}, {
+					path: 'items',
+					select: '_id food quantity price additions',
+					populate: [{
+						path: 'food',
+						select: 'name',
+					}, {
+						path: 'additions',
+						select: 'foodAddition quantity price',
+						populate: {
+							path: 'foodAddition',
+							select: 'name price',
+						},
+					}],
+				}]).exec();
 
 		res.status(200).json({ orders: orders });
 	},
@@ -63,7 +78,7 @@ module.exports = {
 		}
 
 		try {
-			await tryChangeState(id, state);
+			await tryChangeState(id, state, req.context.userId);
 		} catch (err) {
 			console.log(err);
 			return res.status(500).json({ error: err });
@@ -77,20 +92,26 @@ module.exports = {
 		let order;
 
 		try {
-			order = await Order.findOne({ _id: id })
-				.select('_id items state user totalPrice orderDate')
-				.populate({
-					path: 'items user',
-					select: 'email firstName lastName name food quantity additions price',
+			order = await Order.findById(id)
+				.select('items state user totalPrice createdDate finishedDate history comment currentState')
+				.populate([{
+					path: 'items',
+					select: 'name food quantity additions price',
 					populate: {
 						path: 'food additions',
 						select: '_id name price',
 						populate: {
 							path: 'foodAddition',
 							select: 'name price',
-						},
-					},
-				}).exec();
+						}
+					}
+				}, {
+					path: 'user',
+					select: 'email firstName lastName',
+				}, {
+					path: 'history.enteredBy',
+					select: '_id firstName lastName email',
+				}]).exec();
 		} catch (err) {
 			if (mongooseHelper.isObjectIdCastException(err)) {
 				return res.status(404).json({ error: 'Order not found' });
@@ -98,6 +119,9 @@ module.exports = {
 			return res.status(500).json({ error: err });
 		}
 		
+		if (!order) {
+			return res.status(404).json();
+		}
 		res.status(200).json(order);
 	},
 };
@@ -105,7 +129,7 @@ module.exports = {
 function validateOrderPatchRequest(id, state) {
 	const errors = [];
 
-	if (!mongooseHelper.isOfObjectIdLength(id)) {
+	if (!mongooseHelper.isValidObjectId(id)) {
 		errors.push('Order _id is not valid');
 	}
 
@@ -118,16 +142,22 @@ function validateOrderPatchRequest(id, state) {
 	return errors;
 };
 
-async function tryChangeState(orderId, state) {
+async function tryChangeState(orderId, state, userId) {
 	const order = await Order.findById(orderId).exec();
 	if (!order) {
 		throw 'Order not found';
 	}
 
-	if (!stateHelper.canChangeState(order.state, state)) {
-		throw `Order state change from "${order.state}" to "${state}" is not allowed`;
+	const lastOrderState = stateHelper.getLatestState(order.history);
+	if (!stateHelper.canChangeState(lastOrderState.state, state)) {
+		throw `Order state change from "${lastOrderState.state}" to "${state}" is not allowed`;
 	}
 
-	order.state = state;
+	const orderState = new OrderState({
+		state,
+		enteredBy: userId,
+	});
+	order.history.push(orderState);
+	order.currentState = orderState;
 	await order.save();
 };
