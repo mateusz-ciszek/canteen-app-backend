@@ -48,7 +48,7 @@ module.exports = {
 		res.status(201).json(menu._id);
 	},
 
-	async addFood(req, res, next) {
+	async createOrUpdateFood(req, res, next) {
 		const menuId = req.params['menuId'];
 		let menu;
 		try {
@@ -60,14 +60,17 @@ module.exports = {
 			return res.status(404).json({ error: 'Menu not found' });
 		}
 
-		const errors = foodHelper.validateCreateFoodRequest(req.body);
-		if (errors.length !== 0) {
-			return res.status(400).json(errors);
-		}
-		const food = await foodHelper.saveFood(req.body);
-		menu.foods.push(food._id);
-		await menu.save();
-		res.status(201).json();
+		if (req.body._id) {
+			await updateFood(req.body, menu);
+			return res.status(501).json();
+		}	else {
+			try {
+				await saveFood(req.body, menu);
+			} catch (errors) {
+				return res.status(400).json(errors);
+			}
+			return res.status(201).json();
+		}	
 	},
 
 	async deleteMenu(req, res, next) {
@@ -91,4 +94,19 @@ async function saveFoods(foods) {
 		ids.push(saved._id);
 	}
 	return ids;
+}
+
+async function saveFood(request, menu) {
+	const errors = foodHelper.validateCreateFoodRequest(request);
+	if (errors.length !== 0) {
+		throw errors;
+	}
+	const food = await foodHelper.saveFood(request);
+	menu.foods.push(food._id);
+	await menu.save();
+}
+
+async function updateFood(request, menu) {
+	// TODO: add proper implementation
+	console.log('should update');
 }
