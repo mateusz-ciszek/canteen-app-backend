@@ -49,7 +49,7 @@ router.post('/', checkAuth, checkIfAdmin, controller.createMenu);
 /**
  * POST - Dodaj nowy posiłek do menu
  */
-router.post('/:menuId/food', checkAuth, checkIfAdmin, controller.addFood);
+router.post('/:menuId/food', checkAuth, checkIfAdmin, controller.createOrUpdateFood);
 
 /**
  * DELETE - Remove menu with all its contents

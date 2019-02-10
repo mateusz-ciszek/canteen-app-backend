@@ -15,7 +15,7 @@ module.exports = {
 			_id: mongoose.Types.ObjectId(),
 			name: food.name,
 			price: food.price,
-			description: food.description,
+			description: food.description || '',
 			additions: additionIds,
 		}).save();
 		return savedFood;
