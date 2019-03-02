@@ -1,10 +1,10 @@
-const express = require('express');
-const morgan = require('morgan');
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
-const app = express();
+import { Request, Response, NextFunction } from 'express';
+import express = require('express');
+import morgan = require('morgan');
+import bodyParser = require('body-parser');
+import mongoose = require('mongoose');
 
-module.exports = app;
+export const app = express();
 
 const productRoutes = require('./api/routes/example/products');
 const ordersRoutes = require('./api/routes/example/orders');
@@ -52,15 +52,21 @@ app.use('/order', orderRoutes);
  * routów nie psaował do żądania
  */
 app.use((req, res, next) => {
-	const error = new Error('Not found');
-	error.status = 404;
+	const error: HttpError = { 
+		...new Error('Not found'),
+		 status: 404,
+		};
 	next(error);
 });
 
-app.use((error, req, res, next) => {
+app.use((error: HttpError, req: Request, res: Response, next: NextFunction) => {
 	res.status(error.status || 500).json({
 		error: {
 			message: error.message
 		}
 	});
-})
+});
+
+interface HttpError extends Error {
+	status?: number;
+}
