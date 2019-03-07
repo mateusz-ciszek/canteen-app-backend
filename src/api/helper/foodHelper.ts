@@ -1,10 +1,10 @@
 import { Types } from 'mongoose';
-import { Food } from '../models/food';
+import { Food, IFoodModel } from '../models/food';
 import { FoodAddition } from '../models/foodAddition';
 import { onlyUnique } from '../../common/helper/arrayHelper';
 
-export async function saveFood(food: any) {
-	let additionIds = [];
+export async function saveFood(food: any): Promise<IFoodModel> {
+	let additionIds: string[] = [];
 	if (food.additions && food.additions.length) {
 		additionIds = await saveFoodAdditions(food.additions);
 	}
@@ -20,12 +20,12 @@ export async function saveFood(food: any) {
 	return savedFood;
 };
 
-export async function getFoodDetails(foodId: string) {
+export async function getFoodDetails(foodId: string): Promise<IFoodModel | null> {
 	return await Food.findById(foodId).exec();
 };
 
-export function validateCreateFoodRequest(food: any) {
-	const errors = [];
+export function validateCreateFoodRequest(food: any): string[] {
+	const errors: string[] = [];
 
 	if (!food.name) {
 		errors.push('Food name is required');
@@ -41,7 +41,7 @@ export function validateCreateFoodRequest(food: any) {
 	}
 
 	if (food.additions) {
-		const additionErrors: any[] = [];
+		const additionErrors: string[] = [];
 		// Validate all additions and collect all errors
 		food.additions.map((addition: any) => validateCreateFoodAdditionRequest(addition).forEach(error => additionErrors.push(error)));
 		if (additionErrors.length) {
@@ -53,8 +53,8 @@ export function validateCreateFoodRequest(food: any) {
 	return errors;
 };
 
-async function saveFoodAdditions(additions: any) {
-	const ids = [];
+async function saveFoodAdditions(additions: any): Promise<string[]> {
+	const ids: string[] = [];
 	if (additions) {
 		for (const add of additions) {
 			const saved = await new FoodAddition({
@@ -68,8 +68,8 @@ async function saveFoodAdditions(additions: any) {
 	return ids;
 };
 
-function validateCreateFoodAdditionRequest(addition: any) {
-	const errors = [];
+function validateCreateFoodAdditionRequest(addition: any): string[] {
+	const errors: string[] = [];
 
 	if (!addition.name) {
 		errors.push('Food addition name is required');

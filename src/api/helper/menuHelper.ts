@@ -1,8 +1,8 @@
-const foodHelper = require('./foodHelper');
+import * as foodHelper from './foodHelper';
 import { onlyUnique } from '../../common/helper/arrayHelper';
 
-export async function saveFoods(foods: any) {
-	const ids = [];
+export async function saveFoods(foods: any): Promise<string[]> {
+	const ids: string[] = [];
 	for (const food of foods) {
 		const saved = await foodHelper.saveFood(food);
 		ids.push(saved._id);
@@ -10,8 +10,8 @@ export async function saveFoods(foods: any) {
 	return ids;
 };
 
-export function validateMenuCreateRequest(menu: any) {
-	const errors = [];
+export function validateMenuCreateRequest(menu: any): string[] {
+	const errors: string[] = [];
 
 	if (!menu.name) {
 		errors.push('Menu name is required');

@@ -1,4 +1,5 @@
 import { OrderStateEnum, IOrderState } from '../../interface/orderState';
+import { IOrderStateModel } from '../models/orderState';
 
 const allowedStateChanges = getAllowedStateChanges();
 
@@ -27,7 +28,7 @@ export function canChangeState(currentState: OrderStateEnum, nextState: OrderSta
 	return false;
 };
 
-export function getLatestState(history: IOrderState[]): IOrderState {
+export function getLatestState(history: IOrderStateModel[]): IOrderState {
 	return history.reduce((prev, curr) => new Date(curr.enteredDate) > new Date(prev.enteredDate) ? curr : prev);
 };
 

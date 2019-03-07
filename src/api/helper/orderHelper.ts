@@ -1,13 +1,11 @@
 import mongoose from 'mongoose';
-const mongooseHelper = require('../helper/mongooseErrorHelper');
-const onlyUnique = require('../../common/helper/arrayHelper').onlyUnique;
+import * as mongooseHelper from '../helper/mongooseErrorHelper';
+import { onlyUnique } from '../../common/helper/arrayHelper';
 
 import { Food } from '../models/food';
-import { FoodAddition } from '../models/foodAddition';
+import { FoodAddition, IFoodAdditionModel } from '../models/foodAddition';
 import { OrderItem, IOrderItemModel } from '../models/orderItem';
-import { OrderItemAddition } from '../models/orderItemAddition';
-import { IOrderItem } from '../../interface/orderItem';
-import { IOrder } from '../../interface/order';
+import { OrderItemAddition, IOrderItemAdditionModel } from '../models/orderItemAddition';
 
 export async function saveOrderItems(items: any[]): Promise<IOrderItemModel[]> {
 	const savedItems: IOrderItemModel[] = [];
@@ -50,16 +48,16 @@ async function saveItem(item: any): Promise<IOrderItemModel> {
 	}).save();
 };
 
-async function saveOrderItemAdditions(additions: any) {
-	const savedAdditions = [];
+async function saveOrderItemAdditions(additions: any): Promise<IOrderItemAdditionModel[]> {
+	const savedAdditions: IOrderItemAdditionModel[] = [];
 	for (const addition of additions) {
 		savedAdditions.push(await saveAddition(addition));
 	}
 	return savedAdditions;
 };
 
-async function saveAddition(item: any) {
-	const addition = await FoodAddition.findById(item._id).exec();
+async function saveAddition(item: any): Promise<IOrderItemAdditionModel> {
+	const addition: IFoodAdditionModel | null = await FoodAddition.findById(item._id).exec();
 	return await new OrderItemAddition({
 		_id: mongoose.Types.ObjectId(),
 		foodAddition: item._id,
@@ -69,7 +67,7 @@ async function saveAddition(item: any) {
 };
 
 function validateOrderItem(item: any): string[] {
-	const errors = [];
+	const errors: string[] = [];
 
 	if (!item._id) {
 		errors.push('Food item _id is required');
@@ -103,7 +101,7 @@ function validateOrderItem(item: any): string[] {
 };
 
 function validateOrderItemAddition(addition: any): string[] {
-	const errors = [];
+	const errors: string[] = [];
 
 	if (!addition._id) {
 		errors.push('Food item addition _id is required');

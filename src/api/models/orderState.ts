@@ -1,6 +1,10 @@
 import { Document, Schema, Model, model } from 'mongoose';
+import { IOrderState } from '../../interface/orderState';
+import { IUserModel } from './user';
 
-export interface IOrderStateModel extends Document {}
+export interface IOrderStateModel extends Document, IOrderState {
+	user: IUserModel;
+}
 
 export const OrderStateSchema: Schema = new Schema({
 	state: { type: String, required: true },
