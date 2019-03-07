@@ -2,7 +2,7 @@ import mocha from 'mocha';
 import request from 'supertest';
 import { app } from '../app';
 const should = require('chai').should();
-const dbHelper = require('./helper/dbHelper');
+import * as dbHelper from './helper/dbHelper';
 const foodHelper = require('./helper/foodHelper');
 import * as userHelper from './helper/userHelper';
 
@@ -51,11 +51,18 @@ describe('Food', function() {
 
 		const wrongUrl = `${endpoint}/totalyWrongId`;
 
-		it('should get 404 when fetching food details with wrong id', async function() {
+		it('should get 400 when fetching food details with malformed id', async function() {
 			return request(app)
 				.get(wrongUrl)
-				.expect(404)
+				.expect(400)
 				.then();
+		});
+
+		it('should get 404 when fetching food details with wrong id', async function() {
+			const url: string = `${endpoint}/${dbHelper.getRandomId()}`;
+			return request(app)
+					.get(url)
+					.expect(404);
 		});
 
 		it('should get 401 when deleting food unauthorized', async function() {

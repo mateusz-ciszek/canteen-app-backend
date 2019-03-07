@@ -1,27 +1,33 @@
 import { IRequest } from '../../models/Express';
 import { Response, NextFunction } from 'express';
-import { Food } from '../models/food';
+import { Food, IFoodModel } from '../models/food';
 import { Menu } from '../models/menu';
 
 import * as errorHelper from '../helper/mongooseErrorHelper';
 
-export function getFood(req: IRequest, res: Response, next: NextFunction) {
+export async function getFood(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 	const id: string = req.params.foodId;
-	Food.findById(id)
-		.select('id name price additions description')
-		.populate({
-			path: 'additions',
-			select: 'id name price',
-		})
-		.then(result => {
-			return res.status(200).json(result);
-		})
-		.catch(err => {
-			if (errorHelper.isObjectIdCastException(err)) {
-				return res.status(404).json();
-			}
-			return res.status(500).json({ error: err });
-		});
+	let food: IFoodModel | null;
+	
+	try {
+		food = await Food.findById(id)
+				.select('id name price additions description')
+				.populate({
+					path: 'additions',
+					select: 'id name price',
+				}).exec();
+	} catch(err) {
+		if (errorHelper.isObjectIdCastException(err)) {
+			return res.status(400).json();
+		}
+		return res.status(500).json();
+	}
+
+	if (!food) {
+		return res.status(404).json();
+	}
+
+	return res.status(200).json(food);
 };
 
 export function deleteFood(req: IRequest, res: Response, next: NextFunction) {

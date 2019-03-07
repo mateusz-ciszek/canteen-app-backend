@@ -10,3 +10,7 @@ import mongoose from 'mongoose';
 	export async function disconnect(): Promise<void> {
 		return await mongoose.disconnect();
 	};
+
+	export function getRandomId(): string {
+		return mongoose.Types.ObjectId().toString();
+	}
