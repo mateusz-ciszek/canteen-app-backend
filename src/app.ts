@@ -6,8 +6,6 @@ import mongoose = require('mongoose');
 
 export const app = express();
 
-const productRoutes = require('./api/routes/example/products');
-const ordersRoutes = require('./api/routes/example/orders');
 const usersRoutes = require('./api/routes/user');
 const menuRoutes = require('./api/routes/menu');
 const foodRoutes = require('./api/routes/food');
@@ -27,7 +25,7 @@ app.use(bodyParser.json());
 
 // Nagłówki zapobiegające błędom CORS
 // Chyba tylko przeglądarki z tego korzystają
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
 	res.header('Access-Control-Allow-Origin', '*');
 	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
 	if (req.method === 'OPTIONS') {
@@ -38,9 +36,6 @@ app.use((req, res, next) => {
 });
 
 // Główne ścieżki API
-// TODO Usunąć przykładowe endpointy
-app.use('/example/products', productRoutes);
-app.use('/example/orders', ordersRoutes);
 app.use('/user', usersRoutes);
 app.use('/menu', menuRoutes);
 app.use('/food', foodRoutes);
@@ -51,7 +46,7 @@ app.use('/order', orderRoutes);
  * np. jeśli żadne z dostępnych 
  * routów nie psaował do żądania
  */
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
 	const error: HttpError = { 
 		...new Error('Not found'),
 		 status: 404,
