@@ -1,7 +1,12 @@
 import { Document, Schema, Model, model } from 'mongoose';
 import { IOrderItem } from '../../interface/orderItem';
+import { IFoodModel } from './food';
+import { IOrderItemAdditionModel } from './orderItemAddition';
 
-export interface IOrderItemModel extends Document, IOrderItem {}
+export interface IOrderItemModel extends Document, IOrderItem {
+	food: IFoodModel;
+	additions: IOrderItemAdditionModel[];
+}
 
 export const OrderItemSchema: Schema = new Schema({
 	_id: Schema.Types.ObjectId,

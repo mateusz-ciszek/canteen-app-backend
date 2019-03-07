@@ -1,7 +1,10 @@
 import { Document, Schema, Model, model } from 'mongoose';
 import { IMenu } from '../../interface/menu';
+import { IFoodModel } from './food';
 
-export interface IMenuModel extends Document, IMenu {}
+export interface IMenuModel extends Document, IMenu {
+	foods: IFoodModel[];
+}
 
 export const MenuSchema: Schema = new Schema({
 	_id: Schema.Types.ObjectId,

@@ -15,7 +15,7 @@ export async function getFoodId() {
 	if (!menu) {
 		throw 'No foods in database';
 	}
-	return (<IFoodModel>menu.foods[0])._id;
+	return menu.foods[0]._id;
 };
 
 export async function insertFakeFood() {
@@ -46,7 +46,7 @@ export function getMalformedCreateFoodRequest() {
 	};
 };
 
-export async function getFoodWithAddition() {
+export async function getFoodWithAddition(): Promise<IFoodModel | null> {
 	return await Food.findOne({ additions: { $exists: true, $ne: [] } }).exec();
 };
 

@@ -1,7 +1,10 @@
 import { Document, Schema, Model, model } from 'mongoose';
 import { IFood } from '../../interface/food';
+import { IFoodAdditionModel } from './foodAddition';
 
-export interface IFoodModel extends Document, IFood {}
+export interface IFoodModel extends Document, IFood {
+	additions: IFoodAdditionModel[];
+}
 
 export const FoodSchema: Schema = new Schema({
 	_id: Schema.Types.ObjectId,

@@ -1,8 +1,13 @@
 import { Document, Schema, Model, model } from 'mongoose';
 import { IOrder } from '../../interface/order';
 import { OrderStateSchema } from './orderState';
+import { IUserModel } from './user';
+import { IOrderItemModel } from './orderItem';
 
-export interface IOrderModel extends Document, IOrder {}
+export interface IOrderModel extends Document, IOrder {
+	user: IUserModel;
+	items: IOrderItemModel[];
+}
 
 export const OrderSchema = new Schema({
 	_id: Schema.Types.ObjectId,
