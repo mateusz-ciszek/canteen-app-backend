@@ -47,21 +47,21 @@ app.use('/order', orderRoutes);
  * routów nie psaował do żądania
  */
 app.use((req: Request, res: Response, next: NextFunction) => {
-	const error: HttpError = { 
-		...new Error('Not found'),
-		 status: 404,
-		};
-	next(error);
+	next({ 
+		message: 'Not found',
+		status: 404,
+	});
 });
 
 app.use((error: HttpError, req: Request, res: Response, next: NextFunction) => {
 	res.status(error.status || 500).json({
 		error: {
-			message: error.message
-		}
+			message: error.message,
+		},
 	});
 });
 
-interface HttpError extends Error {
+interface HttpError {
 	status?: number;
+	message?: string;
 }

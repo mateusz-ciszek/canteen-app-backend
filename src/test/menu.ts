@@ -1,6 +1,6 @@
-const mocha = require('mocha');
-const request = require('supertest');
-const app = require('../app');
+import mocha from 'mocha';
+import request from 'supertest';
+import { app } from '../app';
 const should = require('chai').should();
 const dbHelper = require('./helper/dbHelper');
 const userHelper = require('./helper/userHelper');
@@ -11,7 +11,7 @@ let mongoose;
 describe('Menu', function() {
 
 	before('connecto to mongoDB', function(done) {
-		dbHelper.connect().then(result => {
+		dbHelper.connect().then((result: any) => {
 			mongoose = result;
 			done();
 		});
@@ -22,7 +22,7 @@ describe('Menu', function() {
 	});
 
 	describe('#menu', function() {
-		let standardToken, adminToken;
+		let standardToken: string, adminToken: string;
 		const endpoint = '/menu';
 
 		before('prepare tokens', async function() {
@@ -104,7 +104,7 @@ describe('Menu', function() {
 		});
 
 		describe('#addFood', function() {
-			let url;
+			let url: string;
 			const malformedRequest = foodHelper.getMalformedCreateFoodRequest();
 			const emptyRequest = foodHelper.getEmptyCreateFoodRequest();
 

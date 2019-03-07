@@ -5,4 +5,9 @@
 		"**/test/helper/**/*"
 ],
 "typescript.tsdk": "node_modules\\typescript\\lib",
+"mocha.files.glob": "src/test/*.ts",
+"mocha.options": {
+		"compilers": "ts-node/register",
+},
+"mocha.requires": ["ts-node/register"],
 }

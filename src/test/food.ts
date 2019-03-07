@@ -1,14 +1,14 @@
-const mocha = require('mocha');
-const request = require('supertest');
-const app = require('../app');
+import mocha from 'mocha';
+import request from 'supertest';
+import { app } from '../app';
 const should = require('chai').should();
 const dbHelper = require('./helper/dbHelper');
 const foodHelper = require('./helper/foodHelper');
-const userHelper = require('./helper/userHelper');
+import * as userHelper from './helper/userHelper';
 
 describe('Food', function() {
 	const endpoint = '/food';
-	let mongoose, standardToken, adminToken;
+	let mongoose, standardToken: string, adminToken: string;
 
 	before('connect to mongoDB', async function() {
 		mongoose = await dbHelper.connect();
@@ -27,7 +27,7 @@ describe('Food', function() {
 	});
 
 	describe('#food', function() {
-		let fakeFoodData;
+		let fakeFoodData: any;
 
 		before('insert fake food', async function() {
 			fakeFoodData = await foodHelper.insertFakeFood(fakeFoodData);
@@ -39,7 +39,7 @@ describe('Food', function() {
 			return request(app)
 				.get(url)
 				.expect(200)
-				.expect(response => {
+				.expect((response: any) => {
 					response.body.should.have.property('_id').that.is.a('string').and.have.lengthOf(24);
 					response.body.should.have.property('name').that.is.a('string').and.have.lengthOf.above(1);
 					response.body.should.have.property('price').that.is.a('number').and.is.not.below(0);
@@ -86,7 +86,7 @@ describe('Food', function() {
 			return request(app)
 				.delete(url)
 				.set('Authorization', `Bearer ${adminToken}`)
-				.expect(response => delete response.body.__v)
+				.expect((response: any) => delete response.body.__v)
 				.expect(200, fakeFoodData)
 				.then();
 		})

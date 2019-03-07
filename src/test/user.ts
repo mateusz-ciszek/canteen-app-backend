@@ -1,8 +1,8 @@
-const mocha = require('mocha');
-const request = require('supertest');
-const app = require('../app');
-const should = require('chai').should();
-const jwt = require('jsonwebtoken');
+import mocha from 'mocha';
+import request from 'supertest';
+import { app } from '../app';
+import { should } from 'chai';
+import { decode } from 'jsonwebtoken';
 const dbHelper = require('./helper/dbHelper');
 const userHelper = require('./helper/userHelper');
 
@@ -18,7 +18,7 @@ describe('User', function() {
 	});
 
 	describe('#register', function() {
-		let originalRegisterData, validRegisterData, existingEmail;
+		let originalRegisterData: any, validRegisterData: any, existingEmail: any;
 		const url = `${endpoint}/signup`;
 
 		before('prepare valid register data', async function() {
@@ -143,7 +143,7 @@ describe('User', function() {
 	});
 
 	describe('#login', function() {
-		let fakeUser, email, password, firstName, lastName;
+		let fakeUser: any, email: string, password: string, firstName, lastName;
 		const url = `${endpoint}/login`;
 		const authFailedResponse = {
 			message: 'Auth failed',
@@ -190,7 +190,7 @@ describe('User', function() {
 					.send({ email, password })
 					.expect(response => {
 						response.body.should.be.an('object').that.have.property('token').that.is.a('string');
-						const decodedEmail = jwt.decode(response.body.token)['email'];
+						const decodedEmail: string = (<{[key: string]: any}>decode(response.body.token))['email'];
 						decodedEmail.should.equal(email);
 					})
 					.expect(200);

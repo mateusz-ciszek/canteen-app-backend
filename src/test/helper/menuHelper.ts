@@ -1,9 +1,9 @@
-const Menu = require('../../api/models/menu');
+import { Menu } from '../../api/models/menu';
 
 module.exports = {
 	async getMenuId() {
 		const menu = await Menu.findOne().exec();
-		return menu._id;
+		return menu!._id;
 	},
 
 	getEmptyCreateMenuRequest() {

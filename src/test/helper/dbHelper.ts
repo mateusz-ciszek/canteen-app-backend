@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 module.exports = {
 	async connect() {
 		return await mongoose.connect(
-			`mongodb+srv://test:test@canteen-application-dev-hkbxg.mongodb.net/dev?retryWrites=true`,
+			`mongodb+srv://test:test-dev@canteen-application-dev-hkbxg.mongodb.net/dev?retryWrites=true`,
 			{ useNewUrlParser: true }
 		);
 	},

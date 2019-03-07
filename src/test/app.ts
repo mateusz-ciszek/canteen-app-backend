@@ -1,7 +1,6 @@
-const mocha = require('mocha');
-const request = require('supertest');
-const app = require('../app');
-const should = require('chai').should();
+import mocha from 'mocha';
+import request from 'supertest';
+import { app } from '../app';
 
 describe('Miscellaneous', function() {
 	it('should get 404 when targeting non existing endpoint', async function() {

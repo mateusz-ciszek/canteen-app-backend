@@ -1,15 +1,16 @@
-const mocha = require('mocha');
-const request = require('supertest');
-const app = require('../app');
-const should = require('chai').should();
+import mocha from 'mocha';
+import request from 'supertest';
+import { app } from '../app';
+import { should } from 'chai';
 const dbHelper = require('./helper/dbHelper');
 const userHelper = require('./helper/userHelper');
 const orderHelper = require('./helper/orderHelper');
 
 describe('Order', function() {
+	let mongoose: any;
 
 	before('connecto to mongoDB', function(done) {
-		dbHelper.connect().then(result => {
+		dbHelper.connect().then((result: any) => {
 			mongoose = result;
 			done();
 		});
@@ -20,9 +21,9 @@ describe('Order', function() {
 	});
 
 	describe('#order', function() {
-		let standardToken, adminToken;
+		let standardToken: string, adminToken: string;
 		const endpoint = '/order';
-		let validRequestBody, requestBody;
+		let validRequestBody: any, requestBody: any;
 
 		before('prepare tokens', async function() {
 			standardToken = await userHelper.getStandardToken();
@@ -188,7 +189,7 @@ describe('Order', function() {
 		});
 
 		describe('#getDetails', function() {
-			let url;
+			let url: string;
 
 			before('prepare url', async function() {
 				const id = await orderHelper.getOrderId();
