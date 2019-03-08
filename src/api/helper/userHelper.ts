@@ -1,11 +1,13 @@
 import { User } from '../models/user';
+import { IRegisterUser } from "../interface/user/register/IRegisterUserRequest";
 
 export async function isEmailAvailable(email: string): Promise<boolean> {
 	return !await User.findOne({ email }).exec();
 };
 
-export function validateRegisterRequest(email: string, password: string, firstName: string, lastName: string): string[] {
+export function validateRegisterRequest(request: IRegisterUser): string[] {
 	const errors: string[] = [];
+	const { email, password, firstName, lastName } = request;
 
 	if (!email) {
 		errors.push('Email is required');
