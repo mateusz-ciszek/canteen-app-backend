@@ -5,7 +5,7 @@ const allowedStateChanges = getAllowedStateChanges();
 
 export function isValidState(state: string): boolean {
 	const states: OrderStateEnum[] = ['IN_PREPARATION', 'PAID', 'READY', 'REJECTED', 'SAVED', 'SENT_TO_PREPARATION', 'SERVED'];
-	return state.toUpperCase() in states;
+	return states.includes(<OrderStateEnum>state);
 };
 
 export function canChangeState(currentState: OrderStateEnum, nextState: OrderStateEnum): boolean {
