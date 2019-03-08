@@ -93,9 +93,7 @@ describe('Food', function() {
 			return request(app)
 				.delete(url)
 				.set('Authorization', `Bearer ${adminToken}`)
-				.expect((response: any) => delete response.body.__v)
-				.expect(200, fakeFoodData)
-				.then();
+				.expect(200);
 		})
 	});
 });

@@ -19,9 +19,9 @@ module.exports = router;
  *   description: ""
  * }
  */
-router.get('/:foodId', controller.getFood);
+router.get('/:id', controller.getFood);
 
 /**
  * DELETE - Usuń posiłek o podanym ID
  */
-router.delete('/:foodId', [checkAuth, isAdmin, controller.deleteFood]);
+router.delete('/:id', [checkAuth, isAdmin, controller.deleteFood]);
