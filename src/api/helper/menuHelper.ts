@@ -1,5 +1,6 @@
 import * as foodHelper from './foodHelper';
 import { onlyUnique } from '../../common/helper/arrayHelper';
+import { IMenuCreateRequest } from '../interface/menu/create/IMenuCreateRequest';
 
 export async function saveFoods(foods: any): Promise<string[]> {
 	const ids: string[] = [];
@@ -10,7 +11,7 @@ export async function saveFoods(foods: any): Promise<string[]> {
 	return ids;
 };
 
-export function validateMenuCreateRequest(menu: any): string[] {
+export function validateMenuCreateRequest(menu: IMenuCreateRequest): string[] {
 	const errors: string[] = [];
 
 	if (!menu.name) {

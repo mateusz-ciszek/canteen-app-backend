@@ -39,7 +39,7 @@ router.get('/', controller.getAllMenus);
 /**
  * GET - Pobierz menu o podanym ID
  */
-router.get('/:menuId', controller.getManuDetails);
+router.get('/:id', controller.getManuDetails);
 
 /**
  * POST - Zapytanie dodające nowe menu do bazy
@@ -53,7 +53,5 @@ router.post('/:menuId/food', [checkAuth, isAdmin, controller.createOrUpdateFood]
 
 /**
  * DELETE - Remove menu with all its contents
- * 
- * Warning! This can't be undone!
  */
-router.delete('/:menuId', [checkAuth, isAdmin, controller.deleteMenu]);
+router.delete('/:id', [checkAuth, isAdmin, controller.deleteMenu]);

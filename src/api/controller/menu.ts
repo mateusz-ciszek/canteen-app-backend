@@ -2,53 +2,64 @@ import { IRequest } from "../../models/Express";
 import { Response, NextFunction } from "express";
 import mongoose from 'mongoose';
 
-import { Menu } from '../models/menu';
+import { Menu, IMenuModel } from '../models/menu';
 import * as foodHelper from '../helper/foodHelper';
 import * as menuHelper from '../helper/menuHelper';
 import * as errorHelper from '../helper/mongooseErrorHelper';
+import { MenuListModelToMenuListResponseConverter } from "../converter/MenuListModelToMenuListResponseConverter";
+import { IMenuListResponse } from "../interface/menu/list/IMenuListResponse";
+import { IMenuDetailsRequest } from "../interface/menu/details/IMenuDetailsRequest";
+import { MenuDetailsModelToMenuDetailsResponseConverter } from "../converter/MenuDetailsModelToMenuDetailsResponse";
+import { IMenuDetailsResponse } from "../interface/menu/details/IMenuDetailsResponse";
+import { IMenuCreateRequest } from "../interface/menu/create/IMenuCreateRequest";
+import { IFoodCreateRequest } from "../interface/menu/create/IFoodCreateRequest";
+import { IValidationErrorsResponse } from "../interface/common/IValidationErrorsResponse";
+import { IMenuDeleteRequest } from "../interface/menu/delete/IMenuDeleteRequest";
 
-export async function getAllMenus(req: IRequest, res: Response, next: NextFunction) {
-	const menus = await Menu.find().select('id name foods')
-			.populate({
-				path: 'foods',
-				select: 'id name price description additions',
-				populate: {
-					path: 'additions',
-					select: 'id name price',
-				},
-			}).exec();
-	res.status(200).json({ menus });
-};
-
-export async function getManuDetails(req: IRequest, res: Response, next: NextFunction) {
-	const id = req.params['menuId'];
-	const menu = await Menu.findById(id).populate({
+export async function getAllMenus(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	const menus = await Menu.find().populate({
 		path: 'foods',
-		select: '_id name price description additions',
+		populate: {
+			path: 'additions',
+		},
 	}).exec();
-	res.status(200).json({ menu });
+
+	const converter = new MenuListModelToMenuListResponseConverter();
+	const response: IMenuListResponse = converter.convert(menus);
+
+	return res.status(200).json(response);
 };
 
-export async function createMenu(req: IRequest, res: Response, next: NextFunction) {
-	const errors = menuHelper.validateMenuCreateRequest(req.body);
+export async function getManuDetails(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	const request: IMenuDetailsRequest = req.params;
+
+	const menu = await Menu.findById(request.id).populate('foods').exec();
+
+	if (!menu) {
+		return res.status(404).json();
+	}
+
+	const converter = new MenuDetailsModelToMenuDetailsResponseConverter();
+	const response: IMenuDetailsResponse = converter.convert(menu);
+
+	return res.status(200).json(response);
+};
+
+export async function createMenu(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	const request: IMenuCreateRequest = req.body;
+	const errors = menuHelper.validateMenuCreateRequest(request);
 	if (errors.length) {
-		return res.status(400).json(errors);
+		const errorResponse: IValidationErrorsResponse = { errors };
+		return res.status(400).json(errorResponse);
 	}
 
-	const foods = req.body.foods;
-	let foodIds: string[] = [];
-	if (foods && foods.length) {
-		foodIds = await saveFoods(foods);
-	}
+	const id: string = (await saveMenu(request))._id;
 
-	const menu = await new Menu({
-		_id: mongoose.Types.ObjectId(),
-		name: req.body.name,
-		foods: foodIds,
-	}).save();
-	res.status(201).json(menu._id);
+	// TODO: saving request should not return any response beside success code
+	return res.status(201).json(id);
 };
 
+// TODO: Split functionality to addFood and updateFood + refator
 export async function createOrUpdateFood(req: IRequest, res: Response, next: NextFunction) {
 	const menuId: string = req.params['menuId'];
 	let menu;
@@ -74,20 +85,35 @@ export async function createOrUpdateFood(req: IRequest, res: Response, next: Nex
 	}	
 };
 
-export async function deleteMenu(req: IRequest, res: Response, next: NextFunction) {
-	const id: string = req.params['menuId'];
+export async function deleteMenu(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	const request: IMenuDeleteRequest = req.params;
 	try {
-		await Menu.findByIdAndDelete(id).exec();
+		await Menu.findByIdAndDelete(request.id).exec();
 	} catch (err) {
 		if (errorHelper.isObjectIdCastException(err)) {
 			return res.status(404).json();
 		}
 		return res.status(500).json();
 	}
-	res.status(200).json();
+	return res.status(200).json();
 };
 
-async function saveFoods(foods: any): Promise<string[]> {
+// TODO: Change returned value to Promise<void> once createMenu hundler return only HTTP code
+async function saveMenu(menu: IMenuCreateRequest): Promise<IMenuModel> {
+	const foods: IFoodCreateRequest[] = menu.foods;
+	let foodIds: string[] = [];
+	if (foods && foods.length) {
+		foodIds = await saveFoods(foods);
+	}
+
+	return await new Menu({
+		_id: mongoose.Types.ObjectId(),
+		name: menu.name,
+		foods: foodIds,
+	}).save();
+}
+
+async function saveFoods(foods: IFoodCreateRequest[]): Promise<string[]> {
 	const ids: string[] = [];
 	for (const food of foods) {
 		const saved = await foodHelper.saveFood(food);
@@ -96,6 +122,7 @@ async function saveFoods(foods: any): Promise<string[]> {
 	return ids;
 }
 
+// TODO: To refactor after spliting createOrUpdateFood(...)
 async function saveFood(request: any, menu: any): Promise<void> {
 	const errors = foodHelper.validateCreateFoodRequest(request);
 	if (errors.length !== 0) {

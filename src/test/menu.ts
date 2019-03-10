@@ -65,7 +65,7 @@ describe('Menu', function() {
 				return request(app)
 						.post(endpoint)
 						.set('Authorization', `Bearer ${adminToken}`)
-						.expect(400, [ 'Menu name is required' ]);
+						.expect(400, { errors: [ 'Menu name is required' ]});
 			});
 
 			it('should get 400 with missing properties', async function() {
@@ -75,7 +75,8 @@ describe('Menu', function() {
 						.send(emptyRequest)
 						.expect(400)
 						.expect(response => {
-							const errors = response.body;
+							response.body.should.be.an('object').and.have.property('errors');
+							const errors = response.body.errors;
 							errors.should.be.an('array').and.have.lengthOf(5);
 							errors.should.include('Menu name is required');
 							errors.should.include('Food name is required');
@@ -92,7 +93,8 @@ describe('Menu', function() {
 						.send(malformedRequest)
 						.expect(400)
 						.expect(response => {
-							const errors = response.body;
+							response.body.should.be.an('object').and.have.property('errors');
+							const errors = response.body.errors;
 							errors.should.be.an('array').and.have.lengthOf(5);
 							errors.should.include('Menu name have to be at least 3 characters long');
 							errors.should.include('Food name have to be at least 3 characters long');

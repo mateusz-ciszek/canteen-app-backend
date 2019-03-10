@@ -2,8 +2,9 @@ import { Types } from 'mongoose';
 import { Food, IFoodModel } from '../models/food';
 import { FoodAddition } from '../models/foodAddition';
 import { onlyUnique } from '../../common/helper/arrayHelper';
+import { IFoodCreateRequest } from '../interface/menu/create/IFoodCreateRequest';
 
-export async function saveFood(food: any): Promise<IFoodModel> {
+export async function saveFood(food: IFoodCreateRequest): Promise<IFoodModel> {
 	let additionIds: string[] = [];
 	if (food.additions && food.additions.length) {
 		additionIds = await saveFoodAdditions(food.additions);
