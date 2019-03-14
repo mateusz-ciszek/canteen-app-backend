@@ -6,8 +6,11 @@ import { Food } from '../models/food';
 import { FoodAddition, IFoodAdditionModel } from '../models/foodAddition';
 import { OrderItem, IOrderItemModel } from '../models/orderItem';
 import { OrderItemAddition, IOrderItemAdditionModel } from '../models/orderItemAddition';
+import { IOrderCreateRequest } from '../interface/order/create/IOrderCreateRequest';
+import { IOrderItemCreateRequest } from '../interface/order/create/IOrderItemCreateRequest';
+import { IOrderItemAdditionCreateRequest } from '../interface/order/create/IOrderItemAdditionCreateRequest';
 
-export async function saveOrderItems(items: any[]): Promise<IOrderItemModel[]> {
+export async function saveOrderItems(items: IOrderItemCreateRequest[]): Promise<IOrderItemModel[]> {
 	const savedItems: IOrderItemModel[] = [];
 	for (const item of items) {
 		savedItems.push(await saveItem(item));
@@ -15,7 +18,7 @@ export async function saveOrderItems(items: any[]): Promise<IOrderItemModel[]> {
 	return savedItems;
 };
 
-export function validateOrderRequest(request: any): string[] {
+export function validateOrderRequest(request: IOrderCreateRequest): string[] {
 	const errors: string[] = [];
 
 	if (!request.items || request.items.length === 0) {
@@ -23,7 +26,7 @@ export function validateOrderRequest(request: any): string[] {
 	} else {
 		const itemsErrors: any[] = [];
 		// Validate all order items and collect all errors
-		request.items.map((item: any) => validateOrderItem(item).forEach(error => itemsErrors.push(error)));
+		request.items.map(item => validateOrderItem(item).forEach(error => itemsErrors.push(error)));
 		if (itemsErrors.length) {
 			// Add only unique items errors to errors
 			errors.push(...<string[]>itemsErrors.filter(onlyUnique));
@@ -33,7 +36,7 @@ export function validateOrderRequest(request: any): string[] {
 	return errors;
 };
 
-async function saveItem(item: any): Promise<IOrderItemModel> {
+async function saveItem(item: IOrderItemCreateRequest): Promise<IOrderItemModel> {
 	const additions = await saveOrderItemAdditions(item.additions);
 	const additionsSumPrice = additions.map(item => item.quantity * item.price)
 			.reduce((accumulated, current) => accumulated + current, 0);
@@ -48,7 +51,7 @@ async function saveItem(item: any): Promise<IOrderItemModel> {
 	}).save();
 };
 
-async function saveOrderItemAdditions(additions: any): Promise<IOrderItemAdditionModel[]> {
+async function saveOrderItemAdditions(additions: IOrderItemAdditionCreateRequest[]): Promise<IOrderItemAdditionModel[]> {
 	const savedAdditions: IOrderItemAdditionModel[] = [];
 	for (const addition of additions) {
 		savedAdditions.push(await saveAddition(addition));
@@ -66,7 +69,7 @@ async function saveAddition(item: any): Promise<IOrderItemAdditionModel> {
 	}).save();
 };
 
-function validateOrderItem(item: any): string[] {
+function validateOrderItem(item: IOrderItemCreateRequest): string[] {
 	const errors: string[] = [];
 
 	if (!item._id) {
@@ -88,7 +91,7 @@ function validateOrderItem(item: any): string[] {
 	if (item.additions) {
 		const additionsErrors: string[] = [];
 		// Validate all additions and collect all errors
-		item.additions.map((addition: any) => {
+		item.additions.map(addition => {
 			validateOrderItemAddition(addition).forEach(error => additionsErrors.push(error));
 		});
 		if (additionsErrors.length) {
@@ -100,7 +103,7 @@ function validateOrderItem(item: any): string[] {
 	return errors;
 };
 
-function validateOrderItemAddition(addition: any): string[] {
+function validateOrderItemAddition(addition: IOrderItemAdditionCreateRequest): string[] {
 	const errors: string[] = [];
 
 	if (!addition._id) {

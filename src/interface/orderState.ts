@@ -7,3 +7,5 @@ export interface IOrderState {
 	enteredDate: Date;
 	enteredBy: IUser;
 }
+
+export const allStates: OrderStateEnum[] = ['IN_PREPARATION', 'PAID', 'READY', 'REJECTED', 'SAVED', 'SENT_TO_PREPARATION', 'SERVED'];

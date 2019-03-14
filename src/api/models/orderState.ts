@@ -3,7 +3,7 @@ import { IOrderState } from '../../interface/orderState';
 import { IUserModel } from './user';
 
 export interface IOrderStateModel extends Document, IOrderState {
-	user: IUserModel;
+	enteredBy: IUserModel;
 }
 
 export const OrderStateSchema: Schema = new Schema({
@@ -13,4 +13,3 @@ export const OrderStateSchema: Schema = new Schema({
 }, { _id: false, id: false });
 
 export const OrderState: Model<IOrderStateModel> = model<IOrderStateModel>('OrderState', OrderStateSchema);
-// module.exports = mongoose.model('OrderState', orderStateSchema);

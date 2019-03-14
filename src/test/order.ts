@@ -50,7 +50,7 @@ describe('Order', function() {
 				return request(app)
 						.post(endpoint)
 						.set('Authorization', `Bearer ${standardToken}`)
-						.expect(400, [ 'Empty orders are not allowed' ]);
+						.expect(400, { errors: [ 'Empty orders are not allowed' ]});
 			});
 
 			it('should get 400 with missing properties', async function() {
@@ -64,7 +64,8 @@ describe('Order', function() {
 						.set('Authorization', `Bearer ${standardToken}`)
 						.send(requestBody)
 						.expect(response => {
-							const errors = response.body;
+							response.body.should.have.a.property('errors').that.is.an('array');
+							const errors = response.body.errors;
 							errors.should.be.an('array').and.have.lengthOf(4);
 							errors.should.include('Food item _id is required');
 							errors.should.include('Food item quantity is required');
@@ -85,7 +86,8 @@ describe('Order', function() {
 						.set('Authorization', `Bearer ${standardToken}`)
 						.send(requestBody)
 						.expect(response => {
-							const errors = response.body;
+							response.body.should.have.a.property('errors').that.is.an('array');
+							const errors = response.body.errors;
 							errors.should.be.an('array').and.have.lengthOf(4);
 							errors.should.include('Food item _id have to be of type string');
 							errors.should.include('Food item quantity have to be of type number');
@@ -106,7 +108,8 @@ describe('Order', function() {
 						.set('Authorization', `Bearer ${standardToken}`)
 						.send(requestBody)
 						.expect(response => {
-							const errors = response.body;
+							response.body.should.have.a.property('errors').that.is.an('array');
+							const errors = response.body.errors;
 							errors.should.be.an('array').and.have.lengthOf(4);
 							errors.should.include('Food item _id is not valid');
 							errors.should.include('Food item quantity have to be greater than 0');
@@ -166,7 +169,8 @@ describe('Order', function() {
 						.set('Authorization', `Bearer ${adminToken}`)
 						.expect(400)
 						.expect(response => {
-							const errors = response.body;
+							response.body.should.have.a.property('errors').that.is.an('array');
+							const errors = response.body.errors;
 							errors.should.be.an('array').and.have.lengthOf(2);
 							errors.should.include('Order _id is not valid');
 							errors.should.include('Order state is required');
@@ -180,7 +184,8 @@ describe('Order', function() {
 						.send({ state: 'INVALID' })
 						.expect(400)
 						.expect(response => {
-							const errors = response.body;
+							response.body.should.have.a.property('errors').that.is.an('array');
+							const errors = response.body.errors;
 							errors.should.be.an('array').and.have.lengthOf(2);
 							errors.should.include('Order _id is not valid');
 							errors.should.include('Invalid order state');
@@ -233,8 +238,13 @@ describe('Order', function() {
 							order.should.have.property('totalPrice').that.is.a('number').and.is.greaterThan(0);
 							order.should.have.property('currentState').that.is.not.null;
 							order.currentState.should.have.property('state').that.is.a('string').and.is.not.null;
-							order.currentState.should.have.property('enteredBy').that.is.a('string').and.is.not.null;
 							order.currentState.should.have.property('enteredDate').that.is.a('string').and.is.not.null;
+							order.currentState.should.have.property('enteredBy').that.is.an('object').and.is.not.null;
+							const user = order.currentState.enteredBy;
+							user.should.have.property('_id').that.is.a('string').and.is.not.null;
+							user.should.have.property('email').that.is.a('string').and.is.not.null;
+							user.should.have.property('firstName').that.is.a('string').and.is.not.null;
+							user.should.have.property('lastName').that.is.a('string').and.is.not.null;
 							order.should.have.property('user');
 							order.user.should.have.property('_id').that.is.a('string').and.is.not.null;
 							order.user.should.have.property('email').that.is.a('string').and.is.not.null;

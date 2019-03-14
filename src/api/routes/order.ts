@@ -21,9 +21,9 @@ router.get('/', [checkAuth, isAdmin, controller.getOrders]);
 /**
  * Modyfikacja statusu zamówienia
  */
-router.patch('/:orderId', [checkAuth, isAdmin, controller.updateOrderState]);
+router.patch('/:id', [checkAuth, isAdmin, controller.updateOrderState]);
 
 /**
  * GET - Download order details
  */
-router.get('/:orderId', [checkAuth, isAdmin, controller.getOrderDetails]);
+router.get('/:id', [checkAuth, isAdmin, controller.getOrderDetails]);
