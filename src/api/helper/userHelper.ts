@@ -1,4 +1,6 @@
-import { User } from '../models/user';
+import { Types } from 'mongoose';
+import { hash } from 'bcrypt';
+import { User, IUserModel } from '../models/user';
 import { IRegisterUser } from "../interface/user/register/IRegisterUserRequest";
 
 export async function isEmailAvailable(email: string): Promise<boolean> {
@@ -35,6 +37,21 @@ export function validateRegisterRequest(request: IRegisterUser): string[] {
 
 	return errors;
 };
+
+export function saveUser(firstName: string, lastName: string, email: string, hash: string, admin: boolean = false): Promise<IUserModel> {
+	return new User({
+		_id: new Types.ObjectId(),
+		firstName,
+		lastName,
+		email,
+		admin,
+		password: hash,
+	}).save();
+}
+
+export function hashPassword(password: string): Promise<string> {
+	return hash(password, 10);
+}
 
 function isValidEmail(email: string): boolean {
 	const regex = new RegExp('[a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z'

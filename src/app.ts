@@ -10,6 +10,8 @@ const usersRoutes = require('./api/routes/user');
 const menuRoutes = require('./api/routes/menu');
 const foodRoutes = require('./api/routes/food');
 const orderRoutes = require('./api/routes/order');
+import { router as workerRoutes } from './api/routes/worker';
+// const workerRoutes = require('./api/routes/worker');
 
 // Połączenie z bazą danych Mongo Atlas
 mongoose.connect(
@@ -40,6 +42,7 @@ app.use('/user', usersRoutes);
 app.use('/menu', menuRoutes);
 app.use('/food', foodRoutes);
 app.use('/order', orderRoutes);
+app.use('/worker', workerRoutes);
 
 /**
  * Obsługa błędów
