@@ -1,5 +1,5 @@
-import { IWorkerModel } from "../../../models/worker";
+import { IWorkerView } from "./IWorkerView";
 
 export interface IWorkerListResponse {
-	workers: IWorkerModel[]; // FIXME: Create view
+	workers: IWorkerView[];
 }

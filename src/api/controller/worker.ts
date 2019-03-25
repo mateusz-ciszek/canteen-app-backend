@@ -8,13 +8,15 @@ import { IWorkerCreateResponse } from "../interface/worker/create/IWorkerCreateR
 import { IWorkerCreateRequest } from "../interface/worker/create/IWorkerCreateRequest";
 import { WorkHoursHelper } from "../helper/WorkHoursHelper";
 import { WorkerValidator } from "../helper/validate/WorkerValidator";
+import { WorkerModelToWorkerViewConverter } from "../converter/WorkerModelToWorkerViewConverter";
 
 export async function getWorkersList(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 	const allWorkers: IWorkerModel[] = await Worker.find()
 			.populate('person')
 			.exec();
 
-	const response: IWorkerListResponse = { workers: allWorkers };
+	const converter = new WorkerModelToWorkerViewConverter();
+	const response: IWorkerListResponse = { workers: allWorkers.map(worker => converter.convert(worker)) };
 	return res.status(200).json(response);
 }
 

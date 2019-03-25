@@ -6,7 +6,7 @@ import { NextFunction } from 'express';
 
 export interface IWorkerModel extends Document, IWorker {
 	person: IUserModel;
-	workHours: IWorkHoursModel[];
+	defaultWorkHours: IWorkHoursModel[];
 }
 
 export const WorkerSchema: Schema = new Schema({

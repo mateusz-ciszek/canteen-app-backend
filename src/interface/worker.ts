@@ -3,6 +3,6 @@ import { IWorkHours } from "./workHours";
 
 export interface IWorker {
 	person: IUser;
-	workHours: IWorkHours[];
+	defaultWorkHours: IWorkHours[];
 	employmentDate: Date;
 }
