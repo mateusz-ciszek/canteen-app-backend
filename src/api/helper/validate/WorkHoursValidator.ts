@@ -2,8 +2,8 @@ import { IWorkHoursCreateRequest } from "../../interface/worker/create/IWorkHour
 import { ISimpleTime } from "../../interface/common/ISimpleTime";
 import { filterUnique } from "../../../common/helper/arrayHelper";
 
-// TODO: Tests
 export class WorkHoursValidator {
+	// TODO: Change return value to boolean
 	public validate(workHours: IWorkHoursCreateRequest[]): string[] {
 		const errors: string[] = [];
 

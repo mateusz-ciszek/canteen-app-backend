@@ -1,7 +1,6 @@
 import { IWorkerCreateRequest } from "../../interface/worker/create/IWorkerCreateRequest";
 import { WorkHoursValidator } from "./WorkHoursValidator";
 
-// TODO: Tests
 export class WorkerValidator {
 	public validateIWorkerCreateRequest(input: IWorkerCreateRequest): boolean {
 		if (!this.isValidName(input.firstName) || !this.isValidName(input.lastName)) {
@@ -18,6 +17,6 @@ export class WorkerValidator {
 	}
 
 	private isValidName(name: string): boolean {
-		return !name || name.length === 0;
+		return !!name && name.length !== 0;
 	}
 }
