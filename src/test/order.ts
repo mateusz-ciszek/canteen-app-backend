@@ -2,13 +2,13 @@ import 'mocha';
 import request from 'supertest';
 import { app } from '../app';
 import { should } from 'chai';
-import { DatabaseHelper } from './helper/databaseHelper';
-import { TokenHelper } from './helper/tokenHelper';
-const orderHelper = require('./helper/orderHelper');
+import { DatabaseTestHelper } from './helper/databaseHelper';
+import { TokenTestHelper } from './helper/tokenHelper';
+import { OrderTestHelper } from './helper/orderHelper';
 should();
 
 describe('Order', () => {
-	const dbHelper = new DatabaseHelper();
+	const dbHelper = new DatabaseTestHelper();
 	
 	before('create connection and init database', async () => {
 		await dbHelper.initDatabase();
@@ -26,12 +26,13 @@ describe('Order', () => {
 		let validRequestBody: any, requestBody: any;
 
 		before('prepare tokens', async () => {
-			const tokenHelper = new TokenHelper(dbHelper);
+			const tokenHelper = new TokenTestHelper(dbHelper);
 			standardToken = await tokenHelper.getStandardToken();
 			adminToken = await tokenHelper.getAdminToken();
 		});
 
 		before('prepare valid response', async () => {
+			const orderHelper = new OrderTestHelper(dbHelper);
 			validRequestBody = await orderHelper.getValidCreateOrderRequest();
 		});
 

@@ -1,4 +1,3 @@
-import { Food, IFoodModel } from '../../api/models/food';
 import { IFoodCreateRequest } from '../../api/interface/menu/create/IFoodCreateRequest';
 
 export class FoodTestHelper {
@@ -11,7 +10,3 @@ export class FoodTestHelper {
 		};
 	};
 }
-
-export async function getFoodWithAddition(): Promise<IFoodModel | null> {
-	return await Food.findOne({ additions: { $exists: true, $ne: [] } }).exec();
-};

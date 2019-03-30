@@ -10,7 +10,7 @@ import { OrderItem } from '../../api/models/orderItem';
 import { OrderItemAddition } from '../../api/models/orderItemAddition';
 import { OrderState } from '../../api/models/orderState';
 
-export class DatabaseHelper {
+export class DatabaseTestHelper {
 	private id: ObjectId | null = null;
 
 	public readonly STANDARD_USER = {

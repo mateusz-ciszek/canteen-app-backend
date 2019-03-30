@@ -1,18 +1,24 @@
-import { getFoodWithAddition } from './foodHelper';
+import { DatabaseTestHelper } from './databaseHelper';
+import { IOrderCreateRequest } from '../../api/interface/order/create/IOrderCreateRequest';
 
-export async function getValidCreateOrderRequest() {
-	const food = await getFoodWithAddition();
+export class OrderTestHelper {
+	private dbHelper: DatabaseTestHelper;
 
-	return {
-		"items": [{
-			"_id": food!._id,
-			"quantity": 1,
-			"additions": [
-				{
-					"_id": food!.additions[0]._id,
-					"quantity": 1
-				}
-			]
-		}]
+	public constructor(dbHelper: DatabaseTestHelper) {
+		this.dbHelper = dbHelper;
+	}
+
+	public getValidCreateOrderRequest(): IOrderCreateRequest {
+		return {
+			items: [{
+				_id: this.dbHelper.FOOD.ID,
+				quantity: 1,
+				additions: [{
+					_id: this.dbHelper.FOOD_ADDITION.ID,
+					quantity: 1,
+				}],
+			}],
+			comment: '',
+		};
 	};
-};
+}

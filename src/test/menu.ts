@@ -2,13 +2,13 @@ import 'mocha';
 import request from 'supertest';
 import { app } from '../app';
 import { expect } from 'chai';
-import { DatabaseHelper } from './helper/databaseHelper';
-import { TokenHelper } from './helper/tokenHelper';
-const menuHelper = require('./helper/menuHelper');
+import { DatabaseTestHelper } from './helper/databaseHelper';
+import { TokenTestHelper } from './helper/tokenHelper';
+import { MenuTestHelper } from './helper/menuHelper';
 import { FoodTestHelper } from './helper/foodHelper';
 
 describe('Menu', () => {
-	const dbHelper = new DatabaseHelper();
+	const dbHelper = new DatabaseTestHelper();
 
 	before('create connection and init database', async () => {
 		await dbHelper.initDatabase();
@@ -25,7 +25,7 @@ describe('Menu', () => {
 		const endpoint = '/menu';
 
 		before('prepare tokens', async () => {
-			const tokenHelper = new TokenHelper(dbHelper);
+			const tokenHelper = new TokenTestHelper(dbHelper);
 			standardToken = await tokenHelper.getStandardToken();
 			adminToken = await tokenHelper.getAdminToken();
 		});
@@ -68,6 +68,7 @@ describe('Menu', () => {
 		});
 
 		describe('#create', () => {
+			const menuHelper = new MenuTestHelper();
 			const emptyRequest = menuHelper.getEmptyCreateMenuRequest();
 			const malformedRequest = menuHelper.getMalformedCreateMenuRequest();
 

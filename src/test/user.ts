@@ -3,12 +3,12 @@ import request from 'supertest';
 import { should } from 'chai';
 import { app } from '../app';
 import { decode } from 'jsonwebtoken';
-import { DatabaseHelper } from './helper/databaseHelper';
+import { DatabaseTestHelper } from './helper/databaseHelper';
 // TODO: Move to 'expect' instead of 'should'
 should();
 
 describe('User', () => {
-	const dbHelper = new DatabaseHelper();
+	const dbHelper = new DatabaseTestHelper();
 	const endpoint = '/user';
 
 	before('connecto to mongoDB', async () => {

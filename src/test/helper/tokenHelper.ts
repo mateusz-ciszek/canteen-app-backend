@@ -1,11 +1,11 @@
 import jwt from 'jsonwebtoken';
 
-import { DatabaseHelper } from './databaseHelper';
+import { DatabaseTestHelper } from './databaseHelper';
 
-export class TokenHelper {
-	private dbHelper: DatabaseHelper;
+export class TokenTestHelper {
+	private dbHelper: DatabaseTestHelper;
 
-	public constructor(dbHelper: DatabaseHelper) {
+	public constructor(dbHelper: DatabaseTestHelper) {
 		this.dbHelper = dbHelper;
 	}
 

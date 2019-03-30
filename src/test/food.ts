@@ -1,20 +1,21 @@
 import 'mocha';
 import request from 'supertest';
+import { should } from 'chai';
 import { app } from '../app';
-import { DatabaseHelper } from './helper/databaseHelper';
-import { TokenHelper } from './helper/tokenHelper';
-require('chai').should();
+import { DatabaseTestHelper } from './helper/databaseHelper';
+import { TokenTestHelper } from './helper/tokenHelper';
+should();
 
 describe('Food', () => {
 	const endpoint = '/food';
-	const dbHelper = new DatabaseHelper();
+	const dbHelper = new DatabaseTestHelper();
 	let standardToken: string, adminToken: string;
 
 	before('create connection and init database, get user tokens', async () => {
 		await dbHelper.initDatabase();
 		await dbHelper.connect();
 		
-		const tokenHelper = new TokenHelper(dbHelper);
+		const tokenHelper = new TokenTestHelper(dbHelper);
 		standardToken = await tokenHelper.getStandardToken();
 		adminToken = await tokenHelper.getAdminToken();
 	});
