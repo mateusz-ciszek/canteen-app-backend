@@ -2,7 +2,7 @@ import 'mocha';
 import request from 'supertest';
 import { app } from '../app';
 import { DatabaseHelper } from './helper/dbHelper';
-import * as userHelper from './helper/userHelper';
+import { TokenHelper } from './helper/userHelper';
 require('chai').should();
 
 describe('Food', () => {
@@ -14,8 +14,9 @@ describe('Food', () => {
 		await dbHelper.initDatabase();
 		await dbHelper.connect();
 		
-		standardToken = await userHelper.getStandardToken();
-		adminToken = await userHelper.getAdminToken();
+		const tokenHelper = new TokenHelper(dbHelper);
+		standardToken = await tokenHelper.getStandardToken();
+		adminToken = await tokenHelper.getAdminToken();
 	});
 
 	after('drop database and close connection', async () => {

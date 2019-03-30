@@ -3,7 +3,7 @@ import request from 'supertest';
 import { app } from '../app';
 import { should } from 'chai';
 import { DatabaseHelper } from './helper/dbHelper';
-const userHelper = require('./helper/userHelper');
+import { TokenHelper } from './helper/userHelper';
 const orderHelper = require('./helper/orderHelper');
 should();
 
@@ -26,8 +26,9 @@ describe('Order', () => {
 		let validRequestBody: any, requestBody: any;
 
 		before('prepare tokens', async () => {
-			standardToken = await userHelper.getStandardToken();
-			adminToken = await userHelper.getAdminToken();
+			const tokenHelper = new TokenHelper(dbHelper);
+			standardToken = await tokenHelper.getStandardToken();
+			adminToken = await tokenHelper.getAdminToken();
 		});
 
 		before('prepare valid response', async () => {

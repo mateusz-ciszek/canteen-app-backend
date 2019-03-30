@@ -3,7 +3,7 @@ import request from 'supertest';
 import { app } from '../app';
 import { expect } from 'chai';
 import { DatabaseHelper } from './helper/dbHelper';
-const userHelper = require('./helper/userHelper');
+import { TokenHelper } from './helper/userHelper';
 const menuHelper = require('./helper/menuHelper');
 import { FoodTestHelper } from './helper/foodHelper';
 
@@ -25,8 +25,9 @@ describe('Menu', () => {
 		const endpoint = '/menu';
 
 		before('prepare tokens', async () => {
-			standardToken = await userHelper.getStandardToken();
-			adminToken = await userHelper.getAdminToken();
+			const tokenHelper = new TokenHelper(dbHelper);
+			standardToken = await tokenHelper.getStandardToken();
+			adminToken = await tokenHelper.getAdminToken();
 		});
 
 		describe('#get', () => {
