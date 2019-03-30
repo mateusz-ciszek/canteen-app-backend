@@ -1,99 +1,84 @@
-import mocha from 'mocha';
+import 'mocha';
 import request from 'supertest';
 import { app } from '../app';
-const should = require('chai').should();
-import * as dbHelper from './helper/dbHelper';
-const foodHelper = require('./helper/foodHelper');
+import { DatabaseHelper } from './helper/dbHelper';
 import * as userHelper from './helper/userHelper';
+require('chai').should();
 
-describe('Food', function() {
+describe('Food', () => {
 	const endpoint = '/food';
-	let mongoose, standardToken: string, adminToken: string;
+	const dbHelper = new DatabaseHelper();
+	let standardToken: string, adminToken: string;
 
-	before('connect to mongoDB', async function() {
-		mongoose = await dbHelper.connect();
-	});
-
-	before('get standard token', async function() {
+	before('create connection and init database, get user tokens', async () => {
+		await dbHelper.initDatabase();
+		await dbHelper.connect();
+		
 		standardToken = await userHelper.getStandardToken();
-	});
-
-	before('get admin token', async function() {
 		adminToken = await userHelper.getAdminToken();
-	})
-
-	after('disconnect from mongoDB', async function() {
-		await dbHelper.disconnect();
 	});
 
-	describe('#food', function() {
-		let fakeFoodData: any;
-
-		before('insert fake food', async function() {
-			fakeFoodData = await foodHelper.insertFakeFood(fakeFoodData);
-		});
-
-		it('should fetch food details', async function() {
-			const id = await foodHelper.getFoodId();
-			const url = `${endpoint}/${id}`;
-			return request(app)
-				.get(url)
-				.expect(200)
-				.expect((response: any) => {
-					response.body.should.have.property('_id').that.is.a('string').and.have.lengthOf(24);
-					response.body.should.have.property('name').that.is.a('string').and.have.lengthOf.above(1);
-					response.body.should.have.property('price').that.is.a('number').and.is.not.below(0);
-					response.body.should.have.property('additions').that.is.an('array').and.is.not.null;
-					response.body.should.have.property('description').that.is.a('string').and.is.not.null;
-				})
-				.then();
-		});
-
+	after('drop database and close connection', async () => {
+		await dbHelper.disconnect();
+		await dbHelper.dropDatabase();
+	});
+	
+	describe('#food', () => {
 		const wrongUrl = `${endpoint}/totalyWrongId`;
 
-		it('should get 400 when fetching food details with malformed id', async function() {
+		it('should fetch food details', async () => {
+			const url = `${endpoint}/${dbHelper.FOOD.ID}`;
 			return request(app)
-				.get(wrongUrl)
-				.expect(400)
-				.then();
+					.get(url)
+					.expect(200)
+					.expect((response: any) => {
+						response.body.should.have.property('_id').that.is.a('string').and.have.lengthOf(24);
+						response.body.should.have.property('name').that.is.a('string').and.have.lengthOf.above(1);
+						response.body.should.have.property('price').that.is.a('number').and.is.not.below(0);
+						response.body.should.have.property('additions').that.is.an('array').and.is.not.null;
+						response.body.should.have.property('description').that.is.a('string').and.is.not.null;
+					});
 		});
 
-		it('should get 404 when fetching food details with wrong id', async function() {
-			const url: string = `${endpoint}/${dbHelper.getRandomId()}`;
+		it('should get 400 when fetching food details with malformed id', async () => {
+			return request(app)
+					.get(wrongUrl)
+					.expect(400);
+		});
+
+		it('should get 404 when fetching food details with wrong id', async () => {
+			const url: string = `${endpoint}/${dbHelper.generateObjectId()}`;
 			return request(app)
 					.get(url)
 					.expect(404);
 		});
 
-		it('should get 401 when deleting food unauthorized', async function() {
+		it('should get 401 when deleting food unauthorized', async () => {
 			return request(app)
-				.delete(wrongUrl)
-				.expect(401)
-				.then();
+					.delete(wrongUrl)
+					.expect(401);
 		});
 
-		it('should get 403 when deleting food without permission', async function() {
+		it('should get 403 when deleting food without permission', async () => {
 			return request(app)
-				.delete(wrongUrl)
-				.set('Authorization', `Bearer ${standardToken}`)
-				.expect(403)
-				.then();
+					.delete(wrongUrl)
+					.set('Authorization', `Bearer ${standardToken}`)
+					.expect(403);
 		});
 
-		it('should get 404 when deleting food with wrong id', async function() {
+		it('should get 404 when deleting food with wrong id', async () => {
 			return request(app)
-				.delete(wrongUrl)
-				.set('Authorization', `Bearer ${adminToken}`)
-				.expect(404)
-				.then();
+					.delete(wrongUrl)
+					.set('Authorization', `Bearer ${adminToken}`)
+					.expect(404);
 		});
 
-		it('should get 200 after succesfully deleting food', async function() {
-			const url = `${endpoint}/${fakeFoodData._id}`;
+		it('should get 200 after succesfully deleting food', async () => {
+			const url = `${endpoint}/${dbHelper.FOOD.ID}`;
 			return request(app)
-				.delete(url)
-				.set('Authorization', `Bearer ${adminToken}`)
-				.expect(200);
+					.delete(url)
+					.set('Authorization', `Bearer ${adminToken}`)
+					.expect(200);
 		})
 	});
 });

@@ -13,6 +13,7 @@ export async function getAdminToken(): Promise<string> {
 	return await getToken(true);
 };
 
+// TODO: Remove
 export async function fakeUserData(): Promise<IFakeUserData> {
 	let email: string;
 	let emailAlreadyExists: boolean;

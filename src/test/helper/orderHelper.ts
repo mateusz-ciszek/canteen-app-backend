@@ -1,5 +1,4 @@
 import { getFoodWithAddition } from './foodHelper';
-import { Order } from '../../api/models/order';
 
 export async function getValidCreateOrderRequest() {
 	const food = await getFoodWithAddition();
@@ -16,9 +15,4 @@ export async function getValidCreateOrderRequest() {
 			]
 		}]
 	};
-};
-
-export async function getOrderId(): Promise<string> {
-	const order = await Order.findOne().exec();
-	return order!._id;
 };
