@@ -1,59 +1,61 @@
-import mocha from 'mocha';
+import 'mocha';
 import request from 'supertest';
 import { app } from '../app';
 import { should } from 'chai';
-const dbHelper = require('./helper/dbHelper');
-const userHelper = require('./helper/userHelper');
-const orderHelper = require('./helper/orderHelper');
+import { DatabaseTestHelper } from './helper/databaseHelper';
+import { TokenTestHelper } from './helper/tokenHelper';
+import { OrderTestHelper } from './helper/orderHelper';
+should();
 
-describe('Order', function() {
-	let mongoose: any;
-
-	before('connecto to mongoDB', function(done) {
-		dbHelper.connect().then((result: any) => {
-			mongoose = result;
-			done();
-		});
+describe('Order', () => {
+	const dbHelper = new DatabaseTestHelper();
+	
+	before('create connection and init database', async () => {
+		await dbHelper.initDatabase();
+		await dbHelper.connect();
 	});
 
-	after('disconnect from mongoDB', function(done) {
-		dbHelper.disconnect().then(() => done());
+	after('drop database and close connection', async () => {
+		await dbHelper.disconnect();
+		await dbHelper.dropDatabase();
 	});
 
-	describe('#order', function() {
+	describe('#order', () => {
 		let standardToken: string, adminToken: string;
 		const endpoint = '/order';
 		let validRequestBody: any, requestBody: any;
 
-		before('prepare tokens', async function() {
-			standardToken = await userHelper.getStandardToken();
-			adminToken = await userHelper.getAdminToken();
+		before('prepare tokens', async () => {
+			const tokenHelper = new TokenTestHelper(dbHelper);
+			standardToken = await tokenHelper.getStandardToken();
+			adminToken = await tokenHelper.getAdminToken();
 		});
 
-		before('prepare valid response', async function() {
+		before('prepare valid response', async () => {
+			const orderHelper = new OrderTestHelper(dbHelper);
 			validRequestBody = await orderHelper.getValidCreateOrderRequest();
 		});
 
-		beforeEach('restore valid request body', async function() {
+		beforeEach('restore valid request body', async () => {
 			requestBody = JSON.parse(JSON.stringify(validRequestBody));
 		});
 
-		describe('#create', function() {
+		describe('#create', () => {
 
-			it('should get 401 without token', async function() {
+			it('should get 401 without token', async () => {
 				return request(app)
 						.post(endpoint)
 						.expect(401);
 			});
 
-			it('should get 400 with empty request', async function() {
+			it('should get 400 with empty request', async () => {
 				return request(app)
 						.post(endpoint)
 						.set('Authorization', `Bearer ${standardToken}`)
 						.expect(400, { errors: [ 'Empty orders are not allowed' ]});
 			});
 
-			it('should get 400 with missing properties', async function() {
+			it('should get 400 with missing properties', async () => {
 				delete requestBody.items[0]._id;
 				delete requestBody.items[0].quantity;
 				delete requestBody.items[0].additions[0]._id;
@@ -75,7 +77,7 @@ describe('Order', function() {
 						.expect(400);
 			});
 
-			it('should get 400 with request with wrong types', async function() {
+			it('should get 400 with request with wrong types', async () => {
 				requestBody.items[0]._id = {};
 				requestBody.items[0].quantity = 'a';
 				requestBody.items[0].additions[0]._id = {};
@@ -97,7 +99,7 @@ describe('Order', function() {
 						.expect(400);						
 			});
 
-			it('should get 400 with malformed request', async function() {
+			it('should get 400 with malformed request', async () => {
 				requestBody.items[0]._id = 'asd';
 				requestBody.items[0].quantity = -4;
 				requestBody.items[0].additions[0]._id = 'zxc';
@@ -121,21 +123,21 @@ describe('Order', function() {
 
 		});
 
-		describe('#getAll', function() {
-			it('should get 401 without token', async function() {
+		describe('#getAll', () => {
+			it('should get 401 without token', async () => {
 				return request(app)
 						.get(endpoint)
 						.expect(401);
 			});
 
-			it('should get 403 with standard user token', async function() {
+			it('should get 403 with standard user token', async () => {
 				return request(app)
 						.get(endpoint)
 						.set('Authorization', `Bearer ${standardToken}`)
 						.expect(403);
 			});
 
-			it('should get 200 and list of orders with valid request', async function() {
+			it('should get 200 and list of orders with valid request', async () => {
 				return request(app)
 						.get(endpoint)
 						.set('Authorization', `Bearer ${adminToken}`)
@@ -147,23 +149,23 @@ describe('Order', function() {
 			});
 		});
 
-		describe('#updateState', function() {
+		describe('#updateState', () => {
 			const url = `${endpoint}/invalidId`;
 
-			it('should get 401 without token', async function() {
+			it('should get 401 without token', async () => {
 				return request(app)
 						.patch(url)
 						.expect(401);
 			});
 
-			it('should get 403 with standard token', async function() {
+			it('should get 403 with standard token', async () => {
 				return request(app)
 						.patch(url)
 						.set('Authorization', `Bearer ${standardToken}`)
 						.expect(403);
 			});
 
-			it('should get 400 with wrong id and no order state', async function() {
+			it('should get 400 with wrong id and no order state', async () => {
 				return request(app)
 						.patch(url)
 						.set('Authorization', `Bearer ${adminToken}`)
@@ -177,7 +179,7 @@ describe('Order', function() {
 						});
 			});
 
-			it('should get 400 with wrong id and invalid order state', async function() {
+			it('should get 400 with wrong id and invalid order state', async () => {
 				return request(app)
 						.patch(url)
 						.set('Authorization', `Bearer ${adminToken}`)
@@ -193,28 +195,27 @@ describe('Order', function() {
 			});
 		});
 
-		describe('#getDetails', function() {
+		describe('#getDetails', () => {
 			let url: string;
 
-			before('prepare url', async function() {
-				const id = await orderHelper.getOrderId();
-				url = `${endpoint}/${id}`;
+			before('prepare url', async () => {
+				url = `${endpoint}/${dbHelper.ORDER.ID}`;
 			});
 
-			it('should get 401 without token', function() {
+			it('should get 401 without token', () => {
 				return request(app)
 						.get(url)
 						.expect(401);
 			});
 
-			it('should get 403 with standard user token', async function() {
+			it('should get 403 with standard user token', async () => {
 				return request(app)
 						.get(url)
 						.set('Authorization', `Bearer ${standardToken}`)
 						.expect(403);
 			});
 
-			it('should fetch order details', async function() {
+			it('should fetch order details', async () => {
 				return request(app)
 						.get(url)
 						.set('Authorization', `Bearer ${adminToken}`)
@@ -253,7 +254,7 @@ describe('Order', function() {
 						});
 			});
 
-			it('shoudl get 404 when fetching with wrong id', async function() {
+			it('shoudl get 404 when fetching with wrong id', async () => {
 				const wrongUrl = `${endpoint}/wrongId`;
 				return request(app)
 						.get(wrongUrl)
