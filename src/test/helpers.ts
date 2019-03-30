@@ -1,9 +1,7 @@
-// TODO: rewrite to TypeScript
 import 'mocha';
 import { should } from 'chai';
 import { OrderStateEnum } from '../interface/orderState';
 import * as stateHelper from '../api/helper/orderStateHelper';
-// TODO: Move to 'expect' instead of 'should'
 should();
 
 describe('Helpers', () => {

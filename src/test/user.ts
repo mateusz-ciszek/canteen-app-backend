@@ -4,7 +4,6 @@ import { should } from 'chai';
 import { app } from '../app';
 import { decode } from 'jsonwebtoken';
 import { DatabaseTestHelper } from './helper/databaseHelper';
-// TODO: Move to 'expect' instead of 'should'
 should();
 
 describe('User', () => {
