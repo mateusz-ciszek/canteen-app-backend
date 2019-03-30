@@ -1,8 +1,8 @@
 import 'mocha';
 import request from 'supertest';
 import { app } from '../app';
-import { DatabaseHelper } from './helper/dbHelper';
-import { TokenHelper } from './helper/userHelper';
+import { DatabaseHelper } from './helper/databaseHelper';
+import { TokenHelper } from './helper/tokenHelper';
 require('chai').should();
 
 describe('Food', () => {

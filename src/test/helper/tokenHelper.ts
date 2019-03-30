@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-import { DatabaseHelper } from './dbHelper';
+import { DatabaseHelper } from './databaseHelper';
 
 export class TokenHelper {
 	private dbHelper: DatabaseHelper;

@@ -2,8 +2,8 @@ import 'mocha';
 import request from 'supertest';
 import { app } from '../app';
 import { should } from 'chai';
-import { DatabaseHelper } from './helper/dbHelper';
-import { TokenHelper } from './helper/userHelper';
+import { DatabaseHelper } from './helper/databaseHelper';
+import { TokenHelper } from './helper/tokenHelper';
 const orderHelper = require('./helper/orderHelper');
 should();
 
