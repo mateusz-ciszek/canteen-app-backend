@@ -2,7 +2,6 @@ import { User, IUserModel } from "../models/user";
 import { Worker } from '../models/worker';
 import { WorkHours } from "../models/workHours";
 import { IWorkHoursCreateRequest } from "../interface/worker/create/IWorkHoursCreateRequest";
-import { ISimpleTime } from "../interface/common/ISimpleTime";
 import { SimpleTimeToDateConverter } from "../converter/common/SimpleTimeToDateConverter";
 
 export async function generateEmail(firstName: string, lastName: string): Promise<string> {

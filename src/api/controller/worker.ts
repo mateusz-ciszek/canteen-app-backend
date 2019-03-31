@@ -29,7 +29,7 @@ export async function createWorker(req: IRequest, res: Response, next: NextFunct
 	}
 
 	const validator = new WorkerValidator();
-	if (validator.validateIWorkerCreateRequest(request)) {
+	if (!validator.validateIWorkerCreateRequest(request)) {
 		return res.status(400).json();
 	}
 

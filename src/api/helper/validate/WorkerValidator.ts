@@ -3,6 +3,10 @@ import { WorkHoursValidator } from "./WorkHoursValidator";
 
 export class WorkerValidator {
 	public validateIWorkerCreateRequest(input: IWorkerCreateRequest): boolean {
+		if (!input.firstName || !input.lastName || !input.workHours) {
+			return false;
+		}
+
 		if (!this.isValidName(input.firstName) || !this.isValidName(input.lastName)) {
 			return false;
 		}
