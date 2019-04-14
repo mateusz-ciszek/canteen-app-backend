@@ -1,5 +1,5 @@
 import { IOrderFoodItemView } from "./IOrderFoodItemView";
-import { IUserView } from "../common/IUserView";
+import { IUserView } from "../../common/IUserView";
 import { IOrderStateView } from "./IOrderStateView";
 
 export interface IOrderDetailsResponse {

@@ -1,20 +1,21 @@
 import { Converter } from "../../common/Converter";
-import { IOrderModel } from "../models/order";
-import { IOrderDetailsResponse } from "../interface/order/details/IOrderDetailsResponse";
-import { IOrderFoodItemView } from "../interface/order/details/IOrderFoodItemView";
-import { IOrderItemModel } from "../models/orderItem";
-import { IFoodModel } from "../models/food";
-import { ISimpleFoodView } from "../interface/order/details/ISimpleFoodView";
-import { IOrderItemAdditionModel } from "../models/orderItemAddition";
-import { IFoodAdditionModel } from "../models/foodAddition";
 import { IFoodAdditionView } from "../interface/menu/list/IFoodAdditionView";
+import { IOrderDetailsResponse } from "../interface/order/details/IOrderDetailsResponse";
 import { IOrderFoodAdditionItemView } from "../interface/order/details/IOrderFoodAdditionItemView";
-import { IUserModel } from "../models/user";
-import { IUserView } from "../interface/order/common/IUserView";
-import { IOrderStateModel } from "../models/orderState";
+import { IOrderFoodItemView } from "../interface/order/details/IOrderFoodItemView";
 import { IOrderStateView } from "../interface/order/details/IOrderStateView";
+import { ISimpleFoodView } from "../interface/order/details/ISimpleFoodView";
+import { IFoodModel } from "../models/food";
+import { IFoodAdditionModel } from "../models/foodAddition";
+import { IOrderModel } from "../models/order";
+import { IOrderItemModel } from "../models/orderItem";
+import { IOrderItemAdditionModel } from "../models/orderItemAddition";
+import { IOrderStateModel } from "../models/orderState";
+import { UserModelToUserViewConverter } from "./common/UserModelToUserViewConverter";
 
 export class OrderModelToOrderDetailsResponseConverter implements Converter<IOrderModel, IOrderDetailsResponse> {
+	userConverter = new UserModelToUserViewConverter();
+
 	convert(input: IOrderModel): IOrderDetailsResponse {
 		const items: IOrderFoodItemView[] = input.items.map(item => this.convertOrderItem(item));
 
@@ -25,7 +26,7 @@ export class OrderModelToOrderDetailsResponseConverter implements Converter<IOrd
 			finishedDate: input.finishedDate,
 			totalPrice: input.totalPrice,
 			items: items,
-			user: this.convertUser(input.user),
+			user: this.userConverter.convert(input.user),
 			currentState: this.convertState(input.currentState),
 			history: input.history.map(state => this.convertState(state)),
 		};
@@ -69,16 +70,7 @@ export class OrderModelToOrderDetailsResponseConverter implements Converter<IOrd
 		return {
 			state: orderState.state,
 			enteredDate: orderState.enteredDate,
-			enteredBy: this.convertUser(orderState.enteredBy),
+			enteredBy: this.userConverter.convert(orderState.enteredBy),
 		}
-	}
-
-	private convertUser(user: IUserModel): IUserView {
-		return {
-			_id: user._id,
-			email: user.email,
-			firstName: user.firstName,
-			lastName: user.lastName,
-		};
 	}
 }

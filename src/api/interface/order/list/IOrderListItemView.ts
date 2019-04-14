@@ -1,5 +1,5 @@
 import { IOrderItemView } from './IOrderItemView';
-import { IUserView } from '../common/IUserView';
+import { IUserView } from '../../common/IUserView';
 import { ICurrentStateView } from './ICurrentStateView';
 
 export interface IOrderListItemView {

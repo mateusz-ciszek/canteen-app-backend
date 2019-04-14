@@ -36,11 +36,11 @@ export async function createOrder(req: IRequest, res: Response): Promise<Respons
 	try {
 		const state = new OrderState({
 			state: 'SAVED',
-			enteredBy: req.context.userId,
+			enteredBy: req.context!.userId,
 		});
 		await new Order({
 			_id: mongoose.Types.ObjectId(),
-			user: req.context.userId,
+			user: req.context!.userId,
 			items: items.map(item => item._id),
 			totalPrice: price,
 			history: [state],
@@ -93,7 +93,7 @@ export async function updateOrderState(req: IRequest, res: Response): Promise<Re
 	}
 
 	try {
-		await tryChangeState(request, req.context.userId);
+		await tryChangeState(request, req.context!.userId);
 	} catch (err) {
 		return res.status(500).json();
 	}
