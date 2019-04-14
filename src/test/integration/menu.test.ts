@@ -1,11 +1,11 @@
 import 'mocha';
 import request from 'supertest';
-import { app } from '../app';
+import { app } from '../../app';
 import { expect } from 'chai';
-import { DatabaseTestHelper } from './helper/databaseHelper';
-import { TokenTestHelper } from './helper/tokenHelper';
-import { MenuTestHelper } from './helper/menuHelper';
-import { FoodTestHelper } from './helper/foodHelper';
+import { DatabaseTestHelper } from '../testHelpers/databaseHelper';
+import { TokenTestHelper } from '../testHelpers/tokenHelper';
+import { MenuTestHelper } from '../testHelpers/menuHelper';
+import { FoodTestHelper } from '../testHelpers/foodHelper';
 
 describe('Menu', () => {
 	const dbHelper = new DatabaseTestHelper();

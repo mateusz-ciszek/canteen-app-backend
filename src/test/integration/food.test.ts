@@ -1,9 +1,9 @@
 import 'mocha';
 import request from 'supertest';
 import { should } from 'chai';
-import { app } from '../app';
-import { DatabaseTestHelper } from './helper/databaseHelper';
-import { TokenTestHelper } from './helper/tokenHelper';
+import { app } from '../../app';
+import { DatabaseTestHelper } from '../testHelpers/databaseHelper';
+import { TokenTestHelper } from '../testHelpers/tokenHelper';
 should();
 
 describe('Food', () => {

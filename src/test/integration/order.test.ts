@@ -1,10 +1,10 @@
 import 'mocha';
 import request from 'supertest';
-import { app } from '../app';
+import { app } from '../../app';
 import { should } from 'chai';
-import { DatabaseTestHelper } from './helper/databaseHelper';
-import { TokenTestHelper } from './helper/tokenHelper';
-import { OrderTestHelper } from './helper/orderHelper';
+import { DatabaseTestHelper } from '../testHelpers/databaseHelper';
+import { TokenTestHelper } from '../testHelpers/tokenHelper';
+import { OrderTestHelper } from '../testHelpers/orderHelper';
 should();
 
 describe('Order', () => {
