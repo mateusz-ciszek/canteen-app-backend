@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -r ts-node/register src/test/*.ts --timeout 4000",
+    "test": "mocha -r ts-node/register src/test/**/*.test.ts --timeout 4000",
+    "test-unit": "mocha -r ts-node/register src/test/unit/**/*.test.ts",
+    "test-it": "mocha -r ts-node/register src/test/integration/**/*.test.ts --timeout 4000",
     "start": "nodemon dist/server.js",
     "build": "tsc -p .",
     "live": "nodemon --exec ts-node src/server.ts"

@@ -1,6 +1,6 @@
 import 'mocha';
 import request from 'supertest';
-import { app } from '../app';
+import { app } from '../../app';
 
 describe('Miscellaneous', () => {
 	it('should get 404 when targeting non existing endpoint', async () => {

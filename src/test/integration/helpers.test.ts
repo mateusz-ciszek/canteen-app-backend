@@ -1,9 +1,10 @@
 import 'mocha';
 import { should } from 'chai';
-import { OrderStateEnum } from '../interface/orderState';
-import * as stateHelper from '../api/helper/orderStateHelper';
+import { OrderStateEnum } from '../../interface/orderState';
+import * as stateHelper from '../../api/helper/orderStateHelper';
 should();
 
+// TODO: Move to unit tests, use expect instead of should
 describe('Helpers', () => {
 	describe('#orderState', () => {
 
