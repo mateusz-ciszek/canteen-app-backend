@@ -1,0 +1,1 @@
+export type DayOffState = 'UNRESOLVED' | 'APPROVED' | 'REJECTED';

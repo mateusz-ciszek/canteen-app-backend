@@ -11,6 +11,7 @@ import { OrderItemAddition } from '../../api/models/orderItemAddition';
 import { OrderState } from '../../api/models/orderState';
 import { Worker } from '../../api/models/worker';
 import { WorkHours } from '../../api/models/workHours';
+import { DayOff } from '../../api/models/DayOff';
 
 export class DatabaseTestHelper {
 	private id: ObjectId | null = null;
@@ -104,6 +105,15 @@ export class DatabaseTestHelper {
 		EMPLOYMENT_DATE: '2019-03-25T16:08:16.747+00:00',
 	}
 
+	public readonly DAY_OFF = {
+		ID: '',
+		WORKER: '',
+		DATE: '2019-04-25T22:00:00.000Z',
+		STATE: 'UNRESOLVED',
+		RESOLVED_BY: null,
+		RESOLVED_DATE: null,
+	}
+
 	public async initDatabase(): Promise<void> {
 		await this.connect();
 
@@ -112,6 +122,7 @@ export class DatabaseTestHelper {
 		await this.saveMenu();
 		await this.saveOrder();
 		await this.saveWorker();
+		await this.saveDayOff();
 
 		await this.disconnect();
 	}
@@ -126,6 +137,7 @@ export class DatabaseTestHelper {
 		await OrderItem.deleteMany({}).exec();
 		await OrderItemAddition.deleteMany({}).exec();
 		await Worker.deleteMany({}).exec();
+		await DayOff.deleteMany({}).exec();
 		await this.disconnect();
 	}
 
@@ -264,5 +276,17 @@ export class DatabaseTestHelper {
 			defaultWorkHours: workHours,
 		}).save();
 		this.WORKER.ID = this.id.toString();
+	}
+
+	private async saveDayOff(): Promise<void> {
+		this.DAY_OFF.WORKER = this.ADMIN_USER.ID;
+		this.id = this.generateObjectId();
+		await new DayOff({
+			_id: this.id,
+			worker: this.DAY_OFF.WORKER,
+			date: this.DAY_OFF.DATE,
+			state: this.DAY_OFF.STATE,
+		}).save();
+		this.DAY_OFF.ID = this.id.toString();
 	}
 }

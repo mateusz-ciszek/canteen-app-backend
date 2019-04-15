@@ -4,6 +4,7 @@ import { expect, should } from 'chai';
 import { IWorkerCreateRequest } from '../../api/interface/worker/create/IWorkerCreateRequest';
 import { DatabaseTestHelper } from '../testHelpers/databaseHelper';
 import { TokenTestHelper } from '../testHelpers/tokenHelper';
+import { IWorkerDayOffRequest } from '../../api/interface/worker/dayOff/IWorkerDayOffRequest';
 should();
 
 describe('Worker', () => {
@@ -154,5 +155,79 @@ describe('Worker', () => {
 
 	describe('#month', () => {
 
+	});
+
+	describe('#dayOff', () => {
+		const url = '/worker/dayoff';
+		let payload: IWorkerDayOffRequest;
+
+		beforeEach('set up', () => {
+			const date = new Date(dbHelper.DAY_OFF.DATE);
+			date.setDate(date.getDate() + 1);
+
+			payload = { dates: [date.toISOString()] };
+		});
+
+		describe('#create', () => {
+			it('should get 401 without auth token', async () => {
+				return request(app)
+						.post(url)
+						.send(payload)
+						.expect(401);
+			});
+
+			it('should get 403 with standard token', async () => {
+				return request(app)
+						.post(url)
+						.send(payload)
+						.set('Authorization', `Bearer ${standardToken}`)
+						.expect(403);
+			});
+
+			it('shoudl get 400 without payload', async () => {
+				return request(app)
+						.post(url)
+						.set('Authorization', `Bearer ${adminToken}`)
+						.expect(400);
+			});
+
+			it('should get 400 with empty array for dates', async () => {
+				payload.dates = [];
+
+				return request(app)
+						.post(url)
+						.send(payload)
+						.set('Authorization', `Bearer ${adminToken}`)
+						.expect(400);
+			});
+
+			it('should get 400 with invalid dates in request', async () => {
+				payload.dates = ['WITH_ALL_CERTAINTY_THIS_IS_NOT_A_VALID_DATE_STRING'];
+
+				return request(app)
+						.post(url)
+						.send(payload)
+						.set('Authorization', `Bearer ${adminToken}`)
+						.expect(400);
+			});
+
+			it('shoudl get 200 with valid payload', async () => {
+				return request(app)
+						.post(url)
+						.send(payload)
+						.set('Authorization', `Bearer ${adminToken}`)
+						.expect(200);
+			});
+
+			it('should get 200 even if that date has already been requested', async () => {
+				payload.dates = [new Date(dbHelper.DAY_OFF.DATE).toISOString()];
+
+				return request(app)
+						.post(url)
+						.send(payload)
+						.set('Authorization', `Bearer ${adminToken}`)
+						.expect(200);
+			});
+		});
 	});
 });

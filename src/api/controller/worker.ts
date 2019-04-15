@@ -11,6 +11,11 @@ import { WorkerValidator } from "../helper/validate/WorkerValidator";
 import { WorkerModelToWorkerViewConverter } from "../converter/WorkerModelToWorkerViewConverter";
 import { IMonthRequest } from "../interface/worker/month/IMonthRequest";
 import { IMonthGetResponse } from "../interface/worker/month/IMonthGetResponse";
+import { IWorkerDayOffRequest } from "../interface/worker/dayOff/IWorkerDayOffRequest";
+import { DayOffRequestValidator } from "../helper/validate/DayOffRequestValidator";
+import { DayOff } from "../models/DayOff";
+import { Types } from "mongoose";
+import { DayOffHelper } from "../helper/DayOffHelper";
 
 export async function getWorkersList(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 	const allWorkers: IWorkerModel[] = await Worker.find()
@@ -55,4 +60,39 @@ export async function getMonth(req: IRequest, res: Response, next: NextFunction)
 	const month: IMonthGetResponse = workerHelper.calculateMonth(request, workers);
 	
 	return res.status(200).json(month);
+}
+
+export async function dayOff(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	const request: IWorkerDayOffRequest = req.body;
+
+	const validator = new DayOffRequestValidator();
+	if (!validator.validate(request)) {
+		res.status(400).json();
+	}
+
+	const worker = await Worker.findOne({ 'person': { '_id': req.context!.userId } }).exec();
+	if (!worker) {
+		return res.status(400).json();
+	}
+	
+	const helper = new DayOffHelper();
+	let dates: Date[];
+	try {
+		dates = request.dates.map(helper.mapDateStringToDate);
+	} catch (err) {
+		return res.status(400).json();
+	}
+	
+	dates = await helper.removeAlreadyRequestedDates(dates, worker._id);
+
+	for (const date of dates) {
+		await new DayOff({
+			_id: new Types.ObjectId(),
+			worker,
+			date,
+			state: 'UNRESOLVED',
+		}).save();
+	}
+
+	return res.status(200).json();
 }
