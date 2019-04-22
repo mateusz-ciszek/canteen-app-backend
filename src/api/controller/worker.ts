@@ -57,7 +57,7 @@ export async function getMonth(req: IRequest, res: Response, next: NextFunction)
 
 	const workers = await Worker.find().populate('person').exec();
 	const workerHelper = new WorkerHelper();
-	const month: IMonthGetResponse = workerHelper.calculateMonth(request, workers);
+	const month: IMonthGetResponse = await workerHelper.calculateMonth(request, workers);
 	
 	return res.status(200).json(month);
 }

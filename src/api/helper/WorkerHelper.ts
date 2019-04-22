@@ -11,6 +11,7 @@ import { IMonthGetResponse } from "../interface/worker/month/IMonthGetResponse";
 import { WorkerModelToWorkerViewConverter } from "../converter/WorkerModelToWorkerViewConverter";
 import { IWorkerCalendarView } from "../interface/worker/month/IWorkerCalendarView";
 import { IDay } from "../interface/worker/month/IDay";
+import { DayOffRepository } from "../repository/DayOffRepository";
 
 export class WorkerHelper {
 	async generateEmail(firstName: string, lastName: string): Promise<string> {
@@ -37,23 +38,42 @@ export class WorkerHelper {
 		return worker;
 	}
 
-	calculateMonth(request: IMonthRequest, workers: IWorkerModel[]): IMonthGetResponse {
+	async calculateMonth(request: IMonthRequest, workers: IWorkerModel[]): Promise<IMonthGetResponse> {
 		const defaultWeek = this.calculateDefaultWeek(workers);
 
 		const calendarHelper = new CalendarHelper();
 		const month: IMonthGetResponse = { weeks: [{}, {}, {}, {}, {}, {}] };
-		calendarHelper.getMonth(request).forEach((week, weekIndex) => week.forEach((day, dayIndex) => {
-			const defaultForDay = defaultWeek[day.getDay()];
-			const dayDetails: IDay = { 
-				workersPresent: defaultForDay.workers.map<IWorkerCalendarView>(worker => ({ // FIXME: Move to a converter
+
+		const dates = calendarHelper.getMonth(request);
+
+		for (let weekIndex = 0; weekIndex < dates.length; ++weekIndex) {
+			const week = dates[weekIndex];
+			for (let dayIndex = 0; dayIndex < week.length; ++ dayIndex) {
+				const day = week[dayIndex];
+
+				const defaultForDay = defaultWeek[day.getDay()];
+				const workersPresent =  defaultForDay.workers.map<IWorkerCalendarView>(worker => ({ // FIXME: Move to a converter
 					id: worker.id,
 					person: worker.person,
 					workHours: worker.defaultWorkHours[dayIndex],
-				})),
-			};
+				}));
 
-			month.weeks[weekIndex][day.toISOString()] = dayDetails;
-		}));
+				const dayOffRepo = new DayOffRepository();
+				const requests = await dayOffRepo.getDaysOff(request.year, request.month, day.getDate(), ['UNRESOLVED']);
+
+				const dayDetails: IDay = { 
+					workersPresent,
+					requests: requests.map(model => ({
+						id: model._id,
+						person: model.worker.person,
+						state: model.state,
+						date: model.date,
+					})),
+				};
+
+				month.weeks[weekIndex][day.toISOString()] = dayDetails;
+			}
+		}
 
 		return month;
 	}
