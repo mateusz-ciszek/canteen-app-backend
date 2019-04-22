@@ -16,6 +16,8 @@ import { DayOffRequestValidator } from "../helper/validate/DayOffRequestValidato
 import { DayOff } from "../models/DayOff";
 import { Types } from "mongoose";
 import { DayOffHelper } from "../helper/DayOffHelper";
+import { IDayOffChangeStatusRequest } from "./IDayOffChangeStatusRequest";
+import { DayOffChangeRequestValidator } from "../helper/validate/DayOffChangeRequestValidator";
 
 export async function getWorkersList(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 	const allWorkers: IWorkerModel[] = await Worker.find()
@@ -62,7 +64,7 @@ export async function getMonth(req: IRequest, res: Response, next: NextFunction)
 	return res.status(200).json(month);
 }
 
-export async function dayOff(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+export async function createDayOffRequest(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 	const request: IWorkerDayOffRequest = req.body;
 
 	const validator = new DayOffRequestValidator();
@@ -93,6 +95,29 @@ export async function dayOff(req: IRequest, res: Response, next: NextFunction): 
 			state: 'UNRESOLVED',
 		}).save();
 	}
+
+	return res.status(200).json();
+}
+
+export async function changeDayffState(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	const request: IDayOffChangeStatusRequest = req.body;
+
+	const validator = new DayOffChangeRequestValidator();
+	if (!validator.validate(request)) {
+		return res.status(400).json();
+	}
+
+	const dayOffRequest = await DayOff.findById(request.id).exec();
+	if (!dayOffRequest) {
+		return res.status(400).json();
+	}
+
+	const worker = await Worker.findById(req.context!.userId).exec();
+
+	dayOffRequest.state = request.state;
+	dayOffRequest.resolvedBy = worker!;
+	dayOffRequest.resolvedDate = new Date();
+	await dayOffRequest.save();
 
 	return res.status(200).json();
 }
