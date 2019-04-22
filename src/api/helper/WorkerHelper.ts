@@ -11,7 +11,9 @@ import { IMonthGetResponse } from "../interface/worker/month/IMonthGetResponse";
 import { WorkerModelToWorkerViewConverter } from "../converter/WorkerModelToWorkerViewConverter";
 import { IWorkerCalendarView } from "../interface/worker/month/IWorkerCalendarView";
 import { IDay } from "../interface/worker/month/IDay";
-import { DayOffRepository } from "../repository/DayOffRepository";
+import { DayOff, IDayOffModel } from "../models/DayOff";
+import { DayOffState } from "../../interface/DayOffStatus";
+import { DayOffModelToDayOffRequestConverter } from "../converter/DayOffModelToDayOffRequestConverter";
 
 export class WorkerHelper {
 	async generateEmail(firstName: string, lastName: string): Promise<string> {
@@ -58,17 +60,12 @@ export class WorkerHelper {
 					workHours: worker.defaultWorkHours[dayIndex],
 				}));
 
-				const dayOffRepo = new DayOffRepository();
-				const requests = await dayOffRepo.getDaysOff(request.year, request.month, day.getDate(), ['UNRESOLVED']);
+				const requests = await this.getDaysOff(request.year, request.month, day.getDate(), ['UNRESOLVED']);
+				const converter = new DayOffModelToDayOffRequestConverter();
 
 				const dayDetails: IDay = { 
 					workersPresent,
-					requests: requests.map(model => ({
-						id: model._id,
-						person: model.worker.person,
-						state: model.state,
-						date: model.date,
-					})),
+					requests: requests.map(model => converter.convert(model)),
 				};
 
 				month.weeks[weekIndex][day.toISOString()] = dayDetails;
@@ -96,5 +93,20 @@ export class WorkerHelper {
 
 	private isWorking(day: IWorkHours): boolean {
 		return !(day.startHour.getHours() === day.endHour.getHours() && day.startHour.getMinutes() === day.endHour.getMinutes());
+	}
+
+	private getDaysOff(year: number, month: number, day: number, states?: DayOffState[]): Promise<IDayOffModel[]> {
+		return DayOff.find({
+			date: new Date(year, month, day, 0, 0, 0, 0),
+			state: {
+				$in: states
+			},
+		}).populate({
+			path: 'worker',
+			populate: {
+				path: 'person',
+				select: '_id firstName lastName email',
+			},
+		}).exec();
 	}
 }
