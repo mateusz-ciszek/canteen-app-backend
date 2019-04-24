@@ -66,7 +66,7 @@ export class WorkerHelper {
 						workHours: worker.defaultWorkHours[dayIndex],
 					}));
 
-				const requests = await this.getDaysOff(request.year, request.month, day.getDate(), ['UNRESOLVED']);
+				const requests = await this.getDaysOff(day.getFullYear(), day.getMonth(), day.getDate(), ['UNRESOLVED']);
 				const converter = new DayOffModelToDayOffRequestConverter();
 
 				const dayDetails: IDay = { 
