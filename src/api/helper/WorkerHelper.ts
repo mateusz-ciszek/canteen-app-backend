@@ -42,6 +42,11 @@ export class WorkerHelper {
 
 	async calculateMonth(request: IMonthRequest, workers: IWorkerModel[]): Promise<IMonthGetResponse> {
 		const defaultWeek = this.calculateDefaultWeek(workers);
+		const acceptedDaysOff: { [workerId: string]: IDayOffModel[] } = {};
+
+		for (const worker of workers) {
+			acceptedDaysOff[worker._id] = await this.getAcceptedDaysOff(request.year, request.month, worker._id);
+		}
 
 		const calendarHelper = new CalendarHelper();
 		const month: IMonthGetResponse = { weeks: [{}, {}, {}, {}, {}, {}] };
@@ -50,15 +55,16 @@ export class WorkerHelper {
 
 		for (let weekIndex = 0; weekIndex < dates.length; ++weekIndex) {
 			const week = dates[weekIndex];
-			for (let dayIndex = 0; dayIndex < week.length; ++ dayIndex) {
+			for (let dayIndex = 0; dayIndex < week.length; ++dayIndex) {
 				const day = week[dayIndex];
 
 				const defaultForDay = defaultWeek[day.getDay()];
-				const workersPresent =  defaultForDay.workers.map<IWorkerCalendarView>(worker => ({ // FIXME: Move to a converter
-					id: worker.id,
-					person: worker.person,
-					workHours: worker.defaultWorkHours[dayIndex],
-				}));
+				const workersPresent =  defaultForDay.workers.filter(worker => !acceptedDaysOff[worker.id].find(dayOff => this.equalDates(day, dayOff.date)))
+					.map<IWorkerCalendarView>(worker => ({ // FIXME: Move to a converter
+						id: worker.id,
+						person: worker.person,
+						workHours: worker.defaultWorkHours[dayIndex],
+					}));
 
 				const requests = await this.getDaysOff(request.year, request.month, day.getDate(), ['UNRESOLVED']);
 				const converter = new DayOffModelToDayOffRequestConverter();
@@ -108,5 +114,23 @@ export class WorkerHelper {
 				select: '_id firstName lastName email',
 			},
 		}).exec();
+	}
+
+	private equalDates(date: Date, other: Date): boolean {
+		return date.getFullYear() === other.getFullYear() && date.getMonth() === other.getMonth() && date.getDate() === other.getDate();
+	}
+
+	private async getAcceptedDaysOff(year: number, month: number, workerId: string): Promise<IDayOffModel[]> {
+		const startDate = new Date(year, month, 1, 0, 0, 0, 0);
+		const endDate = new Date(year, month + 1, 1, 0, 0, 0, 0);
+
+		return DayOff.find({
+			date: {
+				$gte: startDate,
+				$lt: endDate,
+			},
+			worker: workerId,
+			state: 'APPROVED',
+		}).select('date').exec();
 	}
 }

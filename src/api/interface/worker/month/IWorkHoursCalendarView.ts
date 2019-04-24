@@ -1,5 +1,5 @@
 export interface IWorkHoursCalendarView {
-	day: number;
+	day: number; // TODO: Remove
 	startHour: Date;
 	endHour: Date;
 }
