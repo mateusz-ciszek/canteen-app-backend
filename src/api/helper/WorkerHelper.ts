@@ -11,6 +11,9 @@ import { IMonthGetResponse } from "../interface/worker/month/IMonthGetResponse";
 import { WorkerModelToWorkerViewConverter } from "../converter/WorkerModelToWorkerViewConverter";
 import { IWorkerCalendarView } from "../interface/worker/month/IWorkerCalendarView";
 import { IDay } from "../interface/worker/month/IDay";
+import { DayOff, IDayOffModel } from "../models/DayOff";
+import { DayOffState } from "../../interface/DayOffStatus";
+import { DayOffModelToDayOffRequestConverter } from "../converter/DayOffModelToDayOffRequestConverter";
 
 export class WorkerHelper {
 	async generateEmail(firstName: string, lastName: string): Promise<string> {
@@ -37,23 +40,43 @@ export class WorkerHelper {
 		return worker;
 	}
 
-	calculateMonth(request: IMonthRequest, workers: IWorkerModel[]): IMonthGetResponse {
+	async calculateMonth(request: IMonthRequest, workers: IWorkerModel[]): Promise<IMonthGetResponse> {
 		const defaultWeek = this.calculateDefaultWeek(workers);
+		const acceptedDaysOff: { [workerId: string]: IDayOffModel[] } = {};
+
+		for (const worker of workers) {
+			acceptedDaysOff[worker._id] = await this.getAcceptedDaysOff(request.year, request.month, worker._id);
+		}
 
 		const calendarHelper = new CalendarHelper();
 		const month: IMonthGetResponse = { weeks: [{}, {}, {}, {}, {}, {}] };
-		calendarHelper.getMonth(request).forEach((week, weekIndex) => week.forEach((day, dayIndex) => {
-			const defaultForDay = defaultWeek[day.getDay()];
-			const dayDetails: IDay = { 
-				workersPresent: defaultForDay.workers.map<IWorkerCalendarView>(worker => ({ // FIXME: Move to a converter
-					id: worker.id,
-					person: worker.person,
-					workHours: worker.defaultWorkHours[dayIndex],
-				})),
-			};
 
-			month.weeks[weekIndex][day.toISOString()] = dayDetails;
-		}));
+		const dates = calendarHelper.getMonth(request);
+
+		for (let weekIndex = 0; weekIndex < dates.length; ++weekIndex) {
+			const week = dates[weekIndex];
+			for (let dayIndex = 0; dayIndex < week.length; ++dayIndex) {
+				const day = week[dayIndex];
+
+				const defaultForDay = defaultWeek[day.getDay()];
+				const workersPresent =  defaultForDay.workers.filter(worker => !acceptedDaysOff[worker.id].find(dayOff => this.equalDates(day, dayOff.date)))
+					.map<IWorkerCalendarView>(worker => ({ // FIXME: Move to a converter
+						id: worker.id,
+						person: worker.person,
+						workHours: worker.defaultWorkHours[dayIndex],
+					}));
+
+				const requests = await this.getDaysOff(day.getFullYear(), day.getMonth(), day.getDate(), ['UNRESOLVED']);
+				const converter = new DayOffModelToDayOffRequestConverter();
+
+				const dayDetails: IDay = { 
+					workersPresent,
+					requests: requests.map(model => converter.convert(model)),
+				};
+
+				month.weeks[weekIndex][day.toISOString()] = dayDetails;
+			}
+		}
 
 		return month;
 	}
@@ -76,5 +99,38 @@ export class WorkerHelper {
 
 	private isWorking(day: IWorkHours): boolean {
 		return !(day.startHour.getHours() === day.endHour.getHours() && day.startHour.getMinutes() === day.endHour.getMinutes());
+	}
+
+	private getDaysOff(year: number, month: number, day: number, states?: DayOffState[]): Promise<IDayOffModel[]> {
+		return DayOff.find({
+			date: new Date(year, month, day, 0, 0, 0, 0),
+			state: {
+				$in: states
+			},
+		}).populate({
+			path: 'worker',
+			populate: {
+				path: 'person',
+				select: '_id firstName lastName email',
+			},
+		}).exec();
+	}
+
+	private equalDates(date: Date, other: Date): boolean {
+		return date.getFullYear() === other.getFullYear() && date.getMonth() === other.getMonth() && date.getDate() === other.getDate();
+	}
+
+	private async getAcceptedDaysOff(year: number, month: number, workerId: string): Promise<IDayOffModel[]> {
+		const startDate = new Date(year, month, 1, 0, 0, 0, 0);
+		const endDate = new Date(year, month + 1, 1, 0, 0, 0, 0);
+
+		return DayOff.find({
+			date: {
+				$gte: startDate,
+				$lt: endDate,
+			},
+			worker: workerId,
+			state: 'APPROVED',
+		}).select('date').exec();
 	}
 }
