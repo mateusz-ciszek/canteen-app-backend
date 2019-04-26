@@ -52,21 +52,12 @@ describe('Worker', () => {
 						const worker = response.body.workers[0];
 						expect(worker).to.have.property('id').that.is.a('string').and.equals(dbHelper.WORKER.ID);
 						expect(worker).to.have.property('person').that.is.an('object').and.is.not.null;
-						expect(worker).to.have.property('defaultWorkHours').that.is.an('array').and.has.lengthOf(7);
 
 						const person = worker.person;
 						expect(person).to.have.property('_id').that.is.a('string').and.equals(dbHelper.ADMIN_USER.ID);
 						expect(person).to.have.property('email').that.is.a('string').and.equals(dbHelper.ADMIN_USER.EMAIL);
 						expect(person).to.have.property('firstName').that.is.a('string').and.equals(dbHelper.ADMIN_USER.FIRST_NAME);
 						expect(person).to.have.property('lastName').that.is.a('string').and.equals(dbHelper.ADMIN_USER.LAST_NAME);
-
-						const workHours = worker.defaultWorkHours[0];
-						expect(workHours).to.have.property('day').that.is.a('number').and.equals(dbHelper.WORK_HOURS[0].DAY);
-						expect(workHours).to.have.property('startHour').that.is.a('string').and.is.not.null;
-						expect(workHours).to.have.property('endHour').that.is.a('string').and.is.not.null;
-
-						expect(new Date(workHours.startHour).getTime()).to.equal(new Date(dbHelper.WORK_HOURS[0].START_HOUR).getTime());
-						expect(new Date(workHours.endHour).getTime()).to.equal(new Date(dbHelper.WORK_HOURS[0].END_HOUR).getTime());
 					});
 		});
 	});
