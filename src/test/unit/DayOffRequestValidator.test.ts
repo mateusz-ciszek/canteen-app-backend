@@ -1,7 +1,7 @@
 import 'mocha';
 import { expect } from 'chai';
 import { DayOffRequestValidator } from '../../api/helper/validate/DayOffRequestValidator';
-import { IWorkerDayOffRequest } from '../../api/interface/worker/dayOff/IWorkerDayOffRequest';
+import { IWorkerDayOffRequest } from '../../api/interface/worker/dayOff/create/IWorkerDayOffRequest';
 
 describe('#DayOffRequestValidator', () => {
 	let validator: DayOffRequestValidator;
