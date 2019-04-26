@@ -8,7 +8,6 @@ import { IWorkerCreateResponse } from "../interface/worker/create/IWorkerCreateR
 import { IWorkerCreateRequest } from "../interface/worker/create/IWorkerCreateRequest";
 import { WorkHoursHelper } from "../helper/WorkHoursHelper";
 import { WorkerValidator } from "../helper/validate/WorkerValidator";
-import { WorkerModelToWorkerViewConverter } from "../converter/WorkerModelToWorkerViewConverter";
 import { IMonthRequest } from "../interface/worker/month/IMonthRequest";
 import { IMonthGetResponse } from "../interface/worker/month/IMonthGetResponse";
 import { IWorkerDayOffRequest } from "../interface/worker/dayOff/IWorkerDayOffRequest";
@@ -18,13 +17,14 @@ import { Types } from "mongoose";
 import { DayOffHelper } from "../helper/DayOffHelper";
 import { IDayOffChangeStatusRequest } from "./IDayOffChangeStatusRequest";
 import { DayOffChangeRequestValidator } from "../helper/validate/DayOffChangeRequestValidator";
+import { WorkerModelToWorkerListItemConverter } from "../converter/worker/WorkerModelToWorkerListItemConverter";
 
 export async function getWorkersList(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 	const allWorkers: IWorkerModel[] = await Worker.find()
 			.populate('person')
 			.exec();
 
-	const converter = new WorkerModelToWorkerViewConverter();
+	const converter = new WorkerModelToWorkerListItemConverter();
 	const response: IWorkerListResponse = { workers: allWorkers.map(worker => converter.convert(worker)) };
 	return res.status(200).json(response);
 }

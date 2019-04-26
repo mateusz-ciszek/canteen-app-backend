@@ -8,7 +8,7 @@ import { IWorkHours } from "../../interface/workHours";
 import { IMonthRequest } from "../interface/worker/month/IMonthRequest";
 import { CalendarHelper } from "./CalendarHelper";
 import { IMonthGetResponse } from "../interface/worker/month/IMonthGetResponse";
-import { WorkerModelToWorkerViewConverter } from "../converter/WorkerModelToWorkerViewConverter";
+import { WorkerModelToWorkerViewConverter } from "../converter/worker/WorkerModelToWorkerViewConverter";
 import { IWorkerCalendarView } from "../interface/worker/month/IWorkerCalendarView";
 import { IDay } from "../interface/worker/month/IDay";
 import { DayOff, IDayOffModel } from "../models/DayOff";

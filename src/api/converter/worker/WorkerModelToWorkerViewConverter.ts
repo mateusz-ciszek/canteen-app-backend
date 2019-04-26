@@ -1,7 +1,7 @@
-import { Converter } from "../../common/Converter";
-import { IWorkerModel } from "../models/worker";
-import { IWorkerView } from "../interface/worker/list/IWorkerView";
-import { UserModelToUserViewConverter } from "./common/UserModelToUserViewConverter";
+import { Converter } from "../../../common/Converter";
+import { IWorkerModel } from "../../models/worker";
+import { IWorkerView } from "../../interface/worker/month/IWorkerView";
+import { UserModelToUserViewConverter } from "../common/UserModelToUserViewConverter";
 
 export class WorkerModelToWorkerViewConverter implements Converter<IWorkerModel, IWorkerView> {
 	convert(input: IWorkerModel): IWorkerView {
