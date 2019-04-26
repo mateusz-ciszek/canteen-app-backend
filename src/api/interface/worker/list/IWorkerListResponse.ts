@@ -1,5 +1,5 @@
-import { IWorkerView } from "./IWorkerView";
+import { IWorkerListItem } from "./IWorkerListItem";
 
 export interface IWorkerListResponse {
-	workers: IWorkerView[];
+	workers: IWorkerListItem[];
 }

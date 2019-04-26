@@ -1,4 +1,4 @@
-import { IWorkerView } from "../list/IWorkerView";
+import { IWorkerView } from "./IWorkerView";
 
 export interface IWorkDayDetails {
 	workers: IWorkerView[];
