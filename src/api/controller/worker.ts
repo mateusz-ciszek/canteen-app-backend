@@ -10,12 +10,12 @@ import { WorkHoursHelper } from "../helper/WorkHoursHelper";
 import { WorkerValidator } from "../helper/validate/WorkerValidator";
 import { IMonthRequest } from "../interface/worker/month/IMonthRequest";
 import { IMonthGetResponse } from "../interface/worker/month/IMonthGetResponse";
-import { IWorkerDayOffRequest } from "../interface/worker/dayOff/IWorkerDayOffRequest";
+import { IWorkerDayOffRequest } from "../interface/worker/dayOff/create/IWorkerDayOffRequest";
 import { DayOffRequestValidator } from "../helper/validate/DayOffRequestValidator";
 import { DayOff } from "../models/DayOff";
 import { Types } from "mongoose";
 import { DayOffHelper } from "../helper/DayOffHelper";
-import { IDayOffChangeStatusRequest } from "./IDayOffChangeStatusRequest";
+import { IDayOffChangeStatusRequest } from "../interface/worker/dayOff/changeState/IDayOffChangeStatusRequest";
 import { DayOffChangeRequestValidator } from "../helper/validate/DayOffChangeRequestValidator";
 import { WorkerModelToWorkerListItemConverter } from "../converter/worker/WorkerModelToWorkerListItemConverter";
 

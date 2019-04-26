@@ -1,4 +1,4 @@
-import { IDayOffChangeStatusRequest } from "../../controller/IDayOffChangeStatusRequest";
+import { IDayOffChangeStatusRequest } from "../../interface/worker/dayOff/changeState/IDayOffChangeStatusRequest";
 import { isValidObjectId } from "../mongooseErrorHelper";
 
 export class DayOffChangeRequestValidator {
