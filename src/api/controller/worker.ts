@@ -3,7 +3,7 @@ import { Response, NextFunction } from "express";
 import { Worker, IWorkerModel } from "../models/worker";
 import { saveUser, hashPassword } from '../helper/userHelper';
 import { IWorkerListResponse } from "../interface/worker/list/IWorkerListResponse";
-import { WorkerHelper } from '../helper/WorkerHelper';
+import { WorkerHelper, WorkerNotFoundError, NotObjectIdError } from '../helper/WorkerHelper';
 import { IWorkerCreateResponse } from "../interface/worker/create/IWorkerCreateResponse";
 import { IWorkerCreateRequest } from "../interface/worker/create/IWorkerCreateRequest";
 import { WorkHoursHelper } from "../helper/WorkHoursHelper";
@@ -18,6 +18,8 @@ import { DayOffHelper } from "../helper/DayOffHelper";
 import { IDayOffChangeStatusRequest } from "../interface/worker/dayOff/changeState/IDayOffChangeStatusRequest";
 import { DayOffChangeRequestValidator } from "../helper/validate/DayOffChangeRequestValidator";
 import { WorkerModelToWorkerListItemConverter } from "../converter/worker/WorkerModelToWorkerListItemConverter";
+import { IWorkerDetailsRequest } from "../interface/worker/details/IWorkerDetailsRequest";
+import { IWorkerDetailsResponse } from "../interface/worker/details/IWorkerDetailsResponse";
 
 export async function getWorkersList(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 	const allWorkers: IWorkerModel[] = await Worker.find()
@@ -120,4 +122,27 @@ export async function changeDayffState(req: IRequest, res: Response, next: NextF
 	await dayOffRequest.save();
 
 	return res.status(200).json();
+}
+
+export async function getWorkerDetails(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	const request: IWorkerDetailsRequest = req.params;
+
+	const workerHelper = new WorkerHelper();
+	let details: IWorkerDetailsResponse | null = null;
+
+	try {
+		details = await workerHelper.getDetails(request.workerId);
+	} catch (err) {
+		if (err instanceof NotObjectIdError) {
+			console.log(err.message);
+			return res.status(400).json();
+		} else if (err instanceof WorkerNotFoundError) {
+			return res.status(404).json();
+		} else {
+			console.log(err);
+			return res.status(500).json();
+		}
+	}
+
+	return res.status(200).json(details);
 }
