@@ -14,6 +14,12 @@ import { IDay } from "../interface/worker/month/IDay";
 import { DayOff, IDayOffModel } from "../models/DayOff";
 import { DayOffState } from "../../interface/DayOffStatus";
 import { DayOffModelToDayOffRequestConverter } from "../converter/DayOffModelToDayOffRequestConverter";
+import { isValidObjectId } from "./mongooseErrorHelper";
+import { IWorkerDetailsResponse } from "../interface/worker/details/IWorkerDetailsResponse";
+import { UserModelToUserViewConverter } from "../converter/common/UserModelToUserViewConverter";
+import { WorkHoursModelToWorkDayDetailsConverter } from "../converter/worker/WorkHoursModelToWorkDayDetailsConverter";
+import { ObjectId } from "bson";
+import { DayOffModelToDayOffDateilsConverter } from "../converter/worker/DayOffModelToConverter";
 
 export class WorkerHelper {
 	async generateEmail(firstName: string, lastName: string): Promise<string> {
@@ -81,6 +87,39 @@ export class WorkerHelper {
 		return month;
 	}
 
+	async getDetails(workerId: string): Promise<IWorkerDetailsResponse> {
+		if (!isValidObjectId(workerId)) {
+			throw new NotObjectIdError(`"${workerId}" is not a valid object identifier`);
+		}
+
+		const worker = await Worker.findById(workerId).populate('person').exec();
+
+		if (!worker) {
+			throw new WorkerNotFoundError(`Worker with ID: ${workerId} does not exist`);
+		}
+
+		const requests = await DayOff.find({ worker: new ObjectId(workerId) })
+				.populate({
+					path: 'worker resolvedBy',
+					populate: {
+						path: 'person',
+					},
+				})
+				.exec();
+
+		const userConverter = new UserModelToUserViewConverter();
+		const workDayConverter = new WorkHoursModelToWorkDayDetailsConverter();
+		const dayOffConverter = new DayOffModelToDayOffDateilsConverter();
+
+		const response: IWorkerDetailsResponse = {
+			person: userConverter.convert(worker.person),
+			employedDate: worker.employmentDate,
+			workDays: worker.defaultWorkHours.map(workHours => workDayConverter.convert(workHours)),
+			requests: requests.map(request => dayOffConverter.convert(request)),
+		};
+		return response;
+	}
+
 	private calculateDefaultWeek(workers: IWorkerModel[]): IWorkDayDetails[] {
 		const defaultWeek: IWorkDayDetails[] = [];
 		const workerConverter = new WorkerModelToWorkerViewConverter();
@@ -134,3 +173,7 @@ export class WorkerHelper {
 		}).select('date').exec();
 	}
 }
+
+export class WorkerNotFoundError extends Error {}
+
+export class NotObjectIdError extends Error {}
