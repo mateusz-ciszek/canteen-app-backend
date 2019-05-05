@@ -20,6 +20,8 @@ import { DayOffChangeRequestValidator } from "../helper/validate/DayOffChangeReq
 import { WorkerModelToWorkerListItemConverter } from "../converter/worker/WorkerModelToWorkerListItemConverter";
 import { IWorkerDetailsRequest } from "../interface/worker/details/IWorkerDetailsRequest";
 import { IWorkerDetailsResponse } from "../interface/worker/details/IWorkerDetailsResponse";
+import { IWorkerPasswordResetRequest } from "../interface/worker/password/reset/IWorkerPasswordResetRequest";
+import { IWorkerPasswordResetResponse } from "../interface/worker/password/reset/IWorkerPasswordResetResponse";
 
 export async function getWorkersList(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 	const allWorkers: IWorkerModel[] = await Worker.find()
@@ -46,7 +48,7 @@ export async function createWorker(req: IRequest, res: Response, next: NextFunct
 
 	const workerHelper = new WorkerHelper();
 	const email = await workerHelper.generateEmail(request.firstName, request.lastName);
-	const password = Math.random().toString(36).slice(-8);
+	const password = generatePassword();
 	const hash = await hashPassword(password);
 
 	const user = await saveUser(request.firstName, request.lastName, email, hash);
@@ -145,4 +147,28 @@ export async function getWorkerDetails(req: IRequest, res: Response, next: NextF
 	}
 
 	return res.status(200).json(details);
+}
+
+export async function resetPassword(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	const request: IWorkerPasswordResetRequest = req.body;
+
+	if (!request.workerId) {
+		return res.status(400).json();
+	}
+
+	const password = generatePassword();
+	const hash = await hashPassword(password);
+
+	const workerHelper = new WorkerHelper();
+	const worker = await workerHelper.getWorker(request.workerId);
+	const user = worker.person;
+	user.password = hash;
+	await user.save();
+
+	const response: IWorkerPasswordResetResponse = { email: user.email, password };
+	return res.status(200).json(response);
+}
+
+function generatePassword(): string {
+	return Math.random().toString(36).slice(-8);
 }

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
-import { getWorkersList, createWorker, getMonth, createDayOffRequest, changeDayffState, getWorkerDetails } from '../controller/worker';
+import { getWorkersList, createWorker, getMonth, createDayOffRequest, changeDayffState, getWorkerDetails, resetPassword } from '../controller/worker';
 
 export const router = Router();
 
@@ -16,3 +16,5 @@ router.post('/dayoff', checkAuth, isAdmin, createDayOffRequest);
 router.patch('/dayoff', checkAuth, isAdmin, changeDayffState);
 
 router.get('/:workerId', checkAuth, isAdmin, getWorkerDetails);
+
+router.post('/password/reset', checkAuth, isAdmin, resetPassword);
