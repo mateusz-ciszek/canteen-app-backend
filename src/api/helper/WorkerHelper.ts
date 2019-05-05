@@ -88,15 +88,7 @@ export class WorkerHelper {
 	}
 
 	async getDetails(workerId: string): Promise<IWorkerDetailsResponse> {
-		if (!isValidObjectId(workerId)) {
-			throw new NotObjectIdError(`"${workerId}" is not a valid object identifier`);
-		}
-
-		const worker = await Worker.findById(workerId).populate('person').exec();
-
-		if (!worker) {
-			throw new WorkerNotFoundError(`Worker with ID: ${workerId} does not exist`);
-		}
+		const worker = await this.getWorker(workerId);
 
 		const requests = await DayOff.find({ worker: new ObjectId(workerId) })
 				.populate({
@@ -118,6 +110,28 @@ export class WorkerHelper {
 			requests: requests.map(request => dayOffConverter.convert(request)),
 		};
 		return response;
+	}
+
+	async resetPassword(workerId: string, passwordHash: string): Promise<string> {
+		const worker = await this.getWorker(workerId);
+		const user = worker.person;
+		user.password = passwordHash;
+		await user.save();
+		return user.email;
+	}
+
+	async getWorker(id: string): Promise<IWorkerModel> {
+		if (!isValidObjectId(id)) {
+			throw new NotObjectIdError(`"${id}" is not a valid object identifier`);
+		}
+
+		const worker = await Worker.findById(id).populate('person').exec();
+
+		if (!worker) {
+			throw new WorkerNotFoundError(`Worker with ID: ${id} does not exist`);
+		}
+
+		return worker;
 	}
 
 	private calculateDefaultWeek(workers: IWorkerModel[]): IWorkDayDetails[] {
