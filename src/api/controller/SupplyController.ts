@@ -24,7 +24,6 @@ export class SupplyController {
 		try {
 			await this.repository.save(model);
 		} catch (err) {
-			console.log(err);
 			return res.status(400).json();
 		}
 

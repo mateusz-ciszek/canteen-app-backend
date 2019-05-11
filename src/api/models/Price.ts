@@ -4,7 +4,7 @@ import { IPrice } from "../../interface/Price";
 export interface IPriceModel extends Document, IPrice {}
 
 export const PriceSchema: Schema = new Schema({
-	amount: { type: Types.Decimal128, required: true },
+	amount: { type: Number, required: true },
 	currency: {
 		type: String,
 		required: true,
