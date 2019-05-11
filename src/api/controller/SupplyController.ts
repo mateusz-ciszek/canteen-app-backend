@@ -45,12 +45,14 @@ export class SupplyController {
 			filter: req.body.filter,
 		};
 
+		const totalCount = await this.repository.collectionTotalSize();
 		const itemsCount = await this.repository.collectionSize(request);
 		const items = await this.repository.queryList(request);
 		const converter = new SupplyModelToSupplyViewConverter();
 
 		const response: ISupplyListResponse = {
 			page: request.page,
+			totalCount,
 			itemsCount,
 			items: items.map<ISupplyView>(item => converter.convert(item)),
 		};

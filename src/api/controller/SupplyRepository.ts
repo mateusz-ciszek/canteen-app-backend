@@ -21,6 +21,10 @@ export class SupplyRepository {
 		return this.prepareListQuery(conditions).count().exec();
 	}
 
+	collectionTotalSize(): Promise<number> {
+		return Supply.estimatedDocumentCount().exec();
+	}
+
 	private prepareListQuery(conditions: ISupplyListQuery): DocumentQuery<ISupplyModel[], ISupplyModel, {}> {
 		let query = Supply.find({});
 
