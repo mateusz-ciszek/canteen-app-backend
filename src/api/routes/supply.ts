@@ -8,3 +8,5 @@ export const router = Router();
 const controller = new SupplyController();
 
 router.post('', checkAuth, isAdmin, (req, res, next) => controller.newSupplyRequest(req, res, next));
+
+router.post('/list', checkAuth, isAdmin, (req, res, next) => controller.getSupplyList(req, res, next));

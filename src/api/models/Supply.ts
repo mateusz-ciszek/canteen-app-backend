@@ -32,13 +32,18 @@ export const SupplySchema: Schema = new Schema({
 			validator: (value: string) => URL_PATTERN.test(value),
 			message: (error: Error.ValidatorError) => `"${error.value}" is not a valid URL`,
 		},
-	 },
+	},
 	price: { type: PriceSchema, required: true },
 	requestedBy: { type: ObjectId, ref: 'User', required: true },
 	requestedDate: { type: Date, required: false },
 	history: [{ type: SupplyStateSchema, required: false }],
 	comments: [{ type: Schema.Types.ObjectId, ref: 'Comment', required: false }],
 	currentState: { type: SupplyStateSchema, required: false },
+});
+
+SupplySchema.index({
+	name: 'text',
+	description: 'text',
 });
 
 SupplySchema.pre<ISupplyModel>('save', function(next) {
