@@ -61,15 +61,17 @@ SupplySchema.pre<ISupplyModel>('save', function(next) {
 	next();
 });
 
-SupplySchema.methods.setState = async function(state: SupplyStateEnum, user: IUserModel): Promise<void> {
+SupplySchema.methods.setState = async function(state: SupplyStateEnum, user: IUserModel, reason?: string): Promise<void> {
 	const supplyState = new SupplyState({
 		state,
 		enteredBy: user,
 		enteredDate: new Date(),
+		rejectionReason: reason,
 	});
-	this.history.push(supplyState);
-	this.currentState = supplyState;
-	return this.save();
+	return this.updateOne({
+		$set: { currentState: supplyState },
+		$push: { history: supplyState },
+	}).exec();
 };
 
 SupplySchema.methods.addComment = async function(content: string, user: IUserModel): Promise<void> {
@@ -89,7 +91,7 @@ SupplySchema.methods.addComment = async function(content: string, user: IUserMod
 export const Supply: Model<ISupplyModel> = model('Supply', SupplySchema);
 
 export declare interface ISupplyModel {
-	setState(state: SupplyStateEnum, user: IUserModel): Promise<void>;
+	setState(state: SupplyStateEnum, user: IUserModel, reason?: string): Promise<void>;
 	addComment(content: string, user: IUserModel): Promise<void>;
 }
 

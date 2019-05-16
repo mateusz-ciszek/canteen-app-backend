@@ -14,3 +14,5 @@ router.post('/list', checkAuth, isAdmin, (req, res, next) => controller.getSuppl
 router.get('/:supplyId', checkAuth, isAdmin, (req, res, next) => controller.getDetails(req, res, next));
 
 router.post('/comment/:supplyId', checkAuth, isAdmin, (req, res, next) => controller.addComment(req, res, next));
+
+router.patch('', checkAuth, isAdmin, (req, res, next) => controller.updateSupplyRequest(req, res, next));
