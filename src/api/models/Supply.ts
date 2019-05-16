@@ -73,6 +73,10 @@ SupplySchema.methods.setState = async function(state: SupplyStateEnum, user: IUs
 };
 
 SupplySchema.methods.addComment = async function(content: string, user: IUserModel): Promise<void> {
+	if (content === null || content === undefined || content === '') {
+		throw new NoCommentContentError();
+	}
+
 	const comment = await new Comment({
 		content,
 		author: user,
@@ -87,4 +91,10 @@ export const Supply: Model<ISupplyModel> = model('Supply', SupplySchema);
 export declare interface ISupplyModel {
 	setState(state: SupplyStateEnum, user: IUserModel): Promise<void>;
 	addComment(content: string, user: IUserModel): Promise<void>;
+}
+
+export class NoCommentContentError extends Error {
+	constructor() {
+		super('Comment content was not provided');
+	}
 }

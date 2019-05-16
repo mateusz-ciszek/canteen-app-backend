@@ -9,11 +9,12 @@ import { ISupplyListRequest } from "../interface/supply/list/ISupplyListRequest"
 import { ISupplyListResponse } from "../interface/supply/list/ISupplyListResponse";
 import { ISupplyView } from "../interface/supply/list/ISupplyView";
 import { SupplyModelToSupplyViewConverter } from "../converter/supply/SupplyModelToSupplyViewConverter";
-import { ISupplyModel } from "../models/Supply";
+import { ISupplyModel, NoCommentContentError } from "../models/Supply";
 import { Error } from "mongoose";
 import { ISupplyDetailsRequest } from "../interface/supply/details/ISupplyDetailsRequest";
 import { ISupplyDetailsResponse } from "../interface/supply/details/ISupplyDetailsResponse";
 import { SupplyModelToSupplyDetailsResponseConverter } from "../converter/supply/SupplyModelToDupplyDetailsResponseConverter";
+import { ICommentAddRequest } from "../interface/supply/comment/ICommentAddRequest";
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -84,5 +85,22 @@ export class SupplyController {
 		const converter = new SupplyModelToSupplyDetailsResponseConverter();
 		const response: ISupplyDetailsResponse = converter.convert(supply);
 		return res.status(200).json(response);
+	}
+
+	async addComment(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+		const request: ICommentAddRequest = { ...req.body, ...req.params };
+		const user = await User.findById(req.context!.userId);
+		const supply = await this.repository.queryDocument(request.supplyId);
+		
+		try {
+			await supply.addComment(request.content, user!);
+		} catch (err) {
+			if (err instanceof NoCommentContentError) {
+				return res.status(400).json();
+			}
+			return res.status(500).json();
+		}
+
+		return res.status(200).json();
 	}
 }
