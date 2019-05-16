@@ -91,7 +91,7 @@ export class SupplyController {
 		const request: ICommentAddRequest = { ...req.body, ...req.params };
 		const user = await User.findById(req.context!.userId);
 		const supply = await this.repository.queryDocument(request.supplyId);
-		
+
 		try {
 			await supply.addComment(request.content, user!);
 		} catch (err) {
