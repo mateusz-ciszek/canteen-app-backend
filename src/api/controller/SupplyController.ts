@@ -13,7 +13,7 @@ import { ISupplyModel, NoCommentContentError } from "../models/Supply";
 import { Error } from "mongoose";
 import { ISupplyDetailsRequest } from "../interface/supply/details/ISupplyDetailsRequest";
 import { ISupplyDetailsResponse } from "../interface/supply/details/ISupplyDetailsResponse";
-import { SupplyModelToSupplyDetailsResponseConverter } from "../converter/supply/SupplyModelToDupplyDetailsResponseConverter";
+import { SupplyModelToSupplyDetailsResponseConverter } from "../converter/supply/SupplyModelToSupplyDetailsResponseConverter";
 import { ICommentAddRequest } from "../interface/supply/comment/ICommentAddRequest";
 
 const DEFAULT_PAGE_SIZE = 10;
