@@ -20,7 +20,7 @@ export class SupplyModelToSupplyDetailsResponseConverter implements Converter<IS
 			url: input.url || '',
 			price: priceConverter.convert(input.price),
 			requestedBy: userConverter.convert(input.requestedBy),
-			requedtedDate: input.requestedDate,
+			requestedDate: input.requestedDate,
 			comments: input.comments.map(comment => commentConverter.convert(comment)),
 			currentState: stateConverter.convert(input.currentState),
 			history: input.history.map(state => stateConverter.convert(state)),

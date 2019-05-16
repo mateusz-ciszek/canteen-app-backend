@@ -10,7 +10,7 @@ export interface ISupplyDetailsResponse {
 	url: string;
 	price: IPriceView;
 	requestedBy: IUserView;
-	requedtedDate: Date;
+	requestedDate: Date;
 	history: ISupplyStateView[];
 	comments: ICommentView[];
 	currentState: ISupplyStateView;
