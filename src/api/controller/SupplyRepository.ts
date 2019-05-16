@@ -1,11 +1,25 @@
 import { ISupply } from "../../interface/Supply";
 import { ISupplyModel, Supply } from "../models/Supply";
-import { DocumentQuery } from "mongoose";
+import { DocumentQuery, Error } from "mongoose";
 import { ISupplyListFilter } from "../interface/supply/list/ISupplyListFilter";
 
 export class SupplyRepository {
 	save(model: ISupply): Promise<ISupplyModel> {
 		return new Supply(model).save();
+	}
+
+	async queryDocument(id: string): Promise<ISupplyModel> {
+		const document = await Supply.findById(id)
+			.populate({
+				path: 'requestedBy currentState.enteredBy history.enteredBy',
+			})
+			.exec();
+
+		if (!document) {
+			throw new SupplyNotFoundError(id);
+		}
+		
+		return document;
 	}
 
 	async queryList(conditions: ISupplyListQuery): Promise<ISupplyModel[]> {
@@ -63,4 +77,10 @@ export interface ISupplyListQuery {
 	page: number;
 	search: string;
 	filter: ISupplyListFilter;
+}
+
+export class SupplyNotFoundError extends Error {
+	constructor(private id: string) {
+		super(`Supply with ID: ${id} was not found`);
+	}
 }

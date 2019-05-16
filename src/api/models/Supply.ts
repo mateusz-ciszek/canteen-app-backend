@@ -5,7 +5,7 @@ import { ISupplyStateModel, SupplyStateSchema, SupplyState } from "./SupplyState
 import { ICommentModel, Comment } from "./Comment";
 import { ObjectId } from "bson";
 import { SupplyStateEnum } from "../../interface/SupplyState";
-import { PriceSchema } from "./Price";
+import { PriceSchema, IPriceModel } from "./Price";
 
 const URL_PATTERN = new RegExp('^(https?:\\/\\/)?' // protocol
 	+ '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' // domain name
@@ -15,6 +15,7 @@ const URL_PATTERN = new RegExp('^(https?:\\/\\/)?' // protocol
 	+ '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
 
 export interface ISupplyModel extends Document, ISupply {
+	price: IPriceModel;
 	requestedBy: IUserModel;
 	requestedDate: Date;
 	history: ISupplyStateModel[];
