@@ -2,6 +2,8 @@ import { ISupply } from "../../interface/Supply";
 import { ISupplyModel, Supply } from "../models/Supply";
 import { DocumentQuery, Error } from "mongoose";
 import { ISupplyListFilter } from "../interface/supply/list/ISupplyListFilter";
+import { SupplyStateEnum } from "../../interface/SupplyState";
+import { IUserModel } from "../models/user";
 
 export class SupplyRepository {
 	save(model: ISupply): Promise<ISupplyModel> {
@@ -34,6 +36,24 @@ export class SupplyRepository {
 			.skip(conditions.pageSize * conditions.page)
 			.limit(conditions.pageSize)
 			.exec();
+	}
+
+	async setState(id: string, state: SupplyStateEnum, user: IUserModel, reason?: string): Promise<void> {
+		const document = await Supply.findById(id).exec();
+
+		if (!document) {
+			throw new SupplyNotFoundError(id);
+		}
+
+		if (!this.canChangeState(document.currentState.state, state)) {
+			throw new IllegalSupplyStateChangeError(document.currentState.state, state);
+		}
+
+		if ((state === 'REJECTED' || state === 'CANCELLED') && !reason) {
+			throw new NoRejectionReasonError(state);
+		}
+
+		return document.setState(state, user, reason);
 	}
 
 	collectionSize(conditions: ISupplyListQuery): Promise<number> {
@@ -75,6 +95,20 @@ export class SupplyRepository {
 
 		return query;
 	}
+
+	private canChangeState(current: SupplyStateEnum, next: SupplyStateEnum): boolean {
+		const allowedStateChanges: Map<SupplyStateEnum, SupplyStateEnum[]> = new Map<SupplyStateEnum, SupplyStateEnum[]>([
+			['NEW', ['ACCEPTED', 'REJECTED']],
+			['ACCEPTED', ['PENDING', 'CANCELLED']],
+			['REJECTED', []],
+			['CANCELLED', []],
+			['PENDING', ['READY', 'CANCELLED']],
+			['READY', ['DELIVERED', 'CANCELLED']],
+			['DELIVERED', []],
+		]);
+
+		return allowedStateChanges.get(current)!.includes(next);
+	}
 }
 
 export interface ISupplyListQuery {
@@ -87,5 +121,17 @@ export interface ISupplyListQuery {
 export class SupplyNotFoundError extends Error {
 	constructor(private id: string) {
 		super(`Supply with ID: ${id} was not found`);
+	}
+}
+
+export class IllegalSupplyStateChangeError extends Error {
+	constructor(currentState: SupplyStateEnum, requestedState: SupplyStateEnum) {
+		super(`Cannot change form state "${currentState}" to "${requestedState}"`);
+	}
+}
+
+export class NoRejectionReasonError extends Error {
+	constructor(state: SupplyStateEnum) {
+		super(`Rejection reason is required to change to state "${state}"`);
 	}
 }

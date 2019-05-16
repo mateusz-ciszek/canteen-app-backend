@@ -3,7 +3,7 @@ import { IRequest } from "../../models/Express";
 import { User } from "../models/user";
 import { Price } from "../models/Price";
 import { ISupplyCreateRequest } from "../interface/supply/create/ISupplyCreateRequest";
-import { SupplyRepository, SupplyNotFoundError } from "./SupplyRepository";
+import { SupplyRepository, SupplyNotFoundError, IllegalSupplyStateChangeError, NoRejectionReasonError } from "./SupplyRepository";
 import { ISupply } from "../../interface/Supply";
 import { ISupplyListRequest } from "../interface/supply/list/ISupplyListRequest";
 import { ISupplyListResponse } from "../interface/supply/list/ISupplyListResponse";
@@ -15,6 +15,7 @@ import { ISupplyDetailsRequest } from "../interface/supply/details/ISupplyDetail
 import { ISupplyDetailsResponse } from "../interface/supply/details/ISupplyDetailsResponse";
 import { SupplyModelToSupplyDetailsResponseConverter } from "../converter/supply/SupplyModelToSupplyDetailsResponseConverter";
 import { ICommentAddRequest } from "../interface/supply/comment/ICommentAddRequest";
+import { ISupplyUpdateRequest } from "../interface/supply/update/ISupplyUpdateRequest";
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -99,6 +100,29 @@ export class SupplyController {
 				return res.status(400).json();
 			}
 			return res.status(500).json();
+		}
+
+		return res.status(200).json();
+	}
+
+	async updateSupplyRequest(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+		const request: ISupplyUpdateRequest = req.body;
+		const user = await User.findById(req.context!.userId);
+
+		if (request.state) {
+			try {
+				await this.repository.setState(request.id, request.state, user!, request.rejectionReason);
+			} catch(err) {
+				if (err instanceof SupplyNotFoundError) {
+					return res.status(404).json();
+				}
+				if (err instanceof IllegalSupplyStateChangeError || err instanceof NoRejectionReasonError) {
+					return res.status(400).json();
+				}
+				return res.status(500).json();
+			}
+		} else {
+			return res.status(501).json();
 		}
 
 		return res.status(200).json();
