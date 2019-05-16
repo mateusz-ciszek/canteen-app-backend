@@ -10,9 +10,14 @@ export class SupplyRepository {
 
 	async queryDocument(id: string): Promise<ISupplyModel> {
 		const document = await Supply.findById(id)
-			.populate({
+			.populate([{
 				path: 'requestedBy currentState.enteredBy history.enteredBy',
-			})
+			}, {
+				path: 'comments',
+				populate: {
+					path: 'author',
+				},
+			}])
 			.exec();
 
 		if (!document) {
