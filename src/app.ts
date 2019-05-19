@@ -16,8 +16,10 @@ import { router as supplyRoutes } from './api/routes/supply';
 // Połączenie z bazą danych Mongo Atlas
 mongoose.connect(
 	`mongodb+srv://${process.env.MONGO_ATLAS_USER}:${process.env.MONGO_ATLAS_PW}@canteen-application-dev-hkbxg.mongodb.net/${process.env.MONGO_ATLAS_DB_NAME}?retryWrites=true`,
-	{ useNewUrlParser: true }
+	{ useNewUrlParser: true, useCreateIndex: true },
 );
+
+mongoose.set('debug', true);
 
 // Wyświetlanie logów dotyczących otrzymywanych żądań
 app.use(morgan('dev'));
