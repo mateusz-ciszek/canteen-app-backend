@@ -15,6 +15,10 @@ import { IMenuCreateRequest } from "../interface/menu/create/IMenuCreateRequest"
 import { IFoodCreateRequest } from "../interface/menu/create/IFoodCreateRequest";
 import { IValidationErrorsResponse } from "../interface/common/IValidationErrorsResponse";
 import { IMenuDeleteRequest } from "../interface/menu/delete/IMenuDeleteRequest";
+import { MenuRepository, MenuNotFoundError, InvalidObjectIdError } from "../helper/repository/MenuRepository";
+import { IMenuChangeNameRequest } from "../interface/menu/changeName/IMenuChangeNameRequest";
+
+const repository = new MenuRepository();
 
 export async function getAllMenus(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 	const menus = await Menu.find().populate({
@@ -97,6 +101,28 @@ export async function deleteMenu(req: IRequest, res: Response, next: NextFunctio
 	}
 	return res.status(200).json();
 };
+
+export async function changeName(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	const request: IMenuChangeNameRequest = { ...req.params, ...req.body };
+
+	if (!menuHelper.validateName(request.name)) {
+		return res.status(400).json();
+	}
+	
+	try {
+		await repository.changeName(request.id, request.name);
+	} catch (err) {
+		if (err instanceof MenuNotFoundError) {
+			return res.status(404).json();
+		}
+		if (err instanceof InvalidObjectIdError) {
+			return res.status(400).json();
+		}
+		return res.status(500).json();
+	}
+
+	return res.status(200).json();
+}
 
 // TODO: Change returned value to Promise<void> once createMenu hundler return only HTTP code
 async function saveMenu(menu: IMenuCreateRequest): Promise<IMenuModel> {

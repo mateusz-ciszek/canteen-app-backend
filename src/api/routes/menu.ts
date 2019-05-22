@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 
-const controller = require('../controller/menu');
+import { getAllMenus, getManuDetails, createMenu, createOrUpdateFood, deleteMenu, changeName } from '../controller/menu';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
 
@@ -34,24 +34,26 @@ module.exports = router;
  *   }
  * ]
  */
-router.get('/', controller.getAllMenus);
+router.get('/', getAllMenus);
 
 /**
  * GET - Pobierz menu o podanym ID
  */
-router.get('/:id', controller.getManuDetails);
+router.get('/:id', getManuDetails);
 
 /**
  * POST - Zapytanie dodające nowe menu do bazy
  */
-router.post('/', [checkAuth, isAdmin, controller.createMenu]);
+router.post('/', checkAuth, isAdmin, createMenu);
 
 /**
  * POST - Dodaj nowy posiłek do menu
  */
-router.post('/:menuId/food', [checkAuth, isAdmin, controller.createOrUpdateFood]);
+router.post('/:menuId/food', checkAuth, isAdmin, createOrUpdateFood);
 
 /**
  * DELETE - Remove menu with all its contents
  */
-router.delete('/:id', [checkAuth, isAdmin, controller.deleteMenu]);
+router.delete('/:id', checkAuth, isAdmin, deleteMenu);
+
+router.patch('/:id', checkAuth, isAdmin, (req, res, next) => changeName(req, res, next));
