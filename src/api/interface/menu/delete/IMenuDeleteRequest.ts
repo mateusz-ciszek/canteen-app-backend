@@ -1,3 +1,3 @@
 export interface IMenuDeleteRequest {
-	id: string;
+	ids: string[];
 }

@@ -89,16 +89,22 @@ export async function createOrUpdateFood(req: IRequest, res: Response, next: Nex
 	}	
 };
 
-export async function deleteMenu(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
-	const request: IMenuDeleteRequest = req.params;
+export async function deleteMenus(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	const request: IMenuDeleteRequest = req.body;
+
+	if (!request.ids || !request.ids.length) {
+		return res.status(400).json();
+	}
+
 	try {
-		await Menu.findByIdAndDelete(request.id).exec();
+		await repository.delete(request.ids);
 	} catch (err) {
-		if (errorHelper.isObjectIdCastException(err)) {
-			return res.status(404).json();
+		if (err instanceof InvalidObjectIdError) {
+			return res.status(400).json();
 		}
 		return res.status(500).json();
 	}
+
 	return res.status(200).json();
 };
 

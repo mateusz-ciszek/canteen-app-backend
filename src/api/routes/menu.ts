@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 
-import { getAllMenus, getManuDetails, createMenu, createOrUpdateFood, deleteMenu, changeName } from '../controller/menu';
+import { getAllMenus, getManuDetails, createMenu, createOrUpdateFood, deleteMenus, changeName } from '../controller/menu';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
 
@@ -54,6 +54,6 @@ router.post('/:menuId/food', checkAuth, isAdmin, createOrUpdateFood);
 /**
  * DELETE - Remove menu with all its contents
  */
-router.delete('/:id', checkAuth, isAdmin, deleteMenu);
+router.delete('/', checkAuth, isAdmin, deleteMenus);
 
 router.patch('/:id', checkAuth, isAdmin, (req, res, next) => changeName(req, res, next));
