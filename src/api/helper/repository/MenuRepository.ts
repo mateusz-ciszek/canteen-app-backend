@@ -1,5 +1,6 @@
 import { Error as MongooseError } from "mongoose";
 import { IMenuModel, Menu } from "../../models/menu";
+import { DeleteWriteOpResultObject } from "mongodb";
 
 export class MenuRepository {
 	async changeName(id: string, newName: string): Promise<void> {
@@ -16,6 +17,17 @@ export class MenuRepository {
 
 		if (!document) {
 			throw new MenuNotFoundError(id);
+		}
+	}
+
+	async delete(ids: string[]): Promise<void> {
+		try {
+			await Menu.deleteMany({ _id: { $in: ids } }).exec();
+		} catch (err) {
+			if (err instanceof MongooseError.CastError) {
+				throw new InvalidObjectIdError(err.stringValue);
+			}
+			throw err;
 		}
 	}
 }
