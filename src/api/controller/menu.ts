@@ -92,6 +92,10 @@ export async function createOrUpdateFood(req: IRequest, res: Response, next: Nex
 export async function deleteMenus(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 	const request: IMenuDeleteRequest = req.body;
 
+	if (!request.ids || !request.ids.length) {
+		return res.status(400).json();
+	}
+
 	try {
 		await repository.delete(request.ids);
 	} catch (err) {

@@ -6,6 +6,7 @@ import { DatabaseTestHelper } from '../testHelpers/databaseHelper';
 import { TokenTestHelper } from '../testHelpers/tokenHelper';
 import { MenuTestHelper } from '../testHelpers/menuHelper';
 import { FoodTestHelper } from '../testHelpers/foodHelper';
+import { IMenuDeleteRequest } from '../../api/interface/menu/delete/IMenuDeleteRequest';
 
 describe('Menu', () => {
 	const dbHelper = new DatabaseTestHelper();
@@ -178,33 +179,48 @@ describe('Menu', () => {
 		});
 
 		describe('#delete', () => {
-			const wrongUrl = `${endpoint}/menuId`;
+			let payload: IMenuDeleteRequest;
+
+			beforeEach('set up', () => {
+				payload = { ids: [ dbHelper.MENU.ID ] };
+			});
 			
 			it('should get 401 when deleting menu without auth token', async () => {
 				return request(app)
-						.delete(wrongUrl)
+						.delete(endpoint)
+						.send(payload)
 						.expect(401);
 			});
 
 			it('should get 403 when deleting menu without admin permissions', async () => {
 				return request(app)
-						.delete(wrongUrl)
+						.delete(endpoint)
 						.set('Authorization', `Bearer ${standardToken}`)
+						.send(payload)
 						.expect(403);
 			});
 
-			it('should get 404 when deleting menu that does not exist', async () => {
+			it('should get 400 when deleting without sending data', async () => {
 				return request(app)
-						.delete(wrongUrl)
+						.delete(endpoint)
 						.set('Authorization', `Bearer ${adminToken}`)
-						.expect(404);
+						.expect(400);
+			});
+
+			it('should get 400 when deleting menu with invalid ID', async () => {
+				payload = { ids: [ "a" ] };
+				return request(app)
+						.delete(endpoint)
+						.set('Authorization', `Bearer ${adminToken}`)
+						.send(payload)
+						.expect(400);
 			});
 
 			it('should get 200 when deleting existing menu with admin permissions', async () => {
-				const url: string = `${endpoint}/${dbHelper.MENU.ID}`;
 				return request(app)
-						.delete(url)
+						.delete(endpoint)
 						.set('Authorization', `Bearer ${adminToken}`)
+						.send(payload)
 						.expect(200);
 			});
 		});
