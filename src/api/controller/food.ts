@@ -1,14 +1,14 @@
+import { NextFunction, Response } from 'express';
 import { IRequest } from '../../models/Express';
-import { Response, NextFunction } from 'express';
-import { Food, IFoodModel } from '../models/food';
-import { Menu } from '../models/menu';
-
-import * as errorHelper from '../helper/mongooseErrorHelper';
-import * as mongooseErrorHelper from '../helper/mongooseErrorHelper';
-import { IFoodDetailsResponse } from '../interface/food/details/IFoodDetailsResponse';
-import { IFoodDetailsRequest } from '../interface/food/details/IFoodDetailsRequest';
 import { FoodModelToFoodDetailsResponseConverter } from '../converter/FoodModelToFoodDetailsResponseConverter';
+import * as errorHelper from '../helper/mongooseErrorHelper';
+import { MenuRepository, InvalidObjectIdError } from '../helper/repository/MenuRepository';
 import { IFoodDeleteRequest } from '../interface/food/delete/IFoodDeleteRequest';
+import { IFoodDetailsRequest } from '../interface/food/details/IFoodDetailsRequest';
+import { IFoodDetailsResponse } from '../interface/food/details/IFoodDetailsResponse';
+import { Food, IFoodModel } from '../models/food';
+
+const repository = new MenuRepository();
 
 export async function getFood(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 	const request: IFoodDetailsRequest = req.params;
@@ -36,18 +36,21 @@ export async function getFood(req: IRequest, res: Response, next: NextFunction):
 	return res.status(200).json(response);
 };
 
-export async function deleteFood(req: IRequest, res: Response, next: NextFunction) {
-	const request: IFoodDeleteRequest = req.params;
+export async function deleteFood(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	const request: IFoodDeleteRequest = req.body;
 
-	if (!mongooseErrorHelper.isValidObjectId(request.id)) {
-		return res.status(404).json();
+	if (!request.ids || !request.ids.length) {
+		return res.status(400).json();
 	}
 
-	const foodExists: boolean = !!await Food.findById(request.id).exec();
-	if (!foodExists) {
-		return res.status(404).json();
+	try {
+		await repository.removeFoods(request.ids);
+	} catch (err) {
+		if (err instanceof InvalidObjectIdError) {
+			return res.status(400).json();
+		}
+		return res.status(500).json();
 	}
-
-	await Menu.updateMany({ foods: request.id }, { $pull: { foods: request.id } }).exec();
+	
 	return res.status(200).json();
 };

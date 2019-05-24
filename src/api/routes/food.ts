@@ -1,5 +1,5 @@
 import express from 'express';
-const controller = require('../controller/food');
+import { getFood, deleteFood } from '../controller/food';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
 
@@ -19,9 +19,9 @@ module.exports = router;
  *   description: ""
  * }
  */
-router.get('/:id', controller.getFood);
+router.get('/:id', getFood);
 
 /**
  * DELETE - Usuń posiłek o podanym ID
  */
-router.delete('/:id', [checkAuth, isAdmin, controller.deleteFood]);
+router.delete('/', checkAuth, isAdmin, deleteFood);

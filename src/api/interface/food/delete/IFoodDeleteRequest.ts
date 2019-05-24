@@ -1,3 +1,3 @@
 export interface IFoodDeleteRequest {
-	id: string;
+	ids: string[];
 }
