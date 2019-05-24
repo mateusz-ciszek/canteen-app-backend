@@ -5,7 +5,6 @@ import mongoose from 'mongoose';
 import { Menu, IMenuModel } from '../models/menu';
 import * as foodHelper from '../helper/foodHelper';
 import * as menuHelper from '../helper/menuHelper';
-import * as errorHelper from '../helper/mongooseErrorHelper';
 import { MenuListModelToMenuListResponseConverter } from "../converter/MenuListModelToMenuListResponseConverter";
 import { IMenuListResponse } from "../interface/menu/list/IMenuListResponse";
 import { IMenuDetailsRequest } from "../interface/menu/details/IMenuDetailsRequest";
