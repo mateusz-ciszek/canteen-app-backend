@@ -4,6 +4,7 @@ import { should } from 'chai';
 import { app } from '../../app';
 import { DatabaseTestHelper } from '../testHelpers/databaseHelper';
 import { TokenTestHelper } from '../testHelpers/tokenHelper';
+import { IFoodDeleteRequest } from '../../api/interface/food/delete/IFoodDeleteRequest';
 should();
 
 describe('Food', () => {
@@ -26,61 +27,77 @@ describe('Food', () => {
 	});
 	
 	describe('#food', () => {
-		const wrongUrl = `${endpoint}/totalyWrongId`;
 
-		it('should fetch food details', async () => {
-			const url = `${endpoint}/${dbHelper.FOOD.ID}`;
-			return request(app)
-					.get(url)
-					.expect(200)
-					.expect((response: any) => {
-						response.body.should.have.property('_id').that.is.a('string').and.have.lengthOf(24);
-						response.body.should.have.property('name').that.is.a('string').and.have.lengthOf.above(1);
-						response.body.should.have.property('price').that.is.a('number').and.is.not.below(0);
-						response.body.should.have.property('additions').that.is.an('array').and.is.not.null;
-						response.body.should.have.property('description').that.is.a('string').and.is.not.null;
-					});
+		describe('#details', () => {
+
+			it('should fetch food details', async () => {
+				const url = `${endpoint}/${dbHelper.FOOD.ID}`;
+				return request(app)
+						.get(url)
+						.expect(200)
+						.expect((response: any) => {
+							response.body.should.have.property('_id').that.is.a('string').and.have.lengthOf(24);
+							response.body.should.have.property('name').that.is.a('string').and.have.lengthOf.above(1);
+							response.body.should.have.property('price').that.is.a('number').and.is.not.below(0);
+							response.body.should.have.property('additions').that.is.an('array').and.is.not.null;
+							response.body.should.have.property('description').that.is.a('string').and.is.not.null;
+						});
+			});
+	
+			it('should get 400 when fetching food details with malformed id', async () => {
+				const wrongUrl = `${endpoint}/totalyWrongId`;
+				return request(app)
+						.get(wrongUrl)
+						.expect(400);
+			});
+	
+			it('should get 404 when fetching food details with wrong id', async () => {
+				const url: string = `${endpoint}/${dbHelper.generateObjectId()}`;
+				return request(app)
+						.get(url)
+						.expect(404);
+			});
+
 		});
 
-		it('should get 400 when fetching food details with malformed id', async () => {
-			return request(app)
-					.get(wrongUrl)
-					.expect(400);
-		});
+		describe('#delete', () => {
+			let data: IFoodDeleteRequest;
 
-		it('should get 404 when fetching food details with wrong id', async () => {
-			const url: string = `${endpoint}/${dbHelper.generateObjectId()}`;
-			return request(app)
-					.get(url)
-					.expect(404);
-		});
+			beforeEach('set up', () => {
+				data = { ids: [ dbHelper.FOOD.ID ] };
+			});
 
-		it('should get 401 when deleting food unauthorized', async () => {
-			return request(app)
-					.delete(wrongUrl)
-					.expect(401);
+			it('should get 401 when deleting food unauthorized', async () => {
+				return request(app)
+						.delete(endpoint)
+						.send(data)
+						.expect(401);
+			});
+	
+			it('should get 403 when deleting food without permission', async () => {
+				return request(app)
+						.delete(endpoint)
+						.set('Authorization', `Bearer ${standardToken}`)
+						.send(data)
+						.expect(403);
+			});
+	
+			it('should get 400 when deleting food with wrong id', async () => {
+				data = { ids: [ "asd", "fgh" ] };
+				return request(app)
+						.delete(endpoint)
+						.set('Authorization', `Bearer ${adminToken}`)
+						.send(data)
+						.expect(400);
+			});
+	
+			it('should get 200 after succesfully deleting food', async () => {
+				return request(app)
+						.delete(endpoint)
+						.set('Authorization', `Bearer ${adminToken}`)
+						.send(data)
+						.expect(200);
+			});
 		});
-
-		it('should get 403 when deleting food without permission', async () => {
-			return request(app)
-					.delete(wrongUrl)
-					.set('Authorization', `Bearer ${standardToken}`)
-					.expect(403);
-		});
-
-		it('should get 404 when deleting food with wrong id', async () => {
-			return request(app)
-					.delete(wrongUrl)
-					.set('Authorization', `Bearer ${adminToken}`)
-					.expect(404);
-		});
-
-		it('should get 200 after succesfully deleting food', async () => {
-			const url = `${endpoint}/${dbHelper.FOOD.ID}`;
-			return request(app)
-					.delete(url)
-					.set('Authorization', `Bearer ${adminToken}`)
-					.expect(200);
-		})
 	});
 });
