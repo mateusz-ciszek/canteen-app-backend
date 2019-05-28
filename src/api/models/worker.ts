@@ -13,10 +13,14 @@ export const WorkerSchema: Schema = new Schema({
 	person: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 	defaultWorkHours: [{ type: WorkHoursSchema, required: true }],
 	employmentDate: { type: Date, required: false },
+	permissions: [{ type: String, required: false }],
 });
 
 WorkerSchema.pre<IWorkerModel>('save', function(next: NextFunction): void {
 	this.employmentDate = new Date();
+	if (!this.permissions) {
+		this.permissions = [];
+	}
 	next();
 });
 
