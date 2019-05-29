@@ -8,5 +8,6 @@ export async function isAdmin(req: IRequest, res: Response, next: NextFunction) 
 	if (!worker) {
 		return res.status(403).json();
 	}
+	req.context!.workerId = worker._id;
 	next();
 }
