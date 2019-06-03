@@ -6,6 +6,7 @@ import mongoose = require('mongoose');
 
 export const app = express();
 
+import { router as ConfigRoutes } from './api/routes/config';
 const usersRoutes = require('./api/routes/user');
 const menuRoutes = require('./api/routes/menu');
 const foodRoutes = require('./api/routes/food');
@@ -40,6 +41,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 // Główne ścieżki API
+app.use('/config', ConfigRoutes);
 app.use('/user', usersRoutes);
 app.use('/menu', menuRoutes);
 app.use('/food', foodRoutes);
