@@ -14,7 +14,8 @@ import { IMenuCreateRequest } from "../interface/menu/create/IMenuCreateRequest"
 import { IFoodCreateRequest } from "../interface/menu/create/IFoodCreateRequest";
 import { IValidationErrorsResponse } from "../interface/common/IValidationErrorsResponse";
 import { IMenuDeleteRequest } from "../interface/menu/delete/IMenuDeleteRequest";
-import { MenuRepository, MenuNotFoundError, InvalidObjectIdError } from "../helper/repository/MenuRepository";
+import { MenuRepository, MenuNotFoundError } from "../helper/repository/MenuRepository";
+import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";
 import { IMenuChangeNameRequest } from "../interface/menu/changeName/IMenuChangeNameRequest";
 
 const repository = new MenuRepository();

@@ -20,6 +20,7 @@ import { UserModelToUserViewConverter } from "../converter/common/UserModelToUse
 import { WorkHoursModelToWorkDayDetailsConverter } from "../converter/worker/WorkHoursModelToWorkDayDetailsConverter";
 import { ObjectId } from "bson";
 import { DayOffModelToDayOffDateilsConverter } from "../converter/worker/DayOffModelToConverter";
+import { WorkerNotFoundError } from "./repository/WorkerRepository";
 
 export class WorkerHelper {
 	async generateEmail(firstName: string, lastName: string): Promise<string> {
@@ -128,7 +129,7 @@ export class WorkerHelper {
 		const worker = await Worker.findById(id).populate('person').exec();
 
 		if (!worker) {
-			throw new WorkerNotFoundError(`Worker with ID: ${id} does not exist`);
+			throw new WorkerNotFoundError(id);
 		}
 
 		return worker;
@@ -187,7 +188,5 @@ export class WorkerHelper {
 		}).select('date').exec();
 	}
 }
-
-export class WorkerNotFoundError extends Error {}
 
 export class NotObjectIdError extends Error {}

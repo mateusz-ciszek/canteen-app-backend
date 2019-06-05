@@ -1,5 +1,6 @@
 import { Error as MongooseError } from "mongoose";
 import { IMenuModel, Menu } from "../../models/menu";
+import { InvalidObjectIdError } from "./InvalidObjectIdError";
 
 export class MenuRepository {
 	async changeName(id: string, newName: string): Promise<void> {
@@ -45,11 +46,5 @@ export class MenuRepository {
 export class MenuNotFoundError extends Error {
 	constructor(id: string) {
 		super(`Menu with ID: ${id} was not found`);
-	}
-}
-
-export class InvalidObjectIdError extends Error {
-	constructor(id: string) {
-		super(`"${id}" is not a valid object id`);
 	}
 }
