@@ -25,9 +25,30 @@ import { IWorkerPasswordResetResponse } from "../interface/worker/password/reset
 import { WorkerRepository, WorkerNotFoundError } from "../helper/repository/WorkerRepository";
 import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";
 import { IWorkerUpdatePermissions } from "../interface/worker/permissions/update/IWorkerUpdatePermissions";
+import { Permission } from "../../interface/Permission";
+import { IWorkerGetPermissions } from "./IWorkerGetPermissions";
 
 export class WorkerController {
-	repository = new WorkerRepository();
+	private repository = new WorkerRepository();
+
+	async getPermissions(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+		const request: IWorkerGetPermissions = req.params;
+		let permissions: Permission[];
+
+		try {
+			permissions = await this.repository.getPermissions(request.workerId);
+		} catch (err) {
+			if (err instanceof InvalidObjectIdError) {
+				return res.status(400).json();
+			}
+			if (err instanceof WorkerNotFoundError) {
+				return res.status(404).json();
+			}
+			return res.status(500).json();
+		}
+
+		return res.status(200).json(permissions);
+	}
 
 	async updatePermissions(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 		const request: IWorkerUpdatePermissions = req.body;

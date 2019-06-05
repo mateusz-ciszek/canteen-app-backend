@@ -7,18 +7,22 @@ export const router = Router();
 
 const controller = new WorkerController();
 
-router.get('', checkAuth, isAdmin, getWorkersList);
+router.use(checkAuth, isAdmin);
 
-router.post('', checkAuth, isAdmin, createWorker);
+router.get('', getWorkersList);
 
-router.get('/month/:year/:month', checkAuth, isAdmin, getMonth);
+router.post('', createWorker);
 
-router.post('/dayoff', checkAuth, isAdmin, createDayOffRequest);
+router.get('/month/:year/:month', getMonth);
 
-router.patch('/dayoff', checkAuth, isAdmin, changeDayffState);
+router.post('/dayoff', createDayOffRequest);
 
-router.post('/permissions', checkAuth, isAdmin, (req, res, next) => controller.updatePermissions(req, res, next));
+router.patch('/dayoff', changeDayffState);
 
-router.get('/:workerId', checkAuth, isAdmin, getWorkerDetails);
+router.get('/:workerId/permissions', (req, res, next) => controller.getPermissions(req, res, next));
 
-router.post('/password/reset', checkAuth, isAdmin, resetPassword);
+router.post('/permissions', (req, res, next) => controller.updatePermissions(req, res, next));
+
+router.get('/:workerId', getWorkerDetails);
+
+router.post('/password/reset', resetPassword);

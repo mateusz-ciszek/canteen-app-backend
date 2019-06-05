@@ -17,6 +17,25 @@ export class WorkerRepository {
 		return worker;
 	}
 
+	async getPermissions(id: string): Promise<Permission[]> {
+		let worker: IWorkerModel | null;
+
+		try {
+			worker = await Worker.findById(id).exec();
+		} catch (err) {
+			if (err instanceof MongooseError.CastError) {
+				throw new InvalidObjectIdError(id);
+			}
+			throw err;
+		}
+
+		if (!worker) {
+			throw new WorkerNotFoundError(id);
+		}
+
+		return worker.permissions;
+	}
+
 	async updatePermissions(id: string, permissions: Permission[]): Promise<void> {
 		let result: UpdateWriteOpResult['result'];
 		
