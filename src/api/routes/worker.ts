@@ -21,7 +21,7 @@ router.patch('/dayoff', changeDayffState);
 
 router.get('/:workerId/permissions', (req, res, next) => controller.getPermissions(req, res, next));
 
-router.post('/permissions', (req, res, next) => controller.updatePermissions(req, res, next));
+router.post('/:workerId/permissions', (req, res, next) => controller.updatePermissions(req, res, next));
 
 router.get('/:workerId', getWorkerDetails);
 

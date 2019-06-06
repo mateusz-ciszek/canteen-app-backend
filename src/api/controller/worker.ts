@@ -51,14 +51,14 @@ export class WorkerController {
 	}
 
 	async updatePermissions(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
-		const request: IWorkerUpdatePermissions = req.body;
+		const request: IWorkerUpdatePermissions = { ...req.body, ...req.params };
 		
-		if (!request.id || !request.permissions) {
+		if (!request.workerId || !request.permissions) {
 			return res.status(400).json();
 		}
 
 		try {
-			await this.repository.updatePermissions(request.id, request.permissions);
+			await this.repository.updatePermissions(request.workerId, request.permissions);
 		} catch (err) {
 			if (err instanceof InvalidObjectIdError) {
 				return res.status(400).json();
