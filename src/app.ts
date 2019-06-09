@@ -13,6 +13,7 @@ const foodRoutes = require('./api/routes/food');
 const orderRoutes = require('./api/routes/order');
 import { router as workerRoutes } from './api/routes/worker';
 import { router as supplyRoutes } from './api/routes/supply';
+import { HttpError } from './models/HttpError';
 
 // Połączenie z bazą danych Mongo Atlas
 mongoose.connect(
@@ -68,8 +69,3 @@ app.use((error: HttpError, req: Request, res: Response, next: NextFunction) => {
 		},
 	});
 });
-
-interface HttpError {
-	status?: number;
-	message?: string;
-}
