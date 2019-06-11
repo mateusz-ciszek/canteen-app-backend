@@ -2,10 +2,10 @@ import express from 'express';
 import { getFood, deleteFood } from '../controller/food';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
+import { PermissionValidator } from '../middleware/PermissionValidator';
 
-const router = express.Router();
-
-module.exports = router;
+export const router = express.Router();
+const permissionValidator = new PermissionValidator();
 
 // TODO obsłużyć zwracanie grafiki, kiedy ta zostanie już dodana
 /**
@@ -19,9 +19,14 @@ module.exports = router;
  *   description: ""
  * }
  */
-router.get('/:id', getFood);
+router.get('/:id',
+		getFood);
 
 /**
  * DELETE - Usuń posiłek o podanym ID
  */
-router.delete('/', checkAuth, isAdmin, deleteFood);
+router.delete('/',
+		checkAuth,
+		isAdmin,
+		(req, res, next) => permissionValidator.checkPermission('P_MENU_FOOD_DELETE')(req, res, next),
+		deleteFood);

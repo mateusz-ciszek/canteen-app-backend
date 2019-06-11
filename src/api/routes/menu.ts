@@ -1,13 +1,10 @@
 import express from 'express';
-const router = express.Router();
-
 import { getAllMenus, getManuDetails, createMenu, createOrUpdateFood, deleteMenus, changeName } from '../controller/menu';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
 import { PermissionValidator } from '../middleware/PermissionValidator';
 
-module.exports = router;
-
+export const router = express.Router();
 const permissionValidator = new PermissionValidator();
 
 /**
@@ -37,12 +34,14 @@ const permissionValidator = new PermissionValidator();
  *   }
  * ]
  */
-router.get('/', getAllMenus);
+router.get('/',
+		getAllMenus);
 
 /**
  * GET - Pobierz menu o podanym ID
  */
-router.get('/:id', getManuDetails);
+router.get('/:id',
+		getManuDetails);
 
 /**
  * POST - Zapytanie dodające nowe menu do bazy
