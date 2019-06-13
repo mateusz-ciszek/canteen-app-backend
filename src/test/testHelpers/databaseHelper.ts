@@ -153,10 +153,12 @@ export class DatabaseTestHelper {
 	}
 
 	public async connect(): Promise<typeof mongoose> {
-		return await mongoose.connect(
+		const connection = await mongoose.connect(
 			`mongodb+srv://test:test-dev@canteen-application-dev-hkbxg.mongodb.net/test-dev?retryWrites=true`,
 			{ useNewUrlParser: true, useCreateIndex: true }
 		);
+		connection.set('debug', false);
+		return connection;
 	}
 
 	public async disconnect(): Promise<void> {
