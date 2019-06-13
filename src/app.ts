@@ -7,10 +7,10 @@ import mongoose = require('mongoose');
 export const app = express();
 
 import { router as ConfigRoutes } from './api/routes/config';
-const usersRoutes = require('./api/routes/user');
-const menuRoutes = require('./api/routes/menu');
-const foodRoutes = require('./api/routes/food');
-const orderRoutes = require('./api/routes/order');
+import { router as usersRoutes } from './api/routes/user';
+import { router as menuRoutes } from './api/routes/menu';
+import { router as foodRoutes } from './api/routes/food';
+import { router as orderRoutes } from './api/routes/order';
 import { router as workerRoutes } from './api/routes/worker';
 import { router as supplyRoutes } from './api/routes/supply';
 import { HttpError } from './models/HttpError';

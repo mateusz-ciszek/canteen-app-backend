@@ -7,12 +7,12 @@ import { HttpError } from "../../models/HttpError";
 export class PermissionValidator {
 	private util = new PermissionUtil();
 
-	checkPermission(permission: Permission): (req: IRequest, res: Response, next: NextFunction) => Promise<any> {
-		return async (req: IRequest, res: Response, next: NextFunction) => {
+	checkPermission(permission: Permission): (req: IRequest, res: Response, next: NextFunction) => Promise<void> {
+		return async (req: IRequest, res: Response, next: NextFunction): Promise<void> => {
 			if (await this.util.hasPermission(req.context!.workerId!, permission)) {
 				return next();
 			}
-			return next({ status: 401, message: 'Missing permission' } as HttpError);
+			return next({ status: 403, message: 'Missing permission' } as HttpError);
 		}
 	}
 }
