@@ -17,6 +17,7 @@ import { IMenuDeleteRequest } from "../interface/menu/delete/IMenuDeleteRequest"
 import { MenuRepository, MenuNotFoundError } from "../helper/repository/MenuRepository";
 import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";
 import { IMenuChangeNameRequest } from "../interface/menu/changeName/IMenuChangeNameRequest";
+import { IMenuViewActions } from "../interface/menu/list/IMenuViewActions";
 
 const repository = new MenuRepository();
 
@@ -28,8 +29,11 @@ export async function getAllMenus(req: IRequest, res: Response, next: NextFuncti
 		},
 	}).exec();
 
+	// TODO: Add checking permissions after spliting endpoints for employees and customers
+	const actions: IMenuViewActions = { viewDetails: true, modify: true, delete: true };
+
 	const converter = new MenuListModelToMenuListResponseConverter();
-	const response: IMenuListResponse = converter.convert(menus);
+	const response: IMenuListResponse = { menus: menus.map(menu => converter.convert(menu, actions)) };
 
 	return res.status(200).json(response);
 };
