@@ -254,12 +254,12 @@ describe('Order', () => {
 						});
 			});
 
-			it('shoudl get 404 when fetching with wrong id', async () => {
+			it('should get 400 when fetching with malformed id', async () => {
 				const wrongUrl = `${endpoint}/wrongId`;
 				return request(app)
 						.get(wrongUrl)
 						.set('Authorization', `Bearer ${adminToken}`)
-						.expect(404);
+						.expect(400);
 			});
 		});
 	});

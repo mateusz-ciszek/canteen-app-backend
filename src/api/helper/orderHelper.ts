@@ -1,22 +1,8 @@
-import mongoose from 'mongoose';
 import * as mongooseHelper from '../helper/mongooseErrorHelper';
 import { onlyUnique } from '../../common/helper/arrayHelper';
-
-import { Food } from '../models/food';
-import { FoodAddition, IFoodAdditionModel } from '../models/foodAddition';
-import { OrderItem, IOrderItemModel } from '../models/orderItem';
-import { OrderItemAddition, IOrderItemAdditionModel } from '../models/orderItemAddition';
 import { IOrderCreateRequest } from '../interface/order/create/IOrderCreateRequest';
 import { IOrderItemCreateRequest } from '../interface/order/create/IOrderItemCreateRequest';
 import { IOrderItemAdditionCreateRequest } from '../interface/order/create/IOrderItemAdditionCreateRequest';
-
-export async function saveOrderItems(items: IOrderItemCreateRequest[]): Promise<IOrderItemModel[]> {
-	const savedItems: IOrderItemModel[] = [];
-	for (const item of items) {
-		savedItems.push(await saveItem(item));
-	}
-	return savedItems;
-};
 
 export function validateOrderRequest(request: IOrderCreateRequest): string[] {
 	const errors: string[] = [];
@@ -34,39 +20,6 @@ export function validateOrderRequest(request: IOrderCreateRequest): string[] {
 	}
 
 	return errors;
-};
-
-async function saveItem(item: IOrderItemCreateRequest): Promise<IOrderItemModel> {
-	const additions = await saveOrderItemAdditions(item.additions);
-	const additionsSumPrice = additions.map(item => item.quantity * item.price)
-			.reduce((accumulated, current) => accumulated + current, 0);
-
-	const food = await Food.findById(item._id).exec();
-	return await new OrderItem({ 
-		_id: mongoose.Types.ObjectId(),
-		food: item._id,
-		quantity: item.quantity,
-		additions: additions.map(item => item._id),
-		price: food!.price * item.quantity + additionsSumPrice,
-	}).save();
-};
-
-async function saveOrderItemAdditions(additions: IOrderItemAdditionCreateRequest[]): Promise<IOrderItemAdditionModel[]> {
-	const savedAdditions: IOrderItemAdditionModel[] = [];
-	for (const addition of additions) {
-		savedAdditions.push(await saveAddition(addition));
-	}
-	return savedAdditions;
-};
-
-async function saveAddition(item: any): Promise<IOrderItemAdditionModel> {
-	const addition: IFoodAdditionModel | null = await FoodAddition.findById(item._id).exec();
-	return await new OrderItemAddition({
-		_id: mongoose.Types.ObjectId(),
-		foodAddition: item._id,
-		quantity: item.quantity,
-		price: addition!.price * item.quantity,
-	}).save();
 };
 
 function validateOrderItem(item: IOrderItemCreateRequest): string[] {
