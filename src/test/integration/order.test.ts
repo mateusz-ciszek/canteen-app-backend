@@ -52,7 +52,7 @@ describe('Order', () => {
 				return request(app)
 						.post(endpoint)
 						.set('Authorization', `Bearer ${standardToken}`)
-						.expect(400, { errors: [ 'Empty orders are not allowed' ]});
+						.expect(400);
 			});
 
 			it('should get 400 with missing properties', async () => {
@@ -65,15 +65,6 @@ describe('Order', () => {
 						.post(endpoint)
 						.set('Authorization', `Bearer ${standardToken}`)
 						.send(requestBody)
-						.expect(response => {
-							response.body.should.have.a.property('errors').that.is.an('array');
-							const errors = response.body.errors;
-							errors.should.be.an('array').and.have.lengthOf(4);
-							errors.should.include('Food item _id is required');
-							errors.should.include('Food item quantity is required');
-							errors.should.include('Food item addition _id is required');
-							errors.should.include('Food item addition quantity is required');
-						})
 						.expect(400);
 			});
 
@@ -87,15 +78,6 @@ describe('Order', () => {
 						.post(endpoint)
 						.set('Authorization', `Bearer ${standardToken}`)
 						.send(requestBody)
-						.expect(response => {
-							response.body.should.have.a.property('errors').that.is.an('array');
-							const errors = response.body.errors;
-							errors.should.be.an('array').and.have.lengthOf(4);
-							errors.should.include('Food item _id have to be of type string');
-							errors.should.include('Food item quantity have to be of type number');
-							errors.should.include('Food item addition _id have to be of type string');
-							errors.should.include('Food item addition quantity have to be of type number');
-						})
 						.expect(400);						
 			});
 
@@ -109,15 +91,6 @@ describe('Order', () => {
 						.post(endpoint)
 						.set('Authorization', `Bearer ${standardToken}`)
 						.send(requestBody)
-						.expect(response => {
-							response.body.should.have.a.property('errors').that.is.an('array');
-							const errors = response.body.errors;
-							errors.should.be.an('array').and.have.lengthOf(4);
-							errors.should.include('Food item _id is not valid');
-							errors.should.include('Food item quantity have to be greater than 0');
-							errors.should.include('Food item addition _id is not valid');
-							errors.should.include('Food item addition quantity have to be greater than 0');
-						})
 						.expect(400);
 			});
 
@@ -169,14 +142,7 @@ describe('Order', () => {
 				return request(app)
 						.patch(url)
 						.set('Authorization', `Bearer ${adminToken}`)
-						.expect(400)
-						.expect(response => {
-							response.body.should.have.a.property('errors').that.is.an('array');
-							const errors = response.body.errors;
-							errors.should.be.an('array').and.have.lengthOf(2);
-							errors.should.include('Order _id is not valid');
-							errors.should.include('Order state is required');
-						});
+						.expect(400);
 			});
 
 			it('should get 400 with wrong id and invalid order state', async () => {
@@ -184,14 +150,7 @@ describe('Order', () => {
 						.patch(url)
 						.set('Authorization', `Bearer ${adminToken}`)
 						.send({ state: 'INVALID' })
-						.expect(400)
-						.expect(response => {
-							response.body.should.have.a.property('errors').that.is.an('array');
-							const errors = response.body.errors;
-							errors.should.be.an('array').and.have.lengthOf(2);
-							errors.should.include('Order _id is not valid');
-							errors.should.include('Invalid order state');
-						});
+						.expect(400);
 			});
 		});
 

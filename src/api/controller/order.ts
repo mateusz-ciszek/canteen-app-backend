@@ -1,14 +1,9 @@
-import * as orderHelper from '../helper/orderHelper';
-import * as mongooseHelper from '../helper/mongooseErrorHelper';
-import * as stateHelper from '../helper/orderStateHelper';
-
 import { IOrderModel } from '../models/order';
 import { OrderState, IOrderStateModel } from '../models/orderState';
 import { IRequest } from '../../models/Express';
 import { Response } from 'express';
 import { OrderStateEnum } from '../../interface/orderState';
 import { IOrderCreateRequest } from '../interface/order/create/IOrderCreateRequest';
-import { IValidationErrorsResponse } from '../interface/common/IValidationErrorsResponse';
 import { IOrderListResponse } from '../interface/order/list/IOrderListResponse';
 import { OrderModelToOrderListResponseConverter } from '../converter/OrderListModelToOrderListResponseConverter';
 import { IOrderListItemView } from '../interface/order/list/IOrderListItemView';
@@ -17,17 +12,19 @@ import { IOrderDetailsRequest } from '../interface/order/details/IOrderDetailsRe
 import { OrderListFilter } from '../interface/order/list/OrderListFilter';
 import { IOrderDetailsResponse } from '../interface/order/details/IOrderDetailsResponse';
 import { OrderModelToOrderDetailsResponseConverter } from '../converter/OrderModelToOrderDetailsResponseConverter';
-import { OrderRepository, OrderNotFoundError, OrderSaveError } from '../helper/repository/OrderRepository';
+import { OrderRepository, OrderNotFoundError } from '../helper/repository/OrderRepository';
 import { InvalidObjectIdError } from '../helper/repository/InvalidObjectIdError';
+import { OrderStateUpdateRequestValidator } from '../helper/validate/order/OrderStateUpdateRequestValidator';
+import { OrderStateUtil } from '../helper/OrderStateUtil';
+import { OrderCreateRequestValidator } from '../helper/validate/order/OrderCreateReqestValidator';
 
 const repository = new OrderRepository();
 
 export async function createOrder(req: IRequest, res: Response): Promise<Response> {
 	const request: IOrderCreateRequest = req.body;
-	const errors: string[] = orderHelper.validateOrderRequest(request);
-	if (errors.length) {
-		const errorResponse: IValidationErrorsResponse = { errors };
-		return res.status(400).json(errorResponse);
+	const validator = new OrderCreateRequestValidator();
+	if (!validator.validate(request)) {
+		return res.status(400).json();
 	}
 
 	try {
@@ -60,10 +57,9 @@ export async function updateOrderState(req: IRequest, res: Response): Promise<Re
 		state: req.body['state'],
 	};
 	
-	const errors: string[] = validateOrderPatchRequest(request);
-	if (errors.length) {
-		const errorResponse: IValidationErrorsResponse = { errors };
-		return res.status(400).json(errorResponse);
+	const validator = new OrderStateUpdateRequestValidator();
+	if (!validator.validate(request)) {
+		return res.status(400).json();
 	}
 
 	try {
@@ -102,26 +98,11 @@ export async function getOrderDetails(req: IRequest, res: Response): Promise<Res
 	return res.status(200).json(response);
 };
 
-function validateOrderPatchRequest(request: IOrderStateUpdateRequest): string[] {
-	const errors: string[] = [];
-
-	if (!mongooseHelper.isValidObjectId(request.id)) {
-		errors.push('Order _id is not valid');
-	}
-
-	if (!request.state) {
-		errors.push('Order state is required');
-	} else if (!stateHelper.isValidState(request.state)) {
-		errors.push('Invalid order state');
-	}
-
-	return errors;
-};
-
 async function tryChangeState(request: IOrderStateUpdateRequest, userId: any): Promise<void> {
 	const order = await repository.getOrderDetails(request.id);
 
-	if (!stateHelper.canChangeState(order.currentState.state, request.state)) {
+	const stateUtil = new OrderStateUtil();
+	if (!stateUtil.canChangeState(order.currentState.state, request.state)) {
 		throw new InvalidStateChangeError(order.currentState.state, request.state);
 	}
 
