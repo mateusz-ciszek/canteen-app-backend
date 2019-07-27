@@ -35,10 +35,6 @@ describe('ValidatorUtil', () => {
 			expect(validatorUtil.validateNumber(.2)).to.be.true;
 		});
 
-		it('should validate Number', () => {
-			expect(validatorUtil.validateNumber(new Number(0))).to.be.true;
-		});
-
 		it('should not validate object', () => {
 			expect(validatorUtil.validateNumber({})).to.be.false;
 		});
