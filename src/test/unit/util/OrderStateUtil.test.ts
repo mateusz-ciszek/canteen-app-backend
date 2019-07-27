@@ -1,32 +1,40 @@
 import 'mocha';
-import { expect } from 'chai';
-import { OrderStateEnum } from '../../interface/orderState';
-import { OrderStateUtil } from '../../api/helper/OrderStateUtil';
+import { expect } from "chai";
+import { OrderStateUtil } from "../../../api/helper/OrderStateUtil";
+import { OrderStateEnum } from "../../../interface/orderState";
 
-// TODO: Move to unit tests
-describe('Helpers', () => {
-	describe('#orderState', () => {
+describe('OrderStateUtil', () => {
 
-		let allStates: OrderStateEnum[];
-		let stateUtil: OrderStateUtil;
+	let allStates: OrderStateEnum[];
+	let stateUtil: OrderStateUtil;
 
-		beforeEach('set up' ,() => {
-			stateUtil = new OrderStateUtil();
-			allStates = stateUtil.getAllStates();
+	beforeEach('set up' ,() => {
+		stateUtil = new OrderStateUtil();
+		allStates = stateUtil.getAllStates();
+	});
+
+	describe('#allStatesGetter', () => {
+		it('should contain all states', () => {
+			['IN_PREPARATION', 'PAID', 'READY', 'REJECTED', 'SAVED', 'SENT_TO_PREPARATION', 'SERVED']
+					.forEach(state => expect(stateUtil.getAllStates()).to.contain(state));
 		});
-	
+	});
+
+	describe('#stateValidation', () => {
 		it('should return true when validating proper order statues', () => {
 			allStates.map(value => value.toString()).forEach(state => expect(stateUtil.isValidState(state)).to.be.true);
 		});
-
+	
 		it('should return false when validating empty string', () => {
 			expect(stateUtil.isValidState('')).to.be.false;
 		});
-
+	
 		it('should return false when validating invalid string', () => {
 			expect(stateUtil.isValidState('some invalid state')).to.be.false;
 		});
-	
+	});
+
+	describe('stateChange', () => {
 		it('should not allow to change order status in not proper way', () => {
 			expect(stateUtil.canChangeState('REJECTED', 'SAVED')).to.be.false;
 			expect(stateUtil.canChangeState('REJECTED', 'READY')).to.be.false;
