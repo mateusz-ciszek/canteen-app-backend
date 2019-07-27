@@ -1,11 +1,10 @@
 import 'mocha';
 import request from 'supertest';
 import { app } from '../../app';
-import { should } from 'chai';
+import { expect } from 'chai';
 import { DatabaseTestHelper } from '../testHelpers/databaseHelper';
 import { TokenTestHelper } from '../testHelpers/tokenHelper';
 import { OrderTestHelper } from '../testHelpers/orderHelper';
-should();
 
 describe('Order', () => {
 	const dbHelper = new DatabaseTestHelper();
@@ -116,8 +115,8 @@ describe('Order', () => {
 						.set('Authorization', `Bearer ${adminToken}`)
 						.expect(200)
 						.expect(response => {
-							response.body.should.be.an('object').that.have.property('orders');
-							response.body.orders.should.be.an('array');
+							expect(response.body).to.be.an('object').that.have.property('orders');
+							expect(response.body.orders).to.be.an('array');
 						});
 			});
 		});
@@ -181,35 +180,35 @@ describe('Order', () => {
 						.expect(200)
 						.expect(response => {
 							const order = response.body;
-							order.should.have.property('items').that.is.an('array').and.have.lengthOf.above(0);
+							expect(order).to.have.property('items').that.is.an('array').and.have.lengthOf.above(0);
 							const item = order.items[0];
-							item.should.have.property('_id').that.is.a('string').and.is.not.null;
-							item.should.have.property('additions').that.is.an('array');
-							item.should.have.property('price').that.is.a('number').and.is.not.lessThan(0);
-							item.should.have.property('quantity').that.is.a('number').and.is.greaterThan(0);
-							item.should.have.property('food');
+							expect(item).to.have.property('_id').that.is.a('string').and.is.not.null;
+							expect(item).to.have.property('additions').that.is.an('array');
+							expect(item).to.have.property('price').that.is.a('number').and.is.not.lessThan(0);
+							expect(item).to.have.property('quantity').that.is.a('number').and.is.greaterThan(0);
+							expect(item).to.have.property('food');
 							const food = item.food;
-							food.should.have.property('_id').that.is.a('string').and.is.not.null;
-							food.should.have.property('name').that.is.a('string').and.is.not.null;
-							food.should.have.property('price').that.is.a('number').and.is.not.lessThan(0);
-							order.should.have.property('createdDate');
-							order.should.have.property('history').that.is.an('array').and.have.lengthOf.above(0);
-							order.should.have.property('_id').that.is.a('string').and.is.not.null;
-							order.should.have.property('totalPrice').that.is.a('number').and.is.greaterThan(0);
-							order.should.have.property('currentState').that.is.not.null;
-							order.currentState.should.have.property('state').that.is.a('string').and.is.not.null;
-							order.currentState.should.have.property('enteredDate').that.is.a('string').and.is.not.null;
-							order.currentState.should.have.property('enteredBy').that.is.an('object').and.is.not.null;
+							expect(food).to.have.property('_id').that.is.a('string').and.is.not.null;
+							expect(food).to.have.property('name').that.is.a('string').and.is.not.null;
+							expect(food).to.have.property('price').that.is.a('number').and.is.not.lessThan(0);
+							expect(order).to.have.property('createdDate');
+							expect(order).to.have.property('history').that.is.an('array').and.have.lengthOf.above(0);
+							expect(order).to.have.property('_id').that.is.a('string').and.is.not.null;
+							expect(order).to.have.property('totalPrice').that.is.a('number').and.is.greaterThan(0);
+							expect(order).to.have.property('currentState').that.is.not.null;
+							expect(order.currentState).to.have.property('state').that.is.a('string').and.is.not.null;
+							expect(order.currentState).to.have.property('enteredDate').that.is.a('string').and.is.not.null;
+							expect(order.currentState).to.have.property('enteredBy').that.is.an('object').and.is.not.null;
 							const user = order.currentState.enteredBy;
-							user.should.have.property('_id').that.is.a('string').and.is.not.null;
-							user.should.have.property('email').that.is.a('string').and.is.not.null;
-							user.should.have.property('firstName').that.is.a('string').and.is.not.null;
-							user.should.have.property('lastName').that.is.a('string').and.is.not.null;
-							order.should.have.property('user');
-							order.user.should.have.property('_id').that.is.a('string').and.is.not.null;
-							order.user.should.have.property('email').that.is.a('string').and.is.not.null;
-							order.user.should.have.property('firstName').that.is.a('string').and.is.not.null;
-							order.user.should.have.property('lastName').that.is.a('string').and.is.not.null;
+							expect(user).to.have.property('_id').that.is.a('string').and.is.not.null;
+							expect(user).to.have.property('email').that.is.a('string').and.is.not.null;
+							expect(user).to.have.property('firstName').that.is.a('string').and.is.not.null;
+							expect(user).to.have.property('lastName').that.is.a('string').and.is.not.null;
+							expect(order).to.have.property('user');
+							expect(order.user).to.have.property('_id').that.is.a('string').and.is.not.null;
+							expect(order.user).to.have.property('email').that.is.a('string').and.is.not.null;
+							expect(order.user).to.have.property('firstName').that.is.a('string').and.is.not.null;
+							expect(order.user).to.have.property('lastName').that.is.a('string').and.is.not.null;
 						});
 			});
 

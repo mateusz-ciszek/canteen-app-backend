@@ -1,11 +1,10 @@
 import request from 'supertest';
 import { app } from '../../app';
-import { expect, should } from 'chai';
+import { expect } from 'chai';
 import { IWorkerCreateRequest } from '../../api/interface/worker/create/IWorkerCreateRequest';
 import { DatabaseTestHelper } from '../testHelpers/databaseHelper';
 import { TokenTestHelper } from '../testHelpers/tokenHelper';
 import { IWorkerDayOffRequest } from '../../api/interface/worker/dayOff/create/IWorkerDayOffRequest';
-should();
 
 describe('Worker', () => {
 	let standardToken: string;

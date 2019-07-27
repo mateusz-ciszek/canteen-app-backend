@@ -1,10 +1,9 @@
 import 'mocha';
-import { should } from 'chai';
+import { expect } from 'chai';
 import { OrderStateEnum } from '../../interface/orderState';
 import { OrderStateUtil } from '../../api/helper/OrderStateUtil';
-should();
 
-// TODO: Move to unit tests, use expect instead of should
+// TODO: Move to unit tests
 describe('Helpers', () => {
 	describe('#orderState', () => {
 
@@ -17,43 +16,43 @@ describe('Helpers', () => {
 		});
 	
 		it('should return true when validating proper order statues', () => {
-			allStates.map(value => value.toString()).forEach(state => stateUtil.isValidState(state).should.be.true);
+			allStates.map(value => value.toString()).forEach(state => expect(stateUtil.isValidState(state)).to.be.true);
 		});
 
 		it('should return false when validating empty string', () => {
-			stateUtil.isValidState('').should.be.false;
+			expect(stateUtil.isValidState('')).to.be.false;
 		});
 
 		it('should return false when validating invalid string', () => {
-			stateUtil.isValidState('some invalid state').should.be.false;
+			expect(stateUtil.isValidState('some invalid state')).to.be.false;
 		});
 	
 		it('should not allow to change order status in not proper way', () => {
-			stateUtil.canChangeState('REJECTED', 'SAVED').should.be.false;
-			stateUtil.canChangeState('REJECTED', 'READY').should.be.false;
-			stateUtil.canChangeState('REJECTED', 'SERVED').should.be.false;
-			stateUtil.canChangeState('SERVED', 'SAVED').should.be.false;
-			stateUtil.canChangeState('SERVED', 'READY').should.be.false;
-			stateUtil.canChangeState('SERVED', 'REJECTED').should.be.false;
-			stateUtil.canChangeState('READY', 'SAVED').should.be.false;
-			stateUtil.canChangeState('SAVED', 'SERVED').should.be.false;
+			expect(stateUtil.canChangeState('REJECTED', 'SAVED')).to.be.false;
+			expect(stateUtil.canChangeState('REJECTED', 'READY')).to.be.false;
+			expect(stateUtil.canChangeState('REJECTED', 'SERVED')).to.be.false;
+			expect(stateUtil.canChangeState('SERVED', 'SAVED')).to.be.false;
+			expect(stateUtil.canChangeState('SERVED', 'READY')).to.be.false;
+			expect(stateUtil.canChangeState('SERVED', 'REJECTED')).to.be.false;
+			expect(stateUtil.canChangeState('READY', 'SAVED')).to.be.false;
+			expect(stateUtil.canChangeState('SAVED', 'SERVED')).to.be.false;
 		});
 	
 		it('should not allow to change order status into current', () => {
-			allStates.forEach(state => stateUtil.canChangeState(state, state).should.be.false);
+			allStates.forEach(state => expect(stateUtil.canChangeState(state, state)).to.be.false);
 		});
 	
 		it('should allow to change order status in proper way', () => {
-			stateUtil.canChangeState('SAVED', 'PAID').should.be.true;
-			stateUtil.canChangeState('SAVED', 'REJECTED').should.be.true;
-			stateUtil.canChangeState('PAID', 'SENT_TO_PREPARATION').should.be.true;
-			stateUtil.canChangeState('PAID', 'REJECTED').should.be.true;
-			stateUtil.canChangeState('SENT_TO_PREPARATION', 'IN_PREPARATION').should.be.true;
-			stateUtil.canChangeState('SENT_TO_PREPARATION', 'REJECTED').should.be.true;
-			stateUtil.canChangeState('IN_PREPARATION', 'READY').should.be.true;
-			stateUtil.canChangeState('IN_PREPARATION', 'REJECTED').should.be.true;
-			stateUtil.canChangeState('READY', 'SERVED').should.be.true;
-			stateUtil.canChangeState('READY', 'REJECTED').should.be.true;
+			expect(stateUtil.canChangeState('SAVED', 'PAID')).to.be.true;
+			expect(stateUtil.canChangeState('SAVED', 'REJECTED')).to.be.true;
+			expect(stateUtil.canChangeState('PAID', 'SENT_TO_PREPARATION')).to.be.true;
+			expect(stateUtil.canChangeState('PAID', 'REJECTED')).to.be.true;
+			expect(stateUtil.canChangeState('SENT_TO_PREPARATION', 'IN_PREPARATION')).to.be.true;
+			expect(stateUtil.canChangeState('SENT_TO_PREPARATION', 'REJECTED')).to.be.true;
+			expect(stateUtil.canChangeState('IN_PREPARATION', 'READY')).to.be.true;
+			expect(stateUtil.canChangeState('IN_PREPARATION', 'REJECTED')).to.be.true;
+			expect(stateUtil.canChangeState('READY', 'SERVED')).to.be.true;
+			expect(stateUtil.canChangeState('READY', 'REJECTED')).to.be.true;
 		});
 	});
 });
