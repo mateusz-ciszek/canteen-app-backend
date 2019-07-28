@@ -3,7 +3,7 @@ import { Response, NextFunction } from "express";
 import { Worker, IWorkerModel } from "../models/worker";
 import { saveUser, hashPassword } from '../helper/userHelper';
 import { IWorkerListResponse } from "../interface/worker/list/IWorkerListResponse";
-import { WorkerHelper, WorkerNotFoundError, NotObjectIdError } from '../helper/WorkerHelper';
+import { WorkerHelper, NotObjectIdError } from '../helper/WorkerHelper';
 import { IWorkerCreateResponse } from "../interface/worker/create/IWorkerCreateResponse";
 import { IWorkerCreateRequest } from "../interface/worker/create/IWorkerCreateRequest";
 import { WorkHoursHelper } from "../helper/WorkHoursHelper";
@@ -22,6 +22,56 @@ import { IWorkerDetailsRequest } from "../interface/worker/details/IWorkerDetail
 import { IWorkerDetailsResponse } from "../interface/worker/details/IWorkerDetailsResponse";
 import { IWorkerPasswordResetRequest } from "../interface/worker/password/reset/IWorkerPasswordResetRequest";
 import { IWorkerPasswordResetResponse } from "../interface/worker/password/reset/IWorkerPasswordResetResponse";
+import { WorkerRepository, WorkerNotFoundError } from "../helper/repository/WorkerRepository";
+import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";
+import { IWorkerUpdatePermissions } from "../interface/worker/permissions/update/IWorkerUpdatePermissions";
+import { Permission } from "../../interface/Permission";
+import { IWorkerGetPermissions } from "./IWorkerGetPermissions";
+
+export class WorkerController {
+	private repository = new WorkerRepository();
+
+	async getPermissions(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+		const request: IWorkerGetPermissions = req.params;
+		let permissions: Permission[];
+
+		try {
+			permissions = await this.repository.getPermissions(request.workerId);
+		} catch (err) {
+			if (err instanceof InvalidObjectIdError) {
+				return res.status(400).json();
+			}
+			if (err instanceof WorkerNotFoundError) {
+				return res.status(404).json();
+			}
+			return res.status(500).json();
+		}
+
+		return res.status(200).json(permissions);
+	}
+
+	async updatePermissions(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+		const request: IWorkerUpdatePermissions = { ...req.body, ...req.params };
+		
+		if (!request.workerId || !request.permissions) {
+			return res.status(400).json();
+		}
+
+		try {
+			await this.repository.updatePermissions(request.workerId, request.permissions);
+		} catch (err) {
+			if (err instanceof InvalidObjectIdError) {
+				return res.status(400).json();
+			}
+			if (err instanceof WorkerNotFoundError) {
+				return res.status(404).json();
+			}
+			return res.status(500).json();
+		}
+
+		return res.status(200).json();
+	}
+}
 
 export async function getWorkersList(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 	const allWorkers: IWorkerModel[] = await Worker.find()

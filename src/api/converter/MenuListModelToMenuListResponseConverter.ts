@@ -1,26 +1,21 @@
-import { Converter } from "../../common/Converter";
 import { IMenuModel } from "../models/menu";
-import { IMenuListResponse } from "../interface/menu/list/IMenuListResponse";
 import { IMenuView } from "../interface/menu/list/IMenuView";
 import { IFoodView } from "../interface/menu/list/IFoodView";
 import { IFoodModel } from "../models/food";
 import { IFoodAdditionView } from "../interface/menu/list/IFoodAdditionView";
 import { IFoodAdditionModel } from "../models/foodAddition";
+import { ExtendedConverter } from "../../common/ExtendedConverter";
+import { IMenuViewActions } from "../interface/menu/list/IMenuViewActions";
 
-export class MenuListModelToMenuListResponseConverter implements Converter<IMenuModel[], IMenuListResponse> {
-	convert(input: IMenuModel[]): IMenuListResponse {
-		const menus: IMenuView[] = input.map(menu => this.convertMenu(menu));
-
-		return { menus };
-	}
-
-	private convertMenu(menu: IMenuModel): IMenuView {
-		const foods: IFoodView[] = menu.foods.map(food => this.convertFood(food));
+export class MenuListModelToMenuListResponseConverter implements ExtendedConverter<IMenuModel, IMenuView, IMenuViewActions> {
+	convert(input: IMenuModel, extra: IMenuViewActions): IMenuView {
+		const foods: IFoodView[] = input.foods.map(food => this.convertFood(food));
 
 		return {
-			_id: menu._id,
-			name: menu.name,
+			_id: input._id,
+			name: input.name,
 			foods,
+			actions: extra,
 		};
 	}
 

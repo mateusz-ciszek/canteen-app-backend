@@ -12,6 +12,7 @@ import { OrderState } from '../../api/models/orderState';
 import { Worker } from '../../api/models/worker';
 import { WorkHours } from '../../api/models/workHours';
 import { DayOff } from '../../api/models/DayOff';
+import { Permission } from '../../interface/Permission';
 
 export class DatabaseTestHelper {
 	private id: ObjectId | null = null;
@@ -88,6 +89,15 @@ export class DatabaseTestHelper {
 		COMMENT: '',
 	}
 
+	
+	public readonly ALL_PERMISSIONS: Permission[] = ['P_MENU_VIEW_MODULE', 'P_MENU_CREATE', 'P_MENU_LIST_VIEW', 'P_MENU_DETAILS_VIEW', 'P_MENU_MODIFY',
+		'P_MENU_DELETE', 'P_MENU_FOOD_CREATE', 'P_MENU_FOOD_DETAILS_VIEW', 'P_MENU_FOOD_MODIFY', 'P_MENU_FOOD_DELETE', 'P_ORDER_VIEW_MODULE', 'P_ORDER_LIST_VIEW',
+		'P_ORDER_DETAILS_VIEW', 'P_ORDER_ADVANCE_ACCEPT', 'P_ORDER_ADVANCE_PREPARE', 'P_ORDER_ADVANCE_SERVE', 'P_WORKER_VIEW_MODULE', 'P_WORKER_LIST_VIEW',
+		'P_WORKER_CREATE', 'P_WORKER_RESOLVE_DAYOFF_REQUEST', 'P_WORKER_PERMISSIONS_EDIT', 'P_WORKER_DETAILS_VIEW', 'P_WORKER_PASSWORD_RESET',
+		'P_WORKER_PASSWORD_CHANGE', 'P_SUPPLY_VIEW_MODULE', 'P_SUPPLY_LIST_VIEW', 'P_SUPPLY_CREATE', 'P_SUPPLY_DETAILS_VIEW', 'P_SUPPLY_REQUEST_ACCEPT',
+		'P_SUPPLY_REQUEST_ADVANCE', 'P_SUPPLY_REQUEST_CANCEL'];
+
+
 	public readonly WORK_HOURS = [
 		{ DAY: 0, START_HOUR: '1899-12-31T09:00:00.000+00:00', END_HOUR: '1899-12-31T13:00:00.000+00:00' },
 		{ DAY: 1, START_HOUR: '1899-12-31T09:00:00.000+00:00', END_HOUR: '1899-12-31T13:00:00.000+00:00' },
@@ -103,6 +113,7 @@ export class DatabaseTestHelper {
 		PERSON: '',
 		DEFAULT_WORK_HOURS: this.WORK_HOURS,
 		EMPLOYMENT_DATE: '2019-03-25T16:08:16.747+00:00',
+		PERMISSIONS: this.ALL_PERMISSIONS,
 	}
 
 	public readonly DAY_OFF = {
@@ -142,10 +153,12 @@ export class DatabaseTestHelper {
 	}
 
 	public async connect(): Promise<typeof mongoose> {
-		return await mongoose.connect(
+		const connection = await mongoose.connect(
 			`mongodb+srv://test:test-dev@canteen-application-dev-hkbxg.mongodb.net/test-dev?retryWrites=true`,
 			{ useNewUrlParser: true, useCreateIndex: true }
 		);
+		connection.set('debug', false);
+		return connection;
 	}
 
 	public async disconnect(): Promise<void> {
@@ -274,6 +287,7 @@ export class DatabaseTestHelper {
 			_id: this.id,
 			person: this.WORKER.PERSON,
 			defaultWorkHours: workHours,
+			permissions: this.WORKER.PERMISSIONS,
 		}).save();
 		this.WORKER.ID = this.id.toString();
 	}
