@@ -1,11 +1,10 @@
 import 'mocha';
 import request from 'supertest';
-import { should } from 'chai';
+import { expect } from 'chai';
 import { app } from '../../app';
 import { DatabaseTestHelper } from '../testHelpers/databaseHelper';
 import { TokenTestHelper } from '../testHelpers/tokenHelper';
 import { IFoodDeleteRequest } from '../../api/interface/food/delete/IFoodDeleteRequest';
-should();
 
 describe('Food', () => {
 	const endpoint = '/food';
@@ -36,11 +35,11 @@ describe('Food', () => {
 						.get(url)
 						.expect(200)
 						.expect((response: any) => {
-							response.body.should.have.property('_id').that.is.a('string').and.have.lengthOf(24);
-							response.body.should.have.property('name').that.is.a('string').and.have.lengthOf.above(1);
-							response.body.should.have.property('price').that.is.a('number').and.is.not.below(0);
-							response.body.should.have.property('additions').that.is.an('array').and.is.not.null;
-							response.body.should.have.property('description').that.is.a('string').and.is.not.null;
+							expect(response.body).to.have.property('_id').that.is.a('string').and.have.lengthOf(24);
+							expect(response.body).to.have.property('name').that.is.a('string').and.have.lengthOf.above(1);
+							expect(response.body).to.have.property('price').that.is.a('number').and.is.not.below(0);
+							expect(response.body).to.have.property('additions').that.is.an('array').and.is.not.null;
+							expect(response.body).to.have.property('description').that.is.a('string').and.is.not.null;
 						});
 			});
 	

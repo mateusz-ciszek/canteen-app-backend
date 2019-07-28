@@ -1,10 +1,9 @@
 import 'mocha';
 import request from 'supertest';
-import { should } from 'chai';
+import { expect } from 'chai';
 import { app } from '../../app';
 import { decode } from 'jsonwebtoken';
 import { DatabaseTestHelper } from '../testHelpers/databaseHelper';
-should();
 
 describe('User', () => {
 	const dbHelper = new DatabaseTestHelper();
@@ -45,8 +44,8 @@ describe('User', () => {
 					.send(validRegisterData)
 					.expect(400)
 					.expect(response => {
-						response.body.should.be.an('array').and.have.lengthOf(1);
-						response.body[0].should.be.a('string').and.equal('Email is required');
+						expect(response.body).to.be.an('array').and.have.lengthOf(1);
+						expect(response.body[0]).to.be.a('string').and.equal('Email is required');
 					});
 		});
 
@@ -57,8 +56,8 @@ describe('User', () => {
 					.send(validRegisterData)
 					.expect(400)
 					.expect(response => {
-						response.body.should.be.an('array').and.have.lengthOf(1);
-						response.body[0].should.be.a('string').and.equal('Malformed email');
+						expect(response.body).to.be.an('array').and.have.lengthOf(1);
+						expect(response.body[0]).to.be.a('string').and.equal('Malformed email');
 					});
 		});
 
@@ -69,8 +68,8 @@ describe('User', () => {
 					.send(validRegisterData)
 					.expect(400)
 					.expect(response => {
-						response.body.should.be.an('array').and.have.lengthOf(1);
-						response.body[0].should.be.a('string').and.equal('Password is required');
+						expect(response.body).to.be.an('array').and.have.lengthOf(1);
+						expect(response.body[0]).to.be.a('string').and.equal('Password is required');
 					});
 		});
 
@@ -81,8 +80,8 @@ describe('User', () => {
 					.send(validRegisterData)
 					.expect(400)
 					.expect(response => {
-						response.body.should.be.an('array').and.have.lengthOf(1);
-						response.body[0].should.be.a('string').and.equal('Password have to be at least 8 characters long');
+						expect(response.body).to.be.an('array').and.have.lengthOf(1);
+						expect(response.body[0]).to.be.a('string').and.equal('Password have to be at least 8 characters long');
 					});
 		});
 
@@ -93,8 +92,8 @@ describe('User', () => {
 					.send(validRegisterData)
 					.expect(400)
 					.expect(response => {
-						response.body.should.be.an('array').and.have.lengthOf(1);
-						response.body[0].should.be.a('string').and.equal('First name is required');
+						expect(response.body).to.be.an('array').and.have.lengthOf(1);
+						expect(response.body[0]).to.be.a('string').and.equal('First name is required');
 					});
 		});
 
@@ -105,8 +104,8 @@ describe('User', () => {
 					.send(validRegisterData)
 					.expect(400)
 					.expect(response => {
-						response.body.should.be.an('array').and.have.lengthOf(1);
-						response.body[0].should.be.a('string').and.equal('First name have to be at least 3 characters long');
+						expect(response.body).to.be.an('array').and.have.lengthOf(1);
+						expect(response.body[0]).to.be.a('string').and.equal('First name have to be at least 3 characters long');
 					});
 		});
 
@@ -117,8 +116,8 @@ describe('User', () => {
 					.send(validRegisterData)
 					.expect(400)
 					.expect(response => {
-						response.body.should.be.an('array').and.have.lengthOf(1);
-						response.body[0].should.be.a('string').and.equal('Last name is required');
+						expect(response.body).to.be.an('array').and.have.lengthOf(1);
+						expect(response.body[0]).to.be.a('string').and.equal('Last name is required');
 					});
 		});
 
@@ -129,8 +128,8 @@ describe('User', () => {
 					.send(validRegisterData)
 					.expect(400)
 					.expect(response => {
-						response.body.should.be.an('array').and.have.lengthOf(1);
-						response.body[0].should.be.a('string').and.equal('Last name have to be at least 3 characters long');
+						expect(response.body).to.be.an('array').and.have.lengthOf(1);
+						expect(response.body[0]).to.be.a('string').and.equal('Last name have to be at least 3 characters long');
 					});
 		});
 
@@ -182,9 +181,9 @@ describe('User', () => {
 					.post(url)
 					.send({ email, password })
 					.expect(response => {
-						response.body.should.be.an('object').that.have.property('token').that.is.a('string');
+						expect(response.body).to.be.an('object').that.have.property('token').that.is.a('string');
 						const decodedEmail: string = (<{[key: string]: any}>decode(response.body.token))['email'];
-						decodedEmail.should.equal(email);
+						expect(decodedEmail).to.equal(email);
 					})
 					.expect(200);
 		});
