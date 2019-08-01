@@ -3,9 +3,11 @@ import { getAllMenus, getManuDetails, createMenu, createOrUpdateFood, deleteMenu
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
 import { PermissionValidator } from '../middleware/PermissionValidator';
+import { MenuController } from '../controller/MenuController';
 
 export const router = express.Router();
 const permissionValidator = new PermissionValidator();
+const controller = new MenuController();
 
 /**
  * GET - Zwraca listę wszystkich menu z posiłkami
@@ -36,6 +38,14 @@ const permissionValidator = new PermissionValidator();
  */
 router.get('/',
 		getAllMenus);
+
+/**
+ * GET - pobierz config dla modułu menu
+ */
+router.get('/config',
+		checkAuth,
+		isAdmin,
+		(req, res) => controller.getConfig(req, res));
 
 /**
  * GET - Pobierz menu o podanym ID
