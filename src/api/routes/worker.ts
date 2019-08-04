@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
-import { getWorkersList, createWorker, getMonth, createDayOffRequest, changeDayffState, getWorkerDetails, resetPassword, WorkerController } from '../controller/worker';
+import { createWorker, getMonth, createDayOffRequest, changeDayffState, getWorkerDetails, resetPassword, WorkerController } from '../controller/WorkerController';
 import { PermissionValidator } from '../middleware/PermissionValidator';
 
 export const router = Router();
@@ -14,7 +14,7 @@ router.use(checkAuth,
 
 router.get('',
 		(req, res, next) => permissionValidator.checkPermission('P_WORKER_LIST_VIEW')(req, res, next),
-		getWorkersList);
+		(req, res, next) => controller.getWorkersList(req, res, next));
 
 router.post('',
 		(req, res, next) => permissionValidator.checkPermission('P_WORKER_CREATE')(req, res, next),

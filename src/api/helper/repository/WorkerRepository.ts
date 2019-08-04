@@ -5,6 +5,12 @@ import { UpdateWriteOpResult } from "mongodb";
 import { InvalidObjectIdError } from "./InvalidObjectIdError";
 
 export class WorkerRepository {
+	async getAllWorkers(): Promise<IWorkerModel[]> {
+		return Worker.find()
+				.populate('person')
+				.exec();
+	}
+
 	async query(workerId: string): Promise<IWorkerModel> {
 		const worker: IWorkerModel | null = await Worker.findById(workerId)
 				.populate('person')

@@ -71,16 +71,13 @@ export class WorkerController {
 
 		return res.status(200).json();
 	}
-}
 
-export async function getWorkersList(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
-	const allWorkers: IWorkerModel[] = await Worker.find()
-			.populate('person')
-			.exec();
-
-	const converter = new WorkerModelToWorkerListItemConverter();
-	const response: IWorkerListResponse = { workers: allWorkers.map(worker => converter.convert(worker)) };
-	return res.status(200).json(response);
+	async getWorkersList(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+		const allWorkers: IWorkerModel[] = await this.repository.getAllWorkers();
+		const converter = new WorkerModelToWorkerListItemConverter();
+		const response: IWorkerListResponse = { workers: allWorkers.map(worker => converter.convert(worker)) };
+		return res.status(200).json(response);
+	}
 }
 
 export async function createWorker(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
