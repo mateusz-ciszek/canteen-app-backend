@@ -26,7 +26,7 @@ import { WorkerRepository, WorkerNotFoundError } from "../helper/repository/Work
 import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";
 import { IWorkerUpdatePermissions } from "../interface/worker/permissions/update/IWorkerUpdatePermissions";
 import { Permission } from "../../interface/Permission";
-import { IWorkerGetPermissions } from "./IWorkerGetPermissions";
+import { IWorkerGetPermissions } from "../interface/worker/permissions/get/IWorkerGetPermissions";
 
 export class WorkerController {
 	private repository = new WorkerRepository();
