@@ -5,7 +5,8 @@ import * as foodHelper from '../helper/foodHelper';
 import * as menuHelper from '../helper/menuHelper';
 import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";
 import { MenuNotFoundError, MenuRepository } from "../helper/repository/MenuRepository";
-import { IValidationErrorsResponse } from "../interface/common/IValidationErrorsResponse";
+import { FoodCreateRquestValidator } from "../helper/validate/food/FoodCreateRequestValidator";
+import { MenuCreateRequestValidator } from "../helper/validate/menu/MenuCreateRequestValidator";
 import { IMenuChangeNameRequest } from "../interface/menu/changeName/IMenuChangeNameRequest";
 import { IFoodCreateRequest } from "../interface/menu/create/IFoodCreateRequest";
 import { IMenuCreateRequest } from "../interface/menu/create/IMenuCreateRequest";
@@ -16,10 +17,10 @@ const repository = new MenuRepository();
 
 export async function createMenu(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 	const request: IMenuCreateRequest = req.body;
-	const errors = menuHelper.validateMenuCreateRequest(request);
-	if (errors.length) {
-		const errorResponse: IValidationErrorsResponse = { errors };
-		return res.status(400).json(errorResponse);
+
+	const validator = new MenuCreateRequestValidator();
+	if (!validator.validate(request)) {
+		return res.status(400).json();
 	}
 
 	const id: string = (await saveMenu(request))._id;
@@ -121,9 +122,10 @@ async function saveFoods(foods: IFoodCreateRequest[]): Promise<string[]> {
 
 // TODO: To refactor after spliting createOrUpdateFood(...)
 async function saveFood(request: any, menu: any): Promise<void> {
-	const errors = foodHelper.validateCreateFoodRequest(request);
-	if (errors.length !== 0) {
-		throw errors;
+	const validator = new FoodCreateRquestValidator();
+	if (!validator.validate(request)) {
+		// FIXME
+		throw [];
 	}
 	const food = await foodHelper.saveFood(request);
 	menu.foods.push(food._id);
