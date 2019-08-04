@@ -3,7 +3,7 @@ import { IRequest } from "../../models/Express";
 import { User } from "../models/user";
 import { Price } from "../models/Price";
 import { ISupplyCreateRequest } from "../interface/supply/create/ISupplyCreateRequest";
-import { SupplyRepository, SupplyNotFoundError, IllegalSupplyStateChangeError, NoRejectionReasonError } from "./SupplyRepository";
+import { SupplyRepository, SupplyNotFoundError, IllegalSupplyStateChangeError, NoRejectionReasonError } from "../helper/repository/SupplyRepository";
 import { ISupply } from "../../interface/Supply";
 import { ISupplyListRequest } from "../interface/supply/list/ISupplyListRequest";
 import { ISupplyListResponse } from "../interface/supply/list/ISupplyListResponse";
