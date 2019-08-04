@@ -1,8 +1,13 @@
 import { IRequest, Response } from "../../models/Express";
 import { PermissionUtil } from "../helper/PermissionUtil";
 import { IMenuConfigResponse } from "../interface/menu/config/IMenuConfigResponse";
+import { MenuRepository } from "../helper/repository/MenuRepository";
+import { IMenuViewActions } from "../interface/menu/list/IMenuViewActions";
+import { MenuListModelToMenuListResponseConverter } from "../converter/MenuListModelToMenuListResponseConverter";
+import { IMenuListResponse } from "../interface/menu/list/IMenuListResponse";
 
 export class MenuController {
+	private repository = new MenuRepository();
 	private permissionUtil = new PermissionUtil();
 
 	async getConfig(req: IRequest, res: Response): Promise<Response> {
@@ -15,4 +20,19 @@ export class MenuController {
 		};
 		return res.status(200).json(response);
 	}
+
+	async getAllMenus(req: IRequest, res: Response): Promise<Response> {
+		const menus = await this.repository.getAllMenus();
+	
+		// TODO: Add checking permissions after spliting endpoints for employees and customers
+		const actions: IMenuViewActions = {
+			viewDetails: true,
+			modify: true,
+			delete: true,
+		};
+	
+		const converter = new MenuListModelToMenuListResponseConverter();
+		const response: IMenuListResponse = { menus: menus.map(menu => converter.convert(menu, actions)) };
+		return res.status(200).json(response);
+	};
 }

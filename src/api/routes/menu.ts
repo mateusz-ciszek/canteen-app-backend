@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllMenus, getManuDetails, createMenu, createOrUpdateFood, deleteMenus, changeName } from '../controller/menu';
+import { getManuDetails, createMenu, createOrUpdateFood, deleteMenus, changeName } from '../controller/menu';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
 import { PermissionValidator } from '../middleware/PermissionValidator';
@@ -37,7 +37,7 @@ const controller = new MenuController();
  * ]
  */
 router.get('/',
-		getAllMenus);
+		(req, res) => controller.getAllMenus(req, res));
 
 /**
  * GET - pobierz config dla modułu menu

@@ -3,6 +3,15 @@ import { IMenuModel, Menu } from "../../models/menu";
 import { InvalidObjectIdError } from "./InvalidObjectIdError";
 
 export class MenuRepository {
+	async getAllMenus(): Promise<IMenuModel[]> {
+		return Menu.find().populate({
+			path: 'foods',
+			populate: {
+				path: 'additions',
+			},
+		}).exec();
+	}
+
 	async changeName(id: string, newName: string): Promise<void> {
 		let document: IMenuModel | null;
 

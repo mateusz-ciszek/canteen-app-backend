@@ -1,42 +1,21 @@
-import { IRequest } from "../../models/Express";
-import { Response, NextFunction } from "express";
+import { NextFunction, Response } from "express";
 import mongoose from 'mongoose';
-
-import { Menu, IMenuModel } from '../models/menu';
+import { IRequest } from "../../models/Express";
+import { MenuDetailsModelToMenuDetailsResponseConverter } from "../converter/MenuDetailsModelToMenuDetailsResponse";
 import * as foodHelper from '../helper/foodHelper';
 import * as menuHelper from '../helper/menuHelper';
-import { MenuListModelToMenuListResponseConverter } from "../converter/MenuListModelToMenuListResponseConverter";
-import { IMenuListResponse } from "../interface/menu/list/IMenuListResponse";
-import { IMenuDetailsRequest } from "../interface/menu/details/IMenuDetailsRequest";
-import { MenuDetailsModelToMenuDetailsResponseConverter } from "../converter/MenuDetailsModelToMenuDetailsResponse";
-import { IMenuDetailsResponse } from "../interface/menu/details/IMenuDetailsResponse";
-import { IMenuCreateRequest } from "../interface/menu/create/IMenuCreateRequest";
-import { IFoodCreateRequest } from "../interface/menu/create/IFoodCreateRequest";
-import { IValidationErrorsResponse } from "../interface/common/IValidationErrorsResponse";
-import { IMenuDeleteRequest } from "../interface/menu/delete/IMenuDeleteRequest";
-import { MenuRepository, MenuNotFoundError } from "../helper/repository/MenuRepository";
 import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";
+import { MenuNotFoundError, MenuRepository } from "../helper/repository/MenuRepository";
+import { IValidationErrorsResponse } from "../interface/common/IValidationErrorsResponse";
 import { IMenuChangeNameRequest } from "../interface/menu/changeName/IMenuChangeNameRequest";
-import { IMenuViewActions } from "../interface/menu/list/IMenuViewActions";
+import { IFoodCreateRequest } from "../interface/menu/create/IFoodCreateRequest";
+import { IMenuCreateRequest } from "../interface/menu/create/IMenuCreateRequest";
+import { IMenuDeleteRequest } from "../interface/menu/delete/IMenuDeleteRequest";
+import { IMenuDetailsRequest } from "../interface/menu/details/IMenuDetailsRequest";
+import { IMenuDetailsResponse } from "../interface/menu/details/IMenuDetailsResponse";
+import { IMenuModel, Menu } from '../models/menu';
 
 const repository = new MenuRepository();
-
-export async function getAllMenus(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
-	const menus = await Menu.find().populate({
-		path: 'foods',
-		populate: {
-			path: 'additions',
-		},
-	}).exec();
-
-	// TODO: Add checking permissions after spliting endpoints for employees and customers
-	const actions: IMenuViewActions = { viewDetails: true, modify: true, delete: true };
-
-	const converter = new MenuListModelToMenuListResponseConverter();
-	const response: IMenuListResponse = { menus: menus.map(menu => converter.convert(menu, actions)) };
-
-	return res.status(200).json(response);
-};
 
 export async function getManuDetails(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 	const request: IMenuDetailsRequest = req.params;
