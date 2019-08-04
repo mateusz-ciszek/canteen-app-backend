@@ -1,12 +1,9 @@
 import { Validator } from "../Validator";
 import { IOrderCreateRequest } from "../../../interface/order/create/IOrderCreateRequest";
 import { IOrderItemCreateRequest } from "../../../interface/order/create/IOrderItemCreateRequest";
-import { ValidatorUtil } from "../../ValidatorUtil";
 import { IOrderItemAdditionCreateRequest } from "../../../interface/order/create/IOrderItemAdditionCreateRequest";
 
-export class OrderCreateRequestValidator implements Validator<IOrderCreateRequest> {
-	private validatorUtil = new ValidatorUtil();
-
+export class OrderCreateRequestValidator extends Validator<IOrderCreateRequest> {
 	validate(input: IOrderCreateRequest): boolean {
 		if (!input.items || input.items.length === 0) {
 			return false;
@@ -18,10 +15,10 @@ export class OrderCreateRequestValidator implements Validator<IOrderCreateReques
 	}
 
 	private validateOrderItem(item: IOrderItemCreateRequest): boolean {
-		if (!this.validatorUtil.validateId(item._id)) {
+		if (!this.validateId(item._id)) {
 			return false;
 		}
-		if (!this.validatorUtil.validateNumber(item.quantity)) {
+		if (!this.validateNumber(item.quantity)) {
 			return false;
 		}
 		if (item.quantity <= 0) {
@@ -34,10 +31,10 @@ export class OrderCreateRequestValidator implements Validator<IOrderCreateReques
 	}
 
 	private validateOrderItemAddition(addition: IOrderItemAdditionCreateRequest): boolean {
-		if (!this.validatorUtil.validateId(addition._id)) {
+		if (!this.validateId(addition._id)) {
 			return false;
 		}
-		if (!this.validatorUtil.validateNumber(addition.quantity)) {
+		if (!this.validateNumber(addition.quantity)) {
 			return false;
 		}
 		if (addition.quantity <= 0) {

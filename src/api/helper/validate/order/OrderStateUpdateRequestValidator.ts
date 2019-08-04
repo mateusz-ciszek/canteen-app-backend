@@ -3,7 +3,7 @@ import { IOrderStateUpdateRequest } from "../../../interface/order/updateState/I
 import { MongooseUtil } from "../../MongooseUtil";
 import { OrderStateUtil } from "../../OrderStateUtil";
 
-export class OrderStateUpdateRequestValidator implements Validator<IOrderStateUpdateRequest> {
+export class OrderStateUpdateRequestValidator extends Validator<IOrderStateUpdateRequest> {
 	mongooseUtil = new MongooseUtil();
 	stateUtil = new OrderStateUtil();
 
