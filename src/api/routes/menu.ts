@@ -1,5 +1,5 @@
 import express from 'express';
-import { getManuDetails, createMenu, createOrUpdateFood, deleteMenus, changeName } from '../controller/menu';
+import { createMenu, createOrUpdateFood, deleteMenus, changeName } from '../controller/menu';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
 import { PermissionValidator } from '../middleware/PermissionValidator';
@@ -51,7 +51,7 @@ router.get('/config',
  * GET - Pobierz menu o podanym ID
  */
 router.get('/:id',
-		getManuDetails);
+		(req, res) => controller.getManuDetails(req, res));
 
 /**
  * POST - Zapytanie dodające nowe menu do bazy

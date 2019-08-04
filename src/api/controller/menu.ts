@@ -1,7 +1,6 @@
 import { NextFunction, Response } from "express";
 import mongoose from 'mongoose';
 import { IRequest } from "../../models/Express";
-import { MenuDetailsModelToMenuDetailsResponseConverter } from "../converter/MenuDetailsModelToMenuDetailsResponse";
 import * as foodHelper from '../helper/foodHelper';
 import * as menuHelper from '../helper/menuHelper';
 import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";
@@ -11,26 +10,9 @@ import { IMenuChangeNameRequest } from "../interface/menu/changeName/IMenuChange
 import { IFoodCreateRequest } from "../interface/menu/create/IFoodCreateRequest";
 import { IMenuCreateRequest } from "../interface/menu/create/IMenuCreateRequest";
 import { IMenuDeleteRequest } from "../interface/menu/delete/IMenuDeleteRequest";
-import { IMenuDetailsRequest } from "../interface/menu/details/IMenuDetailsRequest";
-import { IMenuDetailsResponse } from "../interface/menu/details/IMenuDetailsResponse";
 import { IMenuModel, Menu } from '../models/menu';
 
 const repository = new MenuRepository();
-
-export async function getManuDetails(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
-	const request: IMenuDetailsRequest = req.params;
-
-	const menu = await Menu.findById(request.id).populate('foods').exec();
-
-	if (!menu) {
-		return res.status(404).json();
-	}
-
-	const converter = new MenuDetailsModelToMenuDetailsResponseConverter();
-	const response: IMenuDetailsResponse = converter.convert(menu);
-
-	return res.status(200).json(response);
-};
 
 export async function createMenu(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 	const request: IMenuCreateRequest = req.body;

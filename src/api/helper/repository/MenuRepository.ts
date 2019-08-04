@@ -12,6 +12,18 @@ export class MenuRepository {
 		}).exec();
 	}
 
+	async getMenuById(id: string): Promise<IMenuModel> {
+		const menu = await Menu.findById(id)
+				.populate('foods')
+				.exec();;
+
+		if (!menu) {
+			throw new MenuNotFoundError(id);
+		}
+
+		return menu;
+	}
+
 	async changeName(id: string, newName: string): Promise<void> {
 		let document: IMenuModel | null;
 
