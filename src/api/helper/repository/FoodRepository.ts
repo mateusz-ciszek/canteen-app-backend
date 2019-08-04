@@ -1,8 +1,10 @@
 import { IFoodAdditionCreateRequest } from "../../interface/menu/create/IFoodAdditionCreateRequest";
 import { IFoodCreateRequest } from "../../interface/menu/create/IFoodCreateRequest";
-import { Food } from "../../models/food";
+import { Food, IFoodModel } from "../../models/food";
 import { FoodAddition } from "../../models/foodAddition";
 import { MongooseUtil } from "../MongooseUtil";
+import { Error as MongooseError } from 'mongoose';
+import { InvalidObjectIdError } from "./InvalidObjectIdError";
 
 export class FoodRepository {
 	private mongooseUtil = new MongooseUtil();
@@ -33,5 +35,34 @@ export class FoodRepository {
 			price: request.price,
 		}).save();
 		return saved._id;
+	}
+
+	async getFoodById(id: string): Promise<IFoodModel> {
+		let food: IFoodModel | null;
+
+		try {
+			food = await Food.findById(id)
+					.populate({
+						path: 'additions',
+						select: 'id name price',
+					}).exec();
+		} catch (err) {
+			if (err instanceof MongooseError.CastError) {
+				throw new InvalidObjectIdError(id);
+			}
+			throw err;
+		}
+
+		if (!food) {
+			throw new FoodNotFoundError(id);
+		}
+
+		return food;
+	}
+}
+
+export class FoodNotFoundError extends Error {
+	constructor(id: string) {
+		super(`Food with ID: ${id} was not found`);
 	}
 }
