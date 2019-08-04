@@ -1,5 +1,5 @@
 import express from 'express';
-import { createMenu, createOrUpdateFood, deleteMenus, changeName } from '../controller/menu';
+import { createOrUpdateFood, deleteMenus, changeName } from '../controller/menu';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
 import { PermissionValidator } from '../middleware/PermissionValidator';
@@ -60,7 +60,7 @@ router.post('/',
 		checkAuth,
 		isAdmin,
 		(req, res, next) => permissionValidator.checkPermission('P_MENU_CREATE')(req, res, next),
-		createMenu);
+		(req, res) => controller.createMenu(req, res));
 
 /**
  * POST - Dodaj nowy posiłek do menu

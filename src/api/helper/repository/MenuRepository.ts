@@ -1,8 +1,14 @@
 import { Error as MongooseError } from "mongoose";
+import { IMenuCreateRequest } from "../../interface/menu/create/IMenuCreateRequest";
 import { IMenuModel, Menu } from "../../models/menu";
+import { MongooseUtil } from "../MongooseUtil";
+import { FoodRepository } from "./FoodRepository";
 import { InvalidObjectIdError } from "./InvalidObjectIdError";
 
 export class MenuRepository {
+	private mongooseUtil = new MongooseUtil();
+	private foodRepository = new FoodRepository();
+
 	async getAllMenus(): Promise<IMenuModel[]> {
 		return Menu.find().populate({
 			path: 'foods',
@@ -22,6 +28,22 @@ export class MenuRepository {
 		}
 
 		return menu;
+	}
+
+	async save(request: IMenuCreateRequest): Promise<string> {
+		const foodIds: string[] = [];
+		if (request.foods) {
+			for (const food of request.foods) {
+				foodIds.push(await this.foodRepository.saveFood(food));
+			}
+		}
+
+		const menu = await new Menu({
+			_id: this.mongooseUtil.generateObjectId(),
+			name: request.name,
+			foods: foodIds,
+		}).save();
+		return menu._id;
 	}
 
 	async changeName(id: string, newName: string): Promise<void> {

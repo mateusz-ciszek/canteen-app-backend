@@ -9,6 +9,8 @@ import { IMenuDetailsRequest } from "../interface/menu/details/IMenuDetailsReque
 import { IMenuDetailsResponse } from "../interface/menu/details/IMenuDetailsResponse";
 import { IMenuListResponse } from "../interface/menu/list/IMenuListResponse";
 import { IMenuViewActions } from "../interface/menu/list/IMenuViewActions";
+import { IMenuCreateRequest } from "../interface/menu/create/IMenuCreateRequest";
+import { MenuCreateRequestValidator } from "../helper/validate/menu/MenuCreateRequestValidator";
 
 export class MenuController {
 	private repository = new MenuRepository();
@@ -36,7 +38,9 @@ export class MenuController {
 		};
 	
 		const converter = new MenuListModelToMenuListResponseConverter();
-		const response: IMenuListResponse = { menus: menus.map(menu => converter.convert(menu, actions)) };
+		const response: IMenuListResponse = {
+			menus: menus.map(menu => converter.convert(menu, actions)),
+		};
 		return res.status(200).json(response);
 	};
 
@@ -61,5 +65,18 @@ export class MenuController {
 		const response: IMenuDetailsResponse = converter.convert(menu);
 	
 		return res.status(200).json(response);
+	};
+
+	async createMenu(req: IRequest, res: Response): Promise<Response> {
+		const request: IMenuCreateRequest = req.body;
+	
+		const validator = new MenuCreateRequestValidator();
+		if (!validator.validate(request)) {
+			return res.status(400).json();
+		}
+	
+		const id: string = await this.repository.save(request);
+		// TODO: add interface for response
+		return res.status(201).json(id);
 	};
 }
