@@ -4,11 +4,21 @@ export class JwtUtil {
 
 	private static KEY = process.env.JWT_KEY || 'secret';
 
-	createToken(email: string, userId: string, admin: boolean): string {
+	generateToken(request: JsonWebTokenData): string {
 		return jwt.sign({
-			email: email,
-			_id: userId,
-			admin: admin,
+			email: request.email,
+			_id: request.userId,
+			admin: request.admin,
 		}, JwtUtil.KEY);
 	}
+
+	decodeToken(token: string): JsonWebTokenData {
+		return jwt.verify(token, JwtUtil.KEY) as JsonWebTokenData;
+	}
+}
+
+export interface JsonWebTokenData {
+	email: string;
+	userId: string;
+	admin: boolean;
 }

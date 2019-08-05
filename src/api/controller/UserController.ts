@@ -1,6 +1,6 @@
 import { IRequest, Response } from "../../models/Express";
 import { BcryptUtil } from "../helper/BcryptUtil";
-import { JwtUtil } from "../helper/JwtUtil";
+import { JsonWebTokenData, JwtUtil } from "../helper/JwtUtil";
 import { SaveUserCommand, UserRepository } from "../helper/repository/UserRepository";
 import { UserRegisterRequestValidator } from "../helper/validate/user/UserRegisterRequestValidator";
 import { ILoginRequest } from "../interface/user/login/ILoginRequest";
@@ -52,7 +52,12 @@ export class UserController {
 			return res.status(401).json();
 		}
 	
-		const token: string = this.jwtUtil.createToken(request.email, user._id, user.admin);
+		const tokenRequest: JsonWebTokenData = {
+			email: request.email,
+			userId: user._id,
+			admin: user.admin,
+		};
+		const token: string = this.jwtUtil.generateToken(tokenRequest);
 		const response: ILoginResponse = { token };
 		return res.status(200).json(response);
 	}
