@@ -121,7 +121,7 @@ describe('User', () => {
 		it('should get 401 when sending empty request', async () => {
 			return request(app)
 					.post(url)
-					.expect(401, authFailedResponse);
+					.expect(401);
 		});
 
 		it('should get 401 when sendding request with wrong email', async () => {
@@ -131,7 +131,7 @@ describe('User', () => {
 						email: email + Math.random().toString(36).substring(7),
 						password,
 					})
-					.expect(401, authFailedResponse);
+					.expect(401);
 		});
 
 		it('should get 401 when sending request with wrong password', async () => {
@@ -141,7 +141,7 @@ describe('User', () => {
 						email,
 						password: Math.random().toString(36).substring(7),
 					})
-					.expect(401, authFailedResponse);
+					.expect(401);
 		});
 
 		it('should get 200 and valid token when sending proper request', async () => {

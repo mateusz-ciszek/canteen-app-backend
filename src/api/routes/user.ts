@@ -1,5 +1,4 @@
 import express from 'express';
-import { loginUser } from '../controller/user';
 import { UserController } from '../controller/UserController';
 
 export const router = express.Router();
@@ -16,4 +15,5 @@ router.post('/signup',
  * 
  * @returns token on success
  */
-router.post('/login', loginUser);
+router.post('/login', 
+		(req, res) => controller.loginUser(req, res));
