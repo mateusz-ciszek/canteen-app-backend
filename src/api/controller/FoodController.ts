@@ -1,10 +1,12 @@
 import { IRequest, Response } from "../../models/Express";
-import { IFoodDetailsRequest } from "../interface/food/details/IFoodDetailsRequest";
-import { IFoodModel } from "../models/food";
-import { FoodRepository, FoodNotFoundError } from "../helper/repository/FoodRepository";
 import { FoodModelToFoodDetailsResponseConverter } from "../converter/FoodModelToFoodDetailsResponseConverter";
-import { IFoodDetailsResponse } from "../interface/food/details/IFoodDetailsResponse";
+import { FoodNotFoundError, FoodRepository } from "../helper/repository/FoodRepository";
 import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";
+import { MenuRepository } from "../helper/repository/MenuRepository";
+import { IFoodDeleteRequest } from "../interface/food/delete/IFoodDeleteRequest";
+import { IFoodDetailsRequest } from "../interface/food/details/IFoodDetailsRequest";
+import { IFoodDetailsResponse } from "../interface/food/details/IFoodDetailsResponse";
+import { IFoodModel } from "../models/food";
 
 export class FoodController {
 	private repository = new FoodRepository();
@@ -28,5 +30,25 @@ export class FoodController {
 		const converter = new FoodModelToFoodDetailsResponseConverter();
 		const response: IFoodDetailsResponse = converter.convert(food);
 		return res.status(200).json(response);
+	}
+
+	async deleteFood(req: IRequest, res: Response): Promise<Response> {
+		const request: IFoodDeleteRequest = req.body;
+	
+		if (!request.ids || !request.ids.length) {
+			return res.status(400).json();
+		}
+	
+		const menuRepository = new MenuRepository();
+		try {
+			await menuRepository.removeFoods(request.ids);
+		} catch (err) {
+			if (err instanceof InvalidObjectIdError) {
+				return res.status(400).json();
+			}
+			return res.status(500).json();
+		}
+		
+		return res.status(200).json();
 	};
 }

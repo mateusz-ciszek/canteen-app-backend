@@ -1,5 +1,4 @@
 import express from 'express';
-import { deleteFood } from '../controller/food';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
 import { PermissionValidator } from '../middleware/PermissionValidator';
@@ -32,4 +31,4 @@ router.delete('/',
 		checkAuth,
 		isAdmin,
 		(req, res, next) => permissionValidator.checkPermission('P_MENU_FOOD_DELETE')(req, res, next),
-		deleteFood);
+		(req, res) => controller.deleteFood(req, res));
