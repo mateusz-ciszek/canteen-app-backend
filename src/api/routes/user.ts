@@ -1,12 +1,15 @@
 import express from 'express';
-import { registerUser, loginUser } from '../controller/user';
+import { loginUser } from '../controller/user';
+import { UserController } from '../controller/UserController';
 
 export const router = express.Router();
+const controller = new UserController();
 
 /**
  * POST - register new user
  */
-router.post('/signup', registerUser);
+router.post('/signup',
+		(req, res) => controller.registerUser(req, res));
 
 /**
  * POST - login user

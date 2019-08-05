@@ -42,11 +42,7 @@ describe('User', () => {
 			return request(app)
 					.post(url)
 					.send(validRegisterData)
-					.expect(400)
-					.expect(response => {
-						expect(response.body).to.be.an('array').and.have.lengthOf(1);
-						expect(response.body[0]).to.be.a('string').and.equal('Email is required');
-					});
+					.expect(400);
 		});
 
 		it('should get 400 with malformed email', async () => {
@@ -54,11 +50,7 @@ describe('User', () => {
 			return request(app)
 					.post(url)
 					.send(validRegisterData)
-					.expect(400)
-					.expect(response => {
-						expect(response.body).to.be.an('array').and.have.lengthOf(1);
-						expect(response.body[0]).to.be.a('string').and.equal('Malformed email');
-					});
+					.expect(400);
 		});
 
 		it('should get 400 with empty password', async () => {
@@ -66,11 +58,7 @@ describe('User', () => {
 			return request(app)
 					.post(url)
 					.send(validRegisterData)
-					.expect(400)
-					.expect(response => {
-						expect(response.body).to.be.an('array').and.have.lengthOf(1);
-						expect(response.body[0]).to.be.a('string').and.equal('Password is required');
-					});
+					.expect(400);
 		});
 
 		it('should get 400 with too short password', async () => {
@@ -78,11 +66,7 @@ describe('User', () => {
 			return request(app)
 					.post(url)
 					.send(validRegisterData)
-					.expect(400)
-					.expect(response => {
-						expect(response.body).to.be.an('array').and.have.lengthOf(1);
-						expect(response.body[0]).to.be.a('string').and.equal('Password have to be at least 8 characters long');
-					});
+					.expect(400);
 		});
 
 		it('should get 400 with empty first name', async () => {
@@ -90,11 +74,7 @@ describe('User', () => {
 			return request(app)
 					.post(url)
 					.send(validRegisterData)
-					.expect(400)
-					.expect(response => {
-						expect(response.body).to.be.an('array').and.have.lengthOf(1);
-						expect(response.body[0]).to.be.a('string').and.equal('First name is required');
-					});
+					.expect(400);
 		});
 
 		it('should get 400 with too short first name', async () => {
@@ -102,11 +82,7 @@ describe('User', () => {
 			return request(app)
 					.post(url)
 					.send(validRegisterData)
-					.expect(400)
-					.expect(response => {
-						expect(response.body).to.be.an('array').and.have.lengthOf(1);
-						expect(response.body[0]).to.be.a('string').and.equal('First name have to be at least 3 characters long');
-					});
+					.expect(400);
 		});
 
 		it('should get 400 with empty last name', async () => {
@@ -114,11 +90,7 @@ describe('User', () => {
 			return request(app)
 					.post(url)
 					.send(validRegisterData)
-					.expect(400)
-					.expect(response => {
-						expect(response.body).to.be.an('array').and.have.lengthOf(1);
-						expect(response.body[0]).to.be.a('string').and.equal('Last name is required');
-					});
+					.expect(400);
 		});
 
 		it('should get 400 with too short last name', async () => {
@@ -126,11 +98,7 @@ describe('User', () => {
 			return request(app)
 					.post(url)
 					.send(validRegisterData)
-					.expect(400)
-					.expect(response => {
-						expect(response.body).to.be.an('array').and.have.lengthOf(1);
-						expect(response.body[0]).to.be.a('string').and.equal('Last name have to be at least 3 characters long');
-					});
+					.expect(400);
 		});
 
 		it('should get 409 with duplicate email', async () => {
@@ -138,7 +106,7 @@ describe('User', () => {
 			return request(app)
 					.post(url)
 					.send(validRegisterData)
-					.expect(409, { message: 'Mail already used' });
+					.expect(409);
 		});
 	});
 

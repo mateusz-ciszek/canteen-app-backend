@@ -1,38 +1,11 @@
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import mongoose from 'mongoose';
-import * as userHelper from '../helper/userHelper';
-
-import { User, IUserModel } from '../models/user';
+import { NextFunction, Response } from 'express';
+import jwt from 'jsonwebtoken';
 import { IRequest } from '../../models/Express';
-import { Response, NextFunction } from 'express';
-import { IRegisterUser } from '../interface/user/register/IRegisterUserRequest';
+import { IErrorResponse } from '../interface/common/IErrorResponse';
 import { ILoginRequest } from '../interface/user/login/ILoginRequest';
 import { ILoginResponse } from '../interface/user/login/ILoginResponse';
-import { IErrorResponse } from '../interface/common/IErrorResponse';
-
-export async function registerUser(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
-	const request: IRegisterUser = req.body;
-	const errors: string[] = userHelper.validateRegisterRequest(request);
-	if (errors.length) {
-		return res.status(400).json(errors);
-	}
-
-	if (!await userHelper.isEmailAvailable(request.email)) {
-		const response: IErrorResponse = { message: 'Mail already used' };
-		return res.status(409).json(response);
-	}
-
-	const hash = await bcrypt.hash(request.password, 10);
-	await new User({
-		...request,
-		_id: new mongoose.Types.ObjectId(),
-		password: hash,
-		admin: false,
-	}).save();
-
-	return res.status(201).json();
-};
+import { IUserModel, User } from '../models/user';
 
 export async function loginUser(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 	const request: ILoginRequest = req.body;
