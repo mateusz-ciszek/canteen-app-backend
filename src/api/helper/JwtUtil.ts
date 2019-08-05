@@ -7,7 +7,7 @@ export class JwtUtil {
 	generateToken(request: JsonWebTokenData): string {
 		return jwt.sign({
 			email: request.email,
-			_id: request.userId,
+			userId: request.userId,
 			admin: request.admin,
 		}, JwtUtil.KEY);
 	}
