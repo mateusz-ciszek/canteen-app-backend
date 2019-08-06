@@ -20,10 +20,6 @@ export async function saveFood(food: IFoodCreateRequest): Promise<IFoodModel> {
 	return savedFood;
 };
 
-export async function getFoodDetails(foodId: string): Promise<IFoodModel | null> {
-	return await Food.findById(foodId).exec();
-};
-
 async function saveFoodAdditions(additions: any): Promise<string[]> {
 	const ids: string[] = [];
 	if (additions) {
