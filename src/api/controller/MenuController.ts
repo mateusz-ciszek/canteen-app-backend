@@ -104,8 +104,8 @@ export class MenuController {
 
 	async changeName(req: IRequest, res: Response): Promise<Response> {
 		const request: IMenuChangeNameRequest = {
-			id: req.params,
-			name: req.body,
+			id: req.params.id,
+			name: req.body.name,
 		};
 	
 		const validator = new MenuChangeNameRequestValidator();
