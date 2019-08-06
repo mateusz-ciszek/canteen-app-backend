@@ -1,9 +1,9 @@
-import jwt from 'jsonwebtoken';
-
+import { JsonWebTokenData, JwtUtil } from '../../api/helper/JwtUtil';
 import { DatabaseTestHelper } from './databaseHelper';
 
 export class TokenTestHelper {
 	private dbHelper: DatabaseTestHelper;
+	private jwtUtil = new JwtUtil();
 
 	public constructor(dbHelper: DatabaseTestHelper) {
 		this.dbHelper = dbHelper;
@@ -19,11 +19,11 @@ export class TokenTestHelper {
 	
 	private async getToken(isAdmin: boolean): Promise<string> {
 		const user = isAdmin ? this.dbHelper.ADMIN_USER : this.dbHelper.STANDARD_USER;
-		const jwtKey = process.env.JWT_KEY || 'secret';
-		return jwt.sign({
+		const request: JsonWebTokenData = {
+			userId: user.ID,
 			email: user.EMAIL,
-			_id: user.ID,
 			admin: isAdmin,
-		}, jwtKey);
+		};
+		return this.jwtUtil.generateToken(request);
 	}
 }
