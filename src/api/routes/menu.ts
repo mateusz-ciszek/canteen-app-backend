@@ -1,5 +1,5 @@
 import express from 'express';
-import { createOrUpdateFood, deleteMenus, changeName } from '../controller/menu';
+import { createOrUpdateFood, changeName } from '../controller/menu';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
 import { PermissionValidator } from '../middleware/PermissionValidator';
@@ -78,7 +78,7 @@ router.delete('/',
 		checkAuth,
 		isAdmin,
 		(req, res, next) => permissionValidator.checkPermission('P_MENU_DELETE')(req, res, next),
-		deleteMenus);
+		(req, res) => controller.deleteMenus(req, res));
 
 /**
  * PATCH - Update menu name
