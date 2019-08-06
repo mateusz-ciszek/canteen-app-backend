@@ -215,7 +215,7 @@ export class DatabaseTestHelper {
 		this.FOOD.ID = this.id.toString();
 	}
 
-	private async saveMenu(): Promise<void> {
+	async saveMenu(): Promise<void> {
 		this.id = this.generateObjectId();
 		await new Menu({
 			_id: this.id,

@@ -1,12 +1,12 @@
+import { expect } from 'chai';
 import 'mocha';
 import request from 'supertest';
-import { app } from '../../app';
-import { expect } from 'chai';
-import { DatabaseTestHelper } from '../testHelpers/databaseHelper';
-import { TokenTestHelper } from '../testHelpers/tokenHelper';
-import { MenuTestHelper } from '../testHelpers/menuHelper';
-import { FoodTestHelper } from '../testHelpers/foodHelper';
 import { IMenuDeleteRequest } from '../../api/interface/menu/delete/IMenuDeleteRequest';
+import { app } from '../../app';
+import { DatabaseTestHelper } from '../testHelpers/databaseHelper';
+import { FoodTestHelper } from '../testHelpers/foodHelper';
+import { MenuTestHelper } from '../testHelpers/menuHelper';
+import { TokenTestHelper } from '../testHelpers/tokenHelper';
 
 describe('Menu', () => {
 	const dbHelper = new DatabaseTestHelper();
@@ -164,6 +164,10 @@ describe('Menu', () => {
 			beforeEach('set up', () => {
 				payload = { ids: [ dbHelper.MENU.ID ] };
 			});
+
+			after('restore deteled manu', async () => {
+				await dbHelper.saveMenu();
+			});
 			
 			it('should get 401 when deleting menu without auth token', async () => {
 				return request(app)
@@ -201,6 +205,66 @@ describe('Menu', () => {
 						.delete(endpoint)
 						.set('Authorization', `Bearer ${adminToken}`)
 						.send(payload)
+						.expect(200);
+			});
+		});
+
+		describe('#changeName', () => {
+			let payload: object;
+			let url: string;
+
+			beforeEach('set up', () => {
+				payload = { name: 'Name to change to' };
+				url = `${endpoint}/${dbHelper.MENU.ID}`;
+			});
+
+			it('should get 401 when changing without token', async () => {
+				return request(app)
+						.patch(url)
+						.send(payload)
+						.expect(401);
+			});
+
+			it('should get 403 when changing with standard token', async () => {
+				return request(app)
+						.patch(url)
+						.send(payload)
+						.set('Authorization', `Bearer ${standardToken}`)
+						.expect(403);
+			});
+
+			it('should get 400 when changing name of a menu with malformed id', async () => {
+				url = `${endpoint}/malformedId`;
+				return request(app)
+						.patch(url)
+						.send(payload)
+						.set('Authorization', `Bearer ${adminToken}`)
+						.expect(400);
+			});
+
+			it('should get 404 when changing name of a non existing menu', async () => {
+				url = `${endpoint}/${dbHelper.generateObjectId()}`;
+				return request(app)
+						.patch(url)
+						.send(payload)
+						.set('Authorization', `Bearer ${adminToken}`)
+						.expect(404);
+			});
+
+			it('should get 400 when changing name without providing name', async () => {
+				payload = {};
+				return request(app)
+						.patch(url)
+						.send(payload)
+						.set('Authorization', `Bearer ${adminToken}`)
+						.expect(400);
+			});
+
+			it('should get 200 when successfully changing menu name', async () => {
+				return request(app)
+						.patch(url)
+						.send(payload)
+						.set('Authorization', `Bearer ${adminToken}`)
 						.expect(200);
 			});
 		});
