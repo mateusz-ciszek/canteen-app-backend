@@ -1,35 +1,40 @@
-import { IRequest } from "../../models/Express";
-import { Response, NextFunction } from "express";
-import { Worker, IWorkerModel } from "../models/worker";
-import { saveUser, hashPassword } from '../helper/userHelper';
-import { IWorkerListResponse } from "../interface/worker/list/IWorkerListResponse";
-import { WorkerHelper, NotObjectIdError } from '../helper/WorkerHelper';
-import { IWorkerCreateResponse } from "../interface/worker/create/IWorkerCreateResponse";
-import { IWorkerCreateRequest } from "../interface/worker/create/IWorkerCreateRequest";
-import { WorkHoursHelper } from "../helper/WorkHoursHelper";
-import { WorkerValidator } from "../helper/validate/WorkerValidator";
-import { IMonthRequest } from "../interface/worker/month/IMonthRequest";
-import { IMonthGetResponse } from "../interface/worker/month/IMonthGetResponse";
-import { IWorkerDayOffRequest } from "../interface/worker/dayOff/create/IWorkerDayOffRequest";
-import { DayOffRequestValidator } from "../helper/validate/DayOffRequestValidator";
-import { DayOff } from "../models/DayOff";
+import { NextFunction, Response } from "express";
 import { Types } from "mongoose";
-import { DayOffHelper } from "../helper/DayOffHelper";
-import { IDayOffChangeStatusRequest } from "../interface/worker/dayOff/changeState/IDayOffChangeStatusRequest";
-import { DayOffChangeRequestValidator } from "../helper/validate/DayOffChangeRequestValidator";
+import { Permission } from "../../interface/Permission";
+import { IRequest } from "../../models/Express";
 import { WorkerModelToWorkerListItemConverter } from "../converter/worker/WorkerModelToWorkerListItemConverter";
+import { WorkHoursCreateRequestToWorkHoursModelConverter } from "../converter/worker/WorkHoursCreateRequestToWorkHoursModelConverter";
+import { BcryptUtil } from "../helper/BcryptUtil";
+import { DayOffHelper } from "../helper/DayOffHelper";
+import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";
+import { SaveUserCommand, UserRepository } from "../helper/repository/UserRepository";
+import { SaveWorkerCommand, WorkerNotFoundError, WorkerRepository } from "../helper/repository/WorkerRepository";
+import { DayOffChangeRequestValidator } from "../helper/validate/DayOffChangeRequestValidator";
+import { DayOffRequestValidator } from "../helper/validate/DayOffRequestValidator";
+import { WorkerValidator } from "../helper/validate/WorkerValidator";
+import { NotObjectIdError, WorkerHelper } from '../helper/WorkerHelper';
+import { WorkHoursHelper } from "../helper/WorkHoursHelper";
+import { IWorkerCreateRequest } from "../interface/worker/create/IWorkerCreateRequest";
+import { IWorkerCreateResponse } from "../interface/worker/create/IWorkerCreateResponse";
+import { IDayOffChangeStatusRequest } from "../interface/worker/dayOff/changeState/IDayOffChangeStatusRequest";
+import { IWorkerDayOffRequest } from "../interface/worker/dayOff/create/IWorkerDayOffRequest";
 import { IWorkerDetailsRequest } from "../interface/worker/details/IWorkerDetailsRequest";
 import { IWorkerDetailsResponse } from "../interface/worker/details/IWorkerDetailsResponse";
+import { IWorkerListResponse } from "../interface/worker/list/IWorkerListResponse";
+import { IMonthGetResponse } from "../interface/worker/month/IMonthGetResponse";
+import { IMonthRequest } from "../interface/worker/month/IMonthRequest";
 import { IWorkerPasswordResetRequest } from "../interface/worker/password/reset/IWorkerPasswordResetRequest";
 import { IWorkerPasswordResetResponse } from "../interface/worker/password/reset/IWorkerPasswordResetResponse";
-import { WorkerRepository, WorkerNotFoundError } from "../helper/repository/WorkerRepository";
-import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";
-import { IWorkerUpdatePermissions } from "../interface/worker/permissions/update/IWorkerUpdatePermissions";
-import { Permission } from "../../interface/Permission";
 import { IWorkerGetPermissions } from "../interface/worker/permissions/get/IWorkerGetPermissions";
+import { IWorkerUpdatePermissions } from "../interface/worker/permissions/update/IWorkerUpdatePermissions";
+import { DayOff } from "../models/DayOff";
+import { IWorkerModel, Worker } from "../models/worker";
 
 export class WorkerController {
 	private repository = new WorkerRepository();
+	private bcrypt = new BcryptUtil();
+	private workerHelper = new WorkerHelper();
+	private userRepository = new UserRepository();
 
 	async getPermissions(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 		const request: IWorkerGetPermissions = req.params;
@@ -78,31 +83,41 @@ export class WorkerController {
 		const response: IWorkerListResponse = { workers: allWorkers.map(worker => converter.convert(worker)) };
 		return res.status(200).json(response);
 	}
-}
 
-export async function createWorker(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
-	const request: IWorkerCreateRequest = req.body;
-
-	if (!request.workHours) {
-		const helper = new WorkHoursHelper();
-		request.workHours = helper.generateDefaultWorkHours();
+	async createWorker(req: IRequest, res: Response): Promise<Response> {
+		const request: IWorkerCreateRequest = req.body;
+	
+		if (!request.workHours) {
+			const helper = new WorkHoursHelper();
+			request.workHours = helper.generateDefaultWorkHours();
+		}
+	
+		const validator = new WorkerValidator();
+		if (!validator.validateIWorkerCreateRequest(request)) {
+			return res.status(400).json();
+		}
+	
+		const email = await this.workerHelper.generateEmail(request.firstName, request.lastName);
+		const password = this.workerHelper.generatePassword();
+		const hash = await this.bcrypt.hashPassword(password);
+	
+		const userCommand: SaveUserCommand = {
+			email: email,
+			firstName: request.firstName,
+			lastName: request.lastName,
+			passwordHash: hash,
+		};
+		const userId = await this.userRepository.saveUser(userCommand);
+		const workHoursConverter = new WorkHoursCreateRequestToWorkHoursModelConverter();
+		const workerCommand: SaveWorkerCommand = {
+			userId: userId,
+			workHours: request.workHours.map(hours => workHoursConverter.convert(hours)),
+		};
+		await this.repository.saveWorker(workerCommand);
+	
+		const response: IWorkerCreateResponse = { email, password };
+		return res.status(201).json(response);
 	}
-
-	const validator = new WorkerValidator();
-	if (!validator.validateIWorkerCreateRequest(request)) {
-		return res.status(400).json();
-	}
-
-	const workerHelper = new WorkerHelper();
-	const email = await workerHelper.generateEmail(request.firstName, request.lastName);
-	const password = generatePassword();
-	const hash = await hashPassword(password);
-
-	const user = await saveUser(request.firstName, request.lastName, email, hash);
-	await workerHelper.saveWorker(user, request.workHours);
-
-	const response: IWorkerCreateResponse = { email, password };
-	return res.status(201).json(response);
 }
 
 export async function getMonth(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
@@ -203,10 +218,10 @@ export async function resetPassword(req: IRequest, res: Response, next: NextFunc
 		return res.status(400).json();
 	}
 
-	const password = generatePassword();
-	const hash = await hashPassword(password);
-
-	const workerHelper = new WorkerHelper();
+	const workerHelper = new WorkerHelper(); // TODO: remove this and use one included in class after moving this
+	const password = workerHelper.generatePassword();
+	const bcrypt = new BcryptUtil(); // TODO: remove this and use one included in class after moving this
+	const hash = await bcrypt.hashPassword(password);
 	const worker = await workerHelper.getWorker(request.workerId);
 	const user = worker.person;
 	user.password = hash;
@@ -214,8 +229,4 @@ export async function resetPassword(req: IRequest, res: Response, next: NextFunc
 
 	const response: IWorkerPasswordResetResponse = { email: user.email, password };
 	return res.status(200).json(response);
-}
-
-function generatePassword(): string {
-	return Math.random().toString(36).slice(-8);
 }

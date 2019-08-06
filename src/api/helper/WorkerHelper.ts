@@ -1,25 +1,22 @@
-import { User, IUserModel } from "../models/user";
-import { Worker, IWorkerModel } from '../models/worker';
-import { WorkHours } from "../models/workHours";
-import { IWorkHoursCreateRequest } from "../interface/worker/create/IWorkHoursCreateRequest";
-import { SimpleTimeToDateConverter } from "../converter/common/SimpleTimeToDateConverter";
-import { IWorkDayDetails } from "../interface/worker/month/IWorkDayDetails";
-import { IWorkHours } from "../../interface/workHours";
-import { IMonthRequest } from "../interface/worker/month/IMonthRequest";
-import { CalendarHelper } from "./CalendarHelper";
-import { IMonthGetResponse } from "../interface/worker/month/IMonthGetResponse";
-import { WorkerModelToWorkerViewConverter } from "../converter/worker/WorkerModelToWorkerViewConverter";
-import { IWorkerCalendarView } from "../interface/worker/month/IWorkerCalendarView";
-import { IDay } from "../interface/worker/month/IDay";
-import { DayOff, IDayOffModel } from "../models/DayOff";
-import { DayOffState } from "../../interface/DayOffStatus";
-import { DayOffModelToDayOffRequestConverter } from "../converter/DayOffModelToDayOffRequestConverter";
-import { isValidObjectId } from "./mongooseErrorHelper";
-import { IWorkerDetailsResponse } from "../interface/worker/details/IWorkerDetailsResponse";
-import { UserModelToUserViewConverter } from "../converter/common/UserModelToUserViewConverter";
-import { WorkHoursModelToWorkDayDetailsConverter } from "../converter/worker/WorkHoursModelToWorkDayDetailsConverter";
 import { ObjectId } from "bson";
+import { DayOffState } from "../../interface/DayOffStatus";
+import { IWorkHours } from "../../interface/workHours";
+import { UserModelToUserViewConverter } from "../converter/common/UserModelToUserViewConverter";
+import { DayOffModelToDayOffRequestConverter } from "../converter/DayOffModelToDayOffRequestConverter";
 import { DayOffModelToDayOffDateilsConverter } from "../converter/worker/DayOffModelToConverter";
+import { WorkerModelToWorkerViewConverter } from "../converter/worker/WorkerModelToWorkerViewConverter";
+import { WorkHoursModelToWorkDayDetailsConverter } from "../converter/worker/WorkHoursModelToWorkDayDetailsConverter";
+import { IWorkerDetailsResponse } from "../interface/worker/details/IWorkerDetailsResponse";
+import { IDay } from "../interface/worker/month/IDay";
+import { IMonthGetResponse } from "../interface/worker/month/IMonthGetResponse";
+import { IMonthRequest } from "../interface/worker/month/IMonthRequest";
+import { IWorkDayDetails } from "../interface/worker/month/IWorkDayDetails";
+import { IWorkerCalendarView } from "../interface/worker/month/IWorkerCalendarView";
+import { DayOff, IDayOffModel } from "../models/DayOff";
+import { User } from "../models/user";
+import { IWorkerModel, Worker } from '../models/worker';
+import { CalendarHelper } from "./CalendarHelper";
+import { isValidObjectId } from "./mongooseErrorHelper";
 import { WorkerNotFoundError } from "./repository/WorkerRepository";
 
 export class WorkerHelper {
@@ -28,23 +25,8 @@ export class WorkerHelper {
 		return `${firstName.toLocaleLowerCase()}.${lastName.toLocaleLowerCase()}${users ? users : ''}@canteem.com`;
 	}
 
-	async saveWorker(user: IUserModel, workHours: IWorkHoursCreateRequest[]) {
-		const workHoursModel = workHours.map(o => {
-			const converter = new SimpleTimeToDateConverter();
-	
-			return new WorkHours({
-				day: o.dayOfTheWeek,
-				startHour: converter.convert(o.start),
-				endHour: converter.convert(o.end),
-			});
-		});
-	
-		const worker = new Worker({
-			person: user._id,
-			defaultWorkHours: workHoursModel,
-		}).save();
-	
-		return worker;
+	generatePassword(): string {
+		return Math.random().toString(36).slice(-8);
 	}
 
 	async calculateMonth(request: IMonthRequest, workers: IWorkerModel[]): Promise<IMonthGetResponse> {
