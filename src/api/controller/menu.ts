@@ -6,7 +6,6 @@ import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError"
 import { MenuNotFoundError, MenuRepository } from "../helper/repository/MenuRepository";
 import { FoodCreateRquestValidator } from "../helper/validate/food/FoodCreateRequestValidator";
 import { IMenuChangeNameRequest } from "../interface/menu/changeName/IMenuChangeNameRequest";
-import { IMenuDeleteRequest } from "../interface/menu/delete/IMenuDeleteRequest";
 import { Menu } from '../models/menu';
 
 const repository = new MenuRepository();
