@@ -21,7 +21,7 @@ export class UserRepository {
 			firstName: command.firstName,
 			lastName: command.lastName,
 			password: command.passwordHash,
-			admin: false,
+			admin: false, // FIXME
 		}).save();
 		return user._id;
 	}

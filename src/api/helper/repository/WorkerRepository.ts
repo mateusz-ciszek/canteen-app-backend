@@ -1,7 +1,8 @@
-import { IWorkerModel, Worker } from "../../models/worker";
-import { Permission } from "../../../interface/Permission";
-import { Error as MongooseError } from 'mongoose';
 import { UpdateWriteOpResult } from "mongodb";
+import { Error as MongooseError } from 'mongoose';
+import { Permission } from "../../../interface/Permission";
+import { IWorkerModel, Worker } from "../../models/worker";
+import { IWorkHoursModel } from '../../models/workHours';
 import { InvalidObjectIdError } from "./InvalidObjectIdError";
 
 export class WorkerRepository {
@@ -21,6 +22,15 @@ export class WorkerRepository {
 		}
 
 		return worker;
+	}
+
+	async saveWorker(command: SaveWorkerCommand): Promise<string> {
+		const worker = await new Worker({
+			person: command.userId,
+			defaultWorkHours: command.workHours,
+		}).save();
+	
+		return worker._id;
 	}
 
 	async getPermissions(id: string): Promise<Permission[]> {
@@ -64,4 +74,9 @@ export class WorkerNotFoundError extends Error {
 	constructor(workerId: string) {
 		super(`Worker with ID: "${workerId}" was not found`);
 	}
+}
+
+export interface SaveWorkerCommand {
+	userId: string;
+	workHours: IWorkHoursModel[];
 }
