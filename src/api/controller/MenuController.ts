@@ -4,7 +4,9 @@ import { MenuListModelToMenuListResponseConverter } from "../converter/MenuListM
 import { PermissionUtil } from "../helper/PermissionUtil";
 import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";
 import { MenuNotFoundError, MenuRepository } from "../helper/repository/MenuRepository";
+import { MenuChangeNameRequestValidator } from "../helper/validate/menu/MenuChangeNameRequestValidator";
 import { MenuCreateRequestValidator } from "../helper/validate/menu/MenuCreateRequestValidator";
+import { IMenuChangeNameRequest } from "../interface/menu/changeName/IMenuChangeNameRequest";
 import { IMenuConfigResponse } from "../interface/menu/config/IMenuConfigResponse";
 import { IMenuCreateRequest } from "../interface/menu/create/IMenuCreateRequest";
 import { IMenuDeleteRequest } from "../interface/menu/delete/IMenuDeleteRequest";
@@ -12,8 +14,7 @@ import { IMenuDetailsRequest } from "../interface/menu/details/IMenuDetailsReque
 import { IMenuDetailsResponse } from "../interface/menu/details/IMenuDetailsResponse";
 import { IMenuListResponse } from "../interface/menu/list/IMenuListResponse";
 import { IMenuViewActions } from "../interface/menu/list/IMenuViewActions";
-import { IMenuChangeNameRequest } from "../interface/menu/changeName/IMenuChangeNameRequest";
-import { MenuChangeNameRequestValidator } from "../helper/validate/menu/MenuChangeNameRequestValidator";
+import { IMenuModel } from "../models/menu";
 
 export class MenuController {
 	private repository = new MenuRepository();
@@ -50,7 +51,7 @@ export class MenuController {
 	async getManuDetails(req: IRequest, res: Response): Promise<Response> {
 		const request: IMenuDetailsRequest = req.params;
 	
-		let menu;
+		let menu: IMenuModel;
 	
 		try {
 			menu = await this.repository.getMenuById(request.id);
@@ -114,7 +115,9 @@ export class MenuController {
 		}
 		
 		try {
-			await this.repository.changeName(request.id, request.name);
+			const menu = await this.repository.getMenuById(request.id);
+			menu.name = request.name;
+			await menu.save();
 		} catch (err) {
 			if (err instanceof MenuNotFoundError) {
 				return res.status(404).json();

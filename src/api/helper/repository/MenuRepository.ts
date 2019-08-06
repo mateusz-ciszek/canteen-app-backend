@@ -1,4 +1,3 @@
-import { Error as MongooseError } from "mongoose";
 import { IMenuCreateRequest } from "../../interface/menu/create/IMenuCreateRequest";
 import { IMenuModel, Menu } from "../../models/menu";
 import { MongooseUtil } from "../MongooseUtil";
@@ -19,9 +18,18 @@ export class MenuRepository {
 	}
 
 	async getMenuById(id: string): Promise<IMenuModel> {
-		const menu = await Menu.findById(id)
-				.populate('foods')
-				.exec();;
+		let menu: IMenuModel | null;
+
+		try {
+			menu = await Menu.findById(id)
+					.populate('foods')
+					.exec();
+		} catch (err) {
+			if (this.mongooseUtil.isObjectIdCastException(err)) {
+				throw new InvalidObjectIdError(id);
+			}
+			throw err;
+		}
 
 		if (!menu) {
 			throw new MenuNotFoundError(id);
@@ -46,28 +54,11 @@ export class MenuRepository {
 		return menu._id;
 	}
 
-	async changeName(id: string, newName: string): Promise<void> {
-		let document: IMenuModel | null;
-
-		try {
-			document = await Menu.findByIdAndUpdate(id, { $set: { name: newName } }).exec();
-		} catch (err) {
-			if (err instanceof MongooseError.CastError) {
-				throw new InvalidObjectIdError(id);
-			}
-			throw err;
-		}
-
-		if (!document) {
-			throw new MenuNotFoundError(id);
-		}
-	}
-
 	async delete(ids: string[]): Promise<void> {
 		try {
 			await Menu.deleteMany({ _id: { $in: ids } }).exec();
 		} catch (err) {
-			if (err instanceof MongooseError.CastError) {
+			if (this.mongooseUtil.isObjectIdCastException(err)) {
 				throw new InvalidObjectIdError(err.stringValue);
 			}
 			throw err;
@@ -78,7 +69,7 @@ export class MenuRepository {
 		try {
 			await Menu.updateMany({ foods: { $in: ids } }, { $pull: { foods: { $in: ids } } }).exec();
 		} catch (err) {
-			if (err instanceof MongooseError.CastError) {
+			if (this.mongooseUtil.isObjectIdCastException(err)) {
 				throw new InvalidObjectIdError(err.stringValue);
 			}
 			throw err;
