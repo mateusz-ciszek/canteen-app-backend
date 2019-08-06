@@ -12,6 +12,8 @@ import { IMenuDetailsRequest } from "../interface/menu/details/IMenuDetailsReque
 import { IMenuDetailsResponse } from "../interface/menu/details/IMenuDetailsResponse";
 import { IMenuListResponse } from "../interface/menu/list/IMenuListResponse";
 import { IMenuViewActions } from "../interface/menu/list/IMenuViewActions";
+import { IMenuChangeNameRequest } from "../interface/menu/changeName/IMenuChangeNameRequest";
+import { MenuChangeNameRequestValidator } from "../helper/validate/menu/MenuChangeNameRequestValidator";
 
 export class MenuController {
 	private repository = new MenuRepository();
@@ -91,6 +93,32 @@ export class MenuController {
 		try {
 			await this.repository.delete(request.ids);
 		} catch (err) {
+			if (err instanceof InvalidObjectIdError) {
+				return res.status(400).json();
+			}
+			return res.status(500).json();
+		}
+	
+		return res.status(200).json();
+	}
+
+	async changeName(req: IRequest, res: Response): Promise<Response> {
+		const request: IMenuChangeNameRequest = {
+			id: req.params,
+			name: req.body,
+		};
+	
+		const validator = new MenuChangeNameRequestValidator();
+		if (!validator.validate(request)) {
+			return res.status(400).json();
+		}
+		
+		try {
+			await this.repository.changeName(request.id, request.name);
+		} catch (err) {
+			if (err instanceof MenuNotFoundError) {
+				return res.status(404).json();
+			}
 			if (err instanceof InvalidObjectIdError) {
 				return res.status(400).json();
 			}

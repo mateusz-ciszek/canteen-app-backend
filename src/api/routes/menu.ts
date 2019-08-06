@@ -1,5 +1,5 @@
 import express from 'express';
-import { createOrUpdateFood, changeName } from '../controller/menu';
+import { createOrUpdateFood } from '../controller/menu';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
 import { PermissionValidator } from '../middleware/PermissionValidator';
@@ -87,4 +87,4 @@ router.patch('/:id',
 		checkAuth,
 		isAdmin,
 		(req, res, next) => permissionValidator.checkPermission('P_MENU_MODIFY')(req, res, next),
-		(req, res, next) => changeName(req, res, next));
+		(req, res) => controller.changeName(req, res));
