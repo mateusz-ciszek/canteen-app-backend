@@ -4,21 +4,33 @@ import { Permission } from "../../../interface/Permission";
 import { IWorkerModel, Worker } from "../../models/worker";
 import { IWorkHoursModel } from '../../models/workHours';
 import { InvalidObjectIdError } from "./InvalidObjectIdError";
+import { MongooseUtil } from "../MongooseUtil";
 
 export class WorkerRepository {
+	private mongooseUtil = new MongooseUtil();
+
 	async getAllWorkers(): Promise<IWorkerModel[]> {
 		return Worker.find()
 				.populate('person')
 				.exec();
 	}
 
-	async query(workerId: string): Promise<IWorkerModel> {
-		const worker: IWorkerModel | null = await Worker.findById(workerId)
+	async findWorkerById(id: string): Promise<IWorkerModel> {
+		let worker: IWorkerModel | null;
+		
+		try {
+			worker = await Worker.findById(id)
 				.populate('person')
 				.exec();
+		} catch (err) {
+			if (this.mongooseUtil.isObjectIdCastException(err)) {
+				throw new InvalidObjectIdError(id);
+			}
+			throw err;
+		}
 
 		if (!worker) {
-			throw new WorkerNotFoundError(workerId);
+			throw new WorkerNotFoundError(id);
 		}
 
 		return worker;
