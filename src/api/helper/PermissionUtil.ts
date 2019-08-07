@@ -9,7 +9,7 @@ export class PermissionUtil {
 		let worker: IWorkerModel;
 
 		try {
-			worker = await this.workerRepository.query(workerId);
+			worker = await this.workerRepository.findWorkerById(workerId);
 		} catch (err) {
 			return false;
 		}
