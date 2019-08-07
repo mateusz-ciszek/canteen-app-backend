@@ -117,16 +117,15 @@ export class WorkerController {
 		const response: IWorkerCreateResponse = { email, password };
 		return res.status(201).json(response);
 	}
-}
 
-export async function getMonth(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
-	const request: IMonthRequest = req.params;
-
-	const workers = await Worker.find().populate('person').exec();
-	const workerHelper = new WorkerHelper();
-	const month: IMonthGetResponse = await workerHelper.calculateMonth(request, workers);
+	async getMonth(req: IRequest, res: Response): Promise<Response> {
+		const request: IMonthRequest = req.params;
 	
-	return res.status(200).json(month);
+		const workers = await this.repository.getAllWorkers();
+		const month: IMonthGetResponse = await this.workerHelper.calculateMonth(request, workers);
+		
+		return res.status(200).json(month);
+	}
 }
 
 export async function createDayOffRequest(req: IRequest, res: Response, next: NextFunction): Promise<Response> {

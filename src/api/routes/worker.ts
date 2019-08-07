@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { changeDayffState, createDayOffRequest, getMonth, getWorkerDetails, resetPassword, WorkerController } from '../controller/WorkerController';
+import { changeDayffState, createDayOffRequest, getWorkerDetails, resetPassword, WorkerController } from '../controller/WorkerController';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
 import { PermissionValidator } from '../middleware/PermissionValidator';
@@ -21,7 +21,7 @@ router.post('',
 		(req, res) => controller.createWorker(req, res));
 
 router.get('/month/:year/:month',
-		getMonth);
+		(req, res) => controller.getMonth(req, res));
 
 router.post('/dayoff',
 		createDayOffRequest);
