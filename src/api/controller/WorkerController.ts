@@ -1,6 +1,5 @@
 import { NextFunction, Response } from "express";
 import { Types } from "mongoose";
-import { Permission } from "../../interface/Permission";
 import { IRequest } from "../../models/Express";
 import { WorkerModelToWorkerListItemConverter } from "../converter/worker/WorkerModelToWorkerListItemConverter";
 import { WorkHoursCreateRequestToWorkHoursModelConverter } from "../converter/worker/WorkHoursCreateRequestToWorkHoursModelConverter";
@@ -38,10 +37,10 @@ export class WorkerController {
 
 	async getPermissions(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 		const request: IWorkerGetPermissions = req.params;
-		let permissions: Permission[];
+		let worker: IWorkerModel;
 
 		try {
-			permissions = await this.repository.getPermissions(request.workerId);
+			worker = await this.repository.findWorkerById(request.workerId);
 		} catch (err) {
 			if (err instanceof InvalidObjectIdError) {
 				return res.status(400).json();
@@ -52,7 +51,7 @@ export class WorkerController {
 			return res.status(500).json();
 		}
 
-		return res.status(200).json(permissions);
+		return res.status(200).json(worker.permissions);
 	}
 
 	async updatePermissions(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
