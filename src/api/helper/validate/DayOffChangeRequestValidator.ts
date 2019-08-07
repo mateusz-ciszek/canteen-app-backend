@@ -1,9 +1,12 @@
 import { IDayOffChangeStatusRequest } from "../../interface/worker/dayOff/changeState/IDayOffChangeStatusRequest";
-import { isValidObjectId } from "../mongooseErrorHelper";
+import { MongooseUtil } from "../MongooseUtil";
+import { Validator } from "./Validator";
 
-export class DayOffChangeRequestValidator {
+export class DayOffChangeRequestValidator extends Validator<IDayOffChangeStatusRequest> {
+	private mongooseUtil = new MongooseUtil();
+
 	validate(request: IDayOffChangeStatusRequest): boolean {
-		if (!isValidObjectId(request.id)) {
+		if (this.mongooseUtil.isValidObjectId(request.id)) {
 			return false;
 		}
 
