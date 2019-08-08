@@ -1,12 +1,7 @@
-import { ObjectId } from "bson";
 import { DayOffState } from "../../interface/DayOffStatus";
 import { IWorkHours } from "../../interface/workHours";
-import { UserModelToUserViewConverter } from "../converter/common/UserModelToUserViewConverter";
 import { DayOffModelToDayOffRequestConverter } from "../converter/DayOffModelToDayOffRequestConverter";
-import { DayOffModelToDayOffDateilsConverter } from "../converter/worker/DayOffModelToConverter";
 import { WorkerModelToWorkerViewConverter } from "../converter/worker/WorkerModelToWorkerViewConverter";
-import { WorkHoursModelToWorkDayDetailsConverter } from "../converter/worker/WorkHoursModelToWorkDayDetailsConverter";
-import { IWorkerDetailsResponse } from "../interface/worker/details/IWorkerDetailsResponse";
 import { IDay } from "../interface/worker/month/IDay";
 import { IMonthGetResponse } from "../interface/worker/month/IMonthGetResponse";
 import { IMonthRequest } from "../interface/worker/month/IMonthRequest";
@@ -68,31 +63,6 @@ export class WorkerHelper {
 		}
 
 		return month;
-	}
-
-	async getDetails(workerId: string): Promise<IWorkerDetailsResponse> {
-		const worker = await this.getWorker(workerId);
-
-		const requests = await DayOff.find({ worker: new ObjectId(workerId) })
-				.populate({
-					path: 'worker resolvedBy',
-					populate: {
-						path: 'person',
-					},
-				})
-				.exec();
-
-		const userConverter = new UserModelToUserViewConverter();
-		const workDayConverter = new WorkHoursModelToWorkDayDetailsConverter();
-		const dayOffConverter = new DayOffModelToDayOffDateilsConverter();
-
-		const response: IWorkerDetailsResponse = {
-			person: userConverter.convert(worker.person),
-			employedDate: worker.employmentDate,
-			workDays: worker.defaultWorkHours.map(workHours => workDayConverter.convert(workHours)),
-			requests: requests.map(request => dayOffConverter.convert(request)),
-		};
-		return response;
 	}
 
 	async resetPassword(workerId: string, passwordHash: string): Promise<string> {
