@@ -10,22 +10,22 @@ describe('DayOffHelper', () => {
 		helper = new DayOffHelper();
 	});
 
-	describe('date mapper function', () => {
-		it('should map date string to date', () => {
-			const DATE_STRING = '2019-04-15T05:47:24.477Z';
-			const MAPPED_DATE = new Date(2019, 3, 15);
+	// describe('date mapper function', () => {
+	// 	it('should map date string to date', () => {
+	// 		const DATE_STRING = '2019-04-15T05:47:24.477Z';
+	// 		const MAPPED_DATE = new Date(2019, 3, 15);
 	
-			const result = helper.mapDateStringToDate(DATE_STRING);
+	// 		const result = helper.mapDateStringToDate(DATE_STRING);
 	
-			expect(result).to.deep.equal(MAPPED_DATE);
-		});
+	// 		expect(result).to.deep.equal(MAPPED_DATE);
+	// 	});
 	
-		it('should not map invalid date string to date', () => {
-			const functionWithThrow = () => helper.mapDateStringToDate('INVALID_DATE_STRING');
+	// 	it('should not map invalid date string to date', () => {
+	// 		const functionWithThrow = () => helper.mapDateStringToDate('INVALID_DATE_STRING');
 	
-			expect(functionWithThrow).to.throw('Invalid Date');
-		});
-	});
+	// 		expect(functionWithThrow).to.throw('Invalid Date');
+	// 	});
+	// });
 
 	// TODO: Move to integration tests
 	// describe('removing already existing dates function', () => {

@@ -7,7 +7,7 @@ export class DayOffRequestValidator extends Validator<IWorkerDayOffRequest> {
 			return false;
 		}
 
-		let invalidDateString = request.dates.some(dateString => isNaN(Date.parse(dateString)));
+		let invalidDateString = request.dates.some(dateString => !this.validateDate(dateString));
 		if (invalidDateString) {
 			return false;
 		}

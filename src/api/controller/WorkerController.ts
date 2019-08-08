@@ -28,6 +28,8 @@ import { IWorkerGetPermissions } from "../interface/worker/permissions/get/IWork
 import { IWorkerUpdatePermissions } from "../interface/worker/permissions/update/IWorkerUpdatePermissions";
 import { DayOff } from "../models/DayOff";
 import { IWorkerModel, Worker } from "../models/worker";
+import { StringToDateConverter } from "../converter/common/StringToDateConverter";
+import { DayOffRepository, SaveDayOffCommand } from "../helper/repository/DayOffRepository";
 
 export class WorkerController {
 	private repository = new WorkerRepository();
@@ -126,41 +128,41 @@ export class WorkerController {
 		
 		return res.status(200).json(month);
 	}
-}
 
-export async function createDayOffRequest(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
-	const request: IWorkerDayOffRequest = req.body;
-
-	const validator = new DayOffRequestValidator();
-	if (!validator.validate(request)) {
-		res.status(400).json();
-	}
-
-	const worker = await Worker.findOne({ 'person': { '_id': req.context!.userId } }).exec();
-	if (!worker) {
-		return res.status(400).json();
-	}
+	async createDayOffRequest(req: IRequest, res: Response): Promise<Response> {
+		const request: IWorkerDayOffRequest = req.body;
 	
-	const helper = new DayOffHelper();
-	let dates: Date[];
-	try {
-		dates = request.dates.map(helper.mapDateStringToDate);
-	} catch (err) {
-		return res.status(400).json();
-	}
+		const validator = new DayOffRequestValidator();
+		if (!validator.validate(request)) {
+			res.status(400).json();
+		}
 	
-	dates = await helper.removeAlreadyRequestedDates(dates, worker._id);
-
-	for (const date of dates) {
-		await new DayOff({
-			_id: new Types.ObjectId(),
-			worker,
-			date,
-			state: 'UNRESOLVED',
-		}).save();
+		let worker: IWorkerModel;
+		try {
+			worker = await this.repository.findWorkerById(req.context!.workerId!);
+		} catch (err) {
+			if (err instanceof InvalidObjectIdError) {
+				return res.status(400).json();
+			}
+			if (err instanceof WorkerNotFoundError) {
+				return res.status(404).json();
+			}
+			return res.status(500).json();
+		}
+		
+		const dateConverter = new StringToDateConverter();
+		let dates = request.dates.map(date => dateConverter.convert(date));
+		const helper = new DayOffHelper();
+		dates = await helper.removeAlreadyRequestedDates(dates, worker._id);
+	
+		const dayOffRepository = new DayOffRepository();
+		for (const date of dates) {
+			const command: SaveDayOffCommand = { worker, date };
+			await dayOffRepository.save(command);
+		}
+	
+		return res.status(200).json();
 	}
-
-	return res.status(200).json();
 }
 
 export async function changeDayffState(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
