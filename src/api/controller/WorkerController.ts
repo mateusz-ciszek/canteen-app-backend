@@ -6,6 +6,8 @@ import { WorkerModelToWorkerListItemConverter } from "../converter/worker/Worker
 import { WorkHoursCreateRequestToWorkHoursModelConverter } from "../converter/worker/WorkHoursCreateRequestToWorkHoursModelConverter";
 import { BcryptUtil } from "../helper/BcryptUtil";
 import { DayOffHelper } from "../helper/DayOffHelper";
+import { IPasswordFactory } from "../helper/IPasswordFactory";
+import { PasswordFactoryImpl } from "../helper/PasswordFactoryImpl";
 import { DayOffNotFoundError, DayOffRepository, SaveDayOffCommand } from "../helper/repository/DayOffRepository";
 import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";
 import { SaveUserCommand, UserRepository } from "../helper/repository/UserRepository";
@@ -36,6 +38,7 @@ export class WorkerController {
 	private workerHelper = new WorkerHelper();
 	private userRepository = new UserRepository();
 	private dayOffRepository = new DayOffRepository();
+	private passwordFactory: IPasswordFactory = new PasswordFactoryImpl();
 
 	async getPermissions(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 		const request: IWorkerGetPermissions = req.params;
@@ -99,7 +102,7 @@ export class WorkerController {
 		}
 	
 		const email = await this.workerHelper.generateEmail(request.firstName, request.lastName);
-		const password = this.workerHelper.generatePassword();
+		const password = this.passwordFactory.generate();
 		const hash = await this.bcrypt.hashPassword(password);
 	
 		const userCommand: SaveUserCommand = {
@@ -215,24 +218,25 @@ export class WorkerController {
 	
 		return res.status(200).json();
 	}
-}
 
-export async function resetPassword(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
-	const request: IWorkerPasswordResetRequest = req.body;
-
-	if (!request.workerId) {
-		return res.status(400).json();
+	async resetPassword(req: IRequest, res: Response): Promise<Response> {
+		const request: IWorkerPasswordResetRequest = req.body;
+	
+		if (!request.workerId) {
+			return res.status(400).json();
+		}
+	
+		const password = this.passwordFactory.generate();
+		const hash = await this.bcrypt.hashPassword(password);
+		const worker = await this.repository.findWorkerById(request.workerId);
+		const user = worker.person;
+		user.password = hash;
+		await user.save();
+	
+		const response: IWorkerPasswordResetResponse = {
+			email: user.email,
+			password: password,
+		};
+		return res.status(200).json(response);
 	}
-
-	const workerHelper = new WorkerHelper(); // TODO: remove this and use one included in class after moving this
-	const password = workerHelper.generatePassword();
-	const bcrypt = new BcryptUtil(); // TODO: remove this and use one included in class after moving this
-	const hash = await bcrypt.hashPassword(password);
-	const worker = await workerHelper.getWorker(request.workerId);
-	const user = worker.person;
-	user.password = hash;
-	await user.save();
-
-	const response: IWorkerPasswordResetResponse = { email: user.email, password };
-	return res.status(200).json(response);
 }

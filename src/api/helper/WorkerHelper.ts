@@ -20,10 +20,6 @@ export class WorkerHelper {
 		return `${firstName.toLocaleLowerCase()}.${lastName.toLocaleLowerCase()}${users ? users : ''}@canteem.com`;
 	}
 
-	generatePassword(): string {
-		return Math.random().toString(36).slice(-8);
-	}
-
 	async calculateMonth(request: IMonthRequest, workers: IWorkerModel[]): Promise<IMonthGetResponse> {
 		const defaultWeek = this.calculateDefaultWeek(workers);
 		const acceptedDaysOff: { [workerId: string]: IDayOffModel[] } = {};

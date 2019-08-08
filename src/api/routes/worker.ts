@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { resetPassword, WorkerController } from '../controller/WorkerController';
+import { WorkerController } from '../controller/WorkerController';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
 import { PermissionValidator } from '../middleware/PermissionValidator';
@@ -44,4 +44,4 @@ router.get('/:workerId',
 
 router.post('/password/reset',
 		(req, res, next) => permissionValidator.checkPermission('P_WORKER_PASSWORD_RESET')(req, res, next),
-		resetPassword);
+		(req, res) => controller.resetPassword(req, res));
