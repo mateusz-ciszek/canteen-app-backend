@@ -8,18 +8,12 @@ import { IMonthRequest } from "../interface/worker/month/IMonthRequest";
 import { IWorkDayDetails } from "../interface/worker/month/IWorkDayDetails";
 import { IWorkerCalendarView } from "../interface/worker/month/IWorkerCalendarView";
 import { DayOff, IDayOffModel } from "../models/DayOff";
-import { User } from "../models/user";
 import { IWorkerModel, Worker } from '../models/worker';
 import { CalendarHelper } from "./CalendarHelper";
 import { isValidObjectId } from "./mongooseErrorHelper";
 import { WorkerNotFoundError } from "./repository/WorkerRepository";
 
 export class WorkerHelper {
-	async generateEmail(firstName: string, lastName: string): Promise<string> {
-		const users: number = await User.countDocuments({ firstName, lastName }).exec();
-		return `${firstName.toLocaleLowerCase()}.${lastName.toLocaleLowerCase()}${users ? users : ''}@canteem.com`;
-	}
-
 	async calculateMonth(request: IMonthRequest, workers: IWorkerModel[]): Promise<IMonthGetResponse> {
 		const defaultWeek = this.calculateDefaultWeek(workers);
 		const acceptedDaysOff: { [workerId: string]: IDayOffModel[] } = {};

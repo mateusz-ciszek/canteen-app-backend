@@ -6,6 +6,7 @@ import { WorkerModelToWorkerListItemConverter } from "../converter/worker/Worker
 import { WorkHoursCreateRequestToWorkHoursModelConverter } from "../converter/worker/WorkHoursCreateRequestToWorkHoursModelConverter";
 import { BcryptUtil } from "../helper/BcryptUtil";
 import { DayOffHelper } from "../helper/DayOffHelper";
+import { EmailFactory } from "../helper/EmailFactory";
 import { IPasswordFactory } from "../helper/IPasswordFactory";
 import { PasswordFactoryImpl } from "../helper/PasswordFactoryImpl";
 import { DayOffNotFoundError, DayOffRepository, SaveDayOffCommand } from "../helper/repository/DayOffRepository";
@@ -101,7 +102,8 @@ export class WorkerController {
 			return res.status(400).json();
 		}
 	
-		const email = await this.workerHelper.generateEmail(request.firstName, request.lastName);
+		const emailFactory = new EmailFactory();
+		const email = await emailFactory.generate(request.firstName, request.lastName);
 		const password = this.passwordFactory.generate();
 		const hash = await this.bcrypt.hashPassword(password);
 	

@@ -1,5 +1,6 @@
 import { IUserModel, User } from "../../models/user";
 import { MongooseUtil } from "../MongooseUtil";
+import { DocumentQuery } from "mongoose";
 
 export class UserRepository {
 	private mongooseUtil = new MongooseUtil();
@@ -25,6 +26,26 @@ export class UserRepository {
 		}).save();
 		return user._id;
 	}
+
+	async find(filter: UserFilter): Promise<IUserModel[]> {
+		return this.prepareQuery(filter).exec();
+	}
+
+	private prepareQuery(filter: UserFilter): DocumentQuery<IUserModel[], IUserModel> {
+		const query = User.find({});
+
+		if (filter.email) {
+			query.find({ email: filter.email });
+		}
+		if (filter.firstName) {
+			query.find({ firstName: filter.firstName });
+		}
+		if (filter.lastName) {
+			query.find({ lastName: filter.lastName });
+		}
+
+		return query;
+	}
 }
 
 export class UserNotFoundError extends Error {
@@ -42,4 +63,10 @@ export interface SaveUserCommand {
 	firstName: string;
 	lastName: string;
 	passwordHash: string;
+}
+
+export interface UserFilter {
+	email?: string;
+	firstName?: string;
+	lastName?: string;
 }
