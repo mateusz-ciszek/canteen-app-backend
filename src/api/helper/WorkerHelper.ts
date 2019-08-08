@@ -8,10 +8,8 @@ import { IMonthRequest } from "../interface/worker/month/IMonthRequest";
 import { IWorkDayDetails } from "../interface/worker/month/IWorkDayDetails";
 import { IWorkerCalendarView } from "../interface/worker/month/IWorkerCalendarView";
 import { DayOff, IDayOffModel } from "../models/DayOff";
-import { IWorkerModel, Worker } from '../models/worker';
+import { IWorkerModel } from '../models/worker';
 import { CalendarHelper } from "./CalendarHelper";
-import { isValidObjectId } from "./mongooseErrorHelper";
-import { WorkerNotFoundError } from "./repository/WorkerRepository";
 
 export class WorkerHelper {
 	async calculateMonth(request: IMonthRequest, workers: IWorkerModel[]): Promise<IMonthGetResponse> {
@@ -53,28 +51,6 @@ export class WorkerHelper {
 		}
 
 		return month;
-	}
-
-	async resetPassword(workerId: string, passwordHash: string): Promise<string> {
-		const worker = await this.getWorker(workerId);
-		const user = worker.person;
-		user.password = passwordHash;
-		await user.save();
-		return user.email;
-	}
-
-	async getWorker(id: string): Promise<IWorkerModel> {
-		if (!isValidObjectId(id)) {
-			throw new NotObjectIdError(`"${id}" is not a valid object identifier`);
-		}
-
-		const worker = await Worker.findById(id).populate('person').exec();
-
-		if (!worker) {
-			throw new WorkerNotFoundError(id);
-		}
-
-		return worker;
 	}
 
 	private calculateDefaultWeek(workers: IWorkerModel[]): IWorkDayDetails[] {
@@ -130,5 +106,3 @@ export class WorkerHelper {
 		}).select('date').exec();
 	}
 }
-
-export class NotObjectIdError extends Error {}
