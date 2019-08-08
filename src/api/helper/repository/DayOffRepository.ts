@@ -2,6 +2,7 @@ import { IWorkerModel } from "../../models/worker";
 import { DayOff, IDayOffModel } from "../../models/DayOff";
 import { MongooseUtil } from "../MongooseUtil";
 import { InvalidObjectIdError } from "./InvalidObjectIdError";
+import { ObjectId } from "bson";
 
 export class DayOffRepository {
 	private mongooseUtil = new MongooseUtil();
@@ -33,6 +34,17 @@ export class DayOffRepository {
 		}
 
 		return dayOff;
+	}
+
+	async findAllDayOffRequestsByWorkerId(id: string): Promise<IDayOffModel[]> {
+		return DayOff.find({ worker: new ObjectId(id) })
+				.populate({
+					path: 'worker resolvedBy',
+					populate: {
+						path: 'person',
+					},
+				})
+				.exec();
 	}
 }
 

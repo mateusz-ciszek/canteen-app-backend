@@ -1,6 +1,7 @@
 import { NextFunction, Response } from "express";
 import { IRequest } from "../../models/Express";
 import { StringToDateConverter } from "../converter/common/StringToDateConverter";
+import { WorkerModelToWorkerDetailsResponseConverter } from "../converter/worker/WorkerModelToWorkerDetailsResponseConnverter";
 import { WorkerModelToWorkerListItemConverter } from "../converter/worker/WorkerModelToWorkerListItemConverter";
 import { WorkHoursCreateRequestToWorkHoursModelConverter } from "../converter/worker/WorkHoursCreateRequestToWorkHoursModelConverter";
 import { BcryptUtil } from "../helper/BcryptUtil";
@@ -12,14 +13,13 @@ import { SaveWorkerCommand, WorkerNotFoundError, WorkerRepository } from "../hel
 import { DayOffChangeRequestValidator } from "../helper/validate/DayOffChangeRequestValidator";
 import { DayOffRequestValidator } from "../helper/validate/DayOffRequestValidator";
 import { WorkerValidator } from "../helper/validate/WorkerValidator";
-import { NotObjectIdError, WorkerHelper } from '../helper/WorkerHelper';
+import { WorkerHelper } from '../helper/WorkerHelper';
 import { WorkHoursHelper } from "../helper/WorkHoursHelper";
 import { IWorkerCreateRequest } from "../interface/worker/create/IWorkerCreateRequest";
 import { IWorkerCreateResponse } from "../interface/worker/create/IWorkerCreateResponse";
 import { IDayOffChangeStatusRequest } from "../interface/worker/dayOff/changeState/IDayOffChangeStatusRequest";
 import { IWorkerDayOffRequest } from "../interface/worker/dayOff/create/IWorkerDayOffRequest";
 import { IWorkerDetailsRequest } from "../interface/worker/details/IWorkerDetailsRequest";
-import { IWorkerDetailsResponse } from "../interface/worker/details/IWorkerDetailsResponse";
 import { IWorkerListResponse } from "../interface/worker/list/IWorkerListResponse";
 import { IMonthGetResponse } from "../interface/worker/month/IMonthGetResponse";
 import { IMonthRequest } from "../interface/worker/month/IMonthRequest";
@@ -120,6 +120,29 @@ export class WorkerController {
 		return res.status(201).json(response);
 	}
 
+	async getWorkerDetails(req: IRequest, res: Response): Promise<Response> {
+		const request: IWorkerDetailsRequest = req.params;
+		let worker: IWorkerModel;
+
+		try {
+			worker = await this.repository.findWorkerById(request.workerId);
+		} catch (err) {
+			if (err instanceof InvalidObjectIdError) {
+				return res.status(400).json();
+			}
+			if (err instanceof WorkerNotFoundError) {
+				return res.status(404).json();
+			}
+			return res.status(500).json();
+		}
+
+		const dayOffRequests = await this.dayOffRepository.findAllDayOffRequestsByWorkerId(request.workerId);
+		const converter = new WorkerModelToWorkerDetailsResponseConverter();
+		const response = converter.convert(worker, dayOffRequests);
+	
+		return res.status(200).json(response);
+	}
+
 	async getMonth(req: IRequest, res: Response): Promise<Response> {
 		const request: IMonthRequest = req.params;
 	
@@ -192,29 +215,6 @@ export class WorkerController {
 	
 		return res.status(200).json();
 	}
-}
-
-export async function getWorkerDetails(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
-	const request: IWorkerDetailsRequest = req.params;
-
-	const workerHelper = new WorkerHelper();
-	let details: IWorkerDetailsResponse | null = null;
-
-	try {
-		details = await workerHelper.getDetails(request.workerId);
-	} catch (err) {
-		if (err instanceof NotObjectIdError) {
-			console.log(err.message);
-			return res.status(400).json();
-		} else if (err instanceof WorkerNotFoundError) {
-			return res.status(404).json();
-		} else {
-			console.log(err);
-			return res.status(500).json();
-		}
-	}
-
-	return res.status(200).json(details);
 }
 
 export async function resetPassword(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
