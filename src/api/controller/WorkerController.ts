@@ -1,10 +1,11 @@
 import { NextFunction, Response } from "express";
-import { Types } from "mongoose";
 import { IRequest } from "../../models/Express";
+import { StringToDateConverter } from "../converter/common/StringToDateConverter";
 import { WorkerModelToWorkerListItemConverter } from "../converter/worker/WorkerModelToWorkerListItemConverter";
 import { WorkHoursCreateRequestToWorkHoursModelConverter } from "../converter/worker/WorkHoursCreateRequestToWorkHoursModelConverter";
 import { BcryptUtil } from "../helper/BcryptUtil";
 import { DayOffHelper } from "../helper/DayOffHelper";
+import { DayOffNotFoundError, DayOffRepository, SaveDayOffCommand } from "../helper/repository/DayOffRepository";
 import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";
 import { SaveUserCommand, UserRepository } from "../helper/repository/UserRepository";
 import { SaveWorkerCommand, WorkerNotFoundError, WorkerRepository } from "../helper/repository/WorkerRepository";
@@ -26,16 +27,15 @@ import { IWorkerPasswordResetRequest } from "../interface/worker/password/reset/
 import { IWorkerPasswordResetResponse } from "../interface/worker/password/reset/IWorkerPasswordResetResponse";
 import { IWorkerGetPermissions } from "../interface/worker/permissions/get/IWorkerGetPermissions";
 import { IWorkerUpdatePermissions } from "../interface/worker/permissions/update/IWorkerUpdatePermissions";
-import { DayOff } from "../models/DayOff";
-import { IWorkerModel, Worker } from "../models/worker";
-import { StringToDateConverter } from "../converter/common/StringToDateConverter";
-import { DayOffRepository, SaveDayOffCommand } from "../helper/repository/DayOffRepository";
+import { IDayOffModel } from "../models/DayOff";
+import { IWorkerModel } from "../models/worker";
 
 export class WorkerController {
 	private repository = new WorkerRepository();
 	private bcrypt = new BcryptUtil();
 	private workerHelper = new WorkerHelper();
 	private userRepository = new UserRepository();
+	private dayOffRepository = new DayOffRepository();
 
 	async getPermissions(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 		const request: IWorkerGetPermissions = req.params;
@@ -155,37 +155,43 @@ export class WorkerController {
 		const helper = new DayOffHelper();
 		dates = await helper.removeAlreadyRequestedDates(dates, worker._id);
 	
-		const dayOffRepository = new DayOffRepository();
 		for (const date of dates) {
 			const command: SaveDayOffCommand = { worker, date };
-			await dayOffRepository.save(command);
+			await this.dayOffRepository.save(command);
 		}
 	
 		return res.status(200).json();
 	}
-}
 
-export async function changeDayffState(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
-	const request: IDayOffChangeStatusRequest = req.body;
-
-	const validator = new DayOffChangeRequestValidator();
-	if (!validator.validate(request)) {
-		return res.status(400).json();
+	async changeDayOffState(req: IRequest, res: Response): Promise<Response> {
+		const request: IDayOffChangeStatusRequest = req.body;
+		let dayOff: IDayOffModel;
+	
+		const validator = new DayOffChangeRequestValidator();
+		if (!validator.validate(request)) {
+			return res.status(400).json();
+		}
+	
+		try {
+			dayOff = await this.dayOffRepository.findDayOffById(request.id);
+		} catch (err) {
+			if (err instanceof InvalidObjectIdError) {
+				return res.status(400).json();
+			}
+			if (err instanceof DayOffNotFoundError) {
+				return res.status(404).json();
+			}
+			return res.status(500).json();
+		}
+	
+		const worker = await this.repository.findWorkerById(req.context!.workerId!);
+		dayOff.state = request.state;
+		dayOff.resolvedBy = worker;
+		dayOff.resolvedDate = new Date();
+		await dayOff.save();
+	
+		return res.status(200).json();
 	}
-
-	const dayOffRequest = await DayOff.findById(request.id).exec();
-	if (!dayOffRequest) {
-		return res.status(400).json();
-	}
-
-	const worker = await Worker.findById(req.context!.userId).exec();
-
-	dayOffRequest.state = request.state;
-	dayOffRequest.resolvedBy = worker!;
-	dayOffRequest.resolvedDate = new Date();
-	await dayOffRequest.save();
-
-	return res.status(200).json();
 }
 
 export async function getWorkerDetails(req: IRequest, res: Response, next: NextFunction): Promise<Response> {

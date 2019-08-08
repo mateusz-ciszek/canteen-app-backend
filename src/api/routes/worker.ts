@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { changeDayffState, getWorkerDetails, resetPassword, WorkerController } from '../controller/WorkerController';
+import { getWorkerDetails, resetPassword, WorkerController } from '../controller/WorkerController';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
 import { PermissionValidator } from '../middleware/PermissionValidator';
@@ -28,7 +28,7 @@ router.post('/dayoff',
 
 router.patch('/dayoff',
 		(req, res, next) => permissionValidator.checkPermission('P_WORKER_RESOLVE_DAYOFF_REQUEST')(req, res, next),
-		changeDayffState);
+		(req, res) => controller.changeDayOffState(req, res));
 
 router.get('/:workerId/permissions',
 		(req, res, next) => permissionValidator.checkPermission('P_WORKER_PERMISSIONS_EDIT')(req, res, next),
