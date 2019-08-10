@@ -8,8 +8,8 @@ export class OrderCreateRequestValidator extends Validator<IOrderCreateRequest> 
 		if (!input.items || input.items.length === 0) {
 			return false;
 		}
-		if (input.items.some(item => !this.validateOrderItem(item))) {
-			return false;
+		if (input.items) {
+			return input.items.some(item => !this.validateOrderItem(item));
 		}
 		return true;
 	}
