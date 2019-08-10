@@ -8,10 +8,7 @@ export class OrderCreateRequestValidator extends Validator<IOrderCreateRequest> 
 		if (!input.items || input.items.length === 0) {
 			return false;
 		}
-		if (input.items) {
-			return input.items.some(item => !this.validateOrderItem(item));
-		}
-		return true;
+		return !input.items.some(item => !this.validateOrderItem(item));
 	}
 
 	private validateOrderItem(item: IOrderItemCreateRequest): boolean {
@@ -25,7 +22,7 @@ export class OrderCreateRequestValidator extends Validator<IOrderCreateRequest> 
 			return false;
 		}
 		if (item.additions) {
-			return item.additions.some(addition => !this.validateOrderItemAddition(addition));
+			return !item.additions.some(addition => !this.validateOrderItemAddition(addition));
 		}
 		return true;
 	}
