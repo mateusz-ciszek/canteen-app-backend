@@ -1,6 +1,6 @@
-import { IWorkerCreateRequest } from "../../interface/worker/create/IWorkerCreateRequest";
+import { IWorkerCreateRequest } from "../../../interface/worker/create/IWorkerCreateRequest";
+import { Validator } from "../Validator";
 import { WorkHoursValidator } from "./WorkHoursValidator";
-import { Validator } from "./Validator";
 
 export class WorkerValidator extends Validator<IWorkerCreateRequest> {
 	private workHoursValidator = new WorkHoursValidator();
@@ -14,12 +14,11 @@ export class WorkerValidator extends Validator<IWorkerCreateRequest> {
 			return false;
 		}
 
-		const errors: string[] = this.workHoursValidator.validate(input.workHours!);
-		if (errors.length) {
+		if (input.workHours.length !== 7) {
 			return false;
 		}
 
-		return true;
+		return !input.workHours.some(hour => !this.workHoursValidator.validate(hour));
 	}
 
 	private isValidName(name: string): boolean {

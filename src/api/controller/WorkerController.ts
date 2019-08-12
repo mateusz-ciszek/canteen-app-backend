@@ -15,7 +15,7 @@ import { SaveUserCommand, UserRepository } from "../helper/repository/UserReposi
 import { SaveWorkerCommand, WorkerNotFoundError, WorkerRepository } from "../helper/repository/WorkerRepository";
 import { DayOffChangeRequestValidator } from "../helper/validate/DayOffChangeRequestValidator";
 import { DayOffRequestValidator } from "../helper/validate/DayOffRequestValidator";
-import { WorkerValidator } from "../helper/validate/WorkerValidator";
+import { WorkerValidator } from "../helper/validate/worker/WorkerValidator";
 import { WorkerHelper } from '../helper/WorkerHelper';
 import { WorkHoursHelper } from "../helper/WorkHoursHelper";
 import { IWorkerCreateRequest } from "../interface/worker/create/IWorkerCreateRequest";
