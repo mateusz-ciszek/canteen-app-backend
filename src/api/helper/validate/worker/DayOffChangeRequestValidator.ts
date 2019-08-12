@@ -1,5 +1,5 @@
-import { IDayOffChangeStatusRequest } from "../../interface/worker/dayOff/changeState/IDayOffChangeStatusRequest";
-import { Validator } from "./Validator";
+import { IDayOffChangeStatusRequest } from "../../../interface/worker/dayOff/changeState/IDayOffChangeStatusRequest";
+import { Validator } from "../Validator";
 
 export class DayOffChangeRequestValidator extends Validator<IDayOffChangeStatusRequest> {
 	validate(request: IDayOffChangeStatusRequest): boolean {

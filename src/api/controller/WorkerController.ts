@@ -13,8 +13,8 @@ import { DayOffNotFoundError, DayOffRepository, SaveDayOffCommand } from "../hel
 import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";
 import { SaveUserCommand, UserRepository } from "../helper/repository/UserRepository";
 import { SaveWorkerCommand, WorkerNotFoundError, WorkerRepository } from "../helper/repository/WorkerRepository";
-import { DayOffChangeRequestValidator } from "../helper/validate/DayOffChangeRequestValidator";
-import { DayOffRequestValidator } from "../helper/validate/DayOffRequestValidator";
+import { DayOffChangeRequestValidator } from "../helper/validate/worker/DayOffChangeRequestValidator";
+import { DayOffRequestValidator } from "../helper/validate/worker/DayOffRequestValidator";
 import { WorkerValidator } from "../helper/validate/worker/WorkerValidator";
 import { WorkerHelper } from '../helper/WorkerHelper';
 import { WorkHoursHelper } from "../helper/WorkHoursHelper";
