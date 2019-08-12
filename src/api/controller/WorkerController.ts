@@ -98,7 +98,7 @@ export class WorkerController {
 		}
 	
 		const validator = new WorkerValidator();
-		if (!validator.validateIWorkerCreateRequest(request)) {
+		if (!validator.validate(request)) {
 			return res.status(400).json();
 		}
 	
