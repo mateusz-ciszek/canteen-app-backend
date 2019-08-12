@@ -8,24 +8,11 @@ export class WorkHoursValidator extends Validator<IWorkHoursCreateRequest> {
 			return false;
 		}
 
-		if (!this.isTimeValid(input.start) || !this.isTimeValid(input.end)) {
+		if (!this.validateSimpleTime(input.start) || !this.validateSimpleTime(input.end)) {
 			return false;
 		}
 
 		if (!this.isTimeInOrder(input.start, input.end)) {
-			return false;
-		}
-
-		return true;
-	}
-
-	// TODO: Extract SimpleTimeValidator
-	private isTimeValid(time: ISimpleTime): boolean {
-		if (time.hour < 0 || time.hour > 23) {
-			return false;
-		}
-
-		if (time.minute < 0 || time.minute > 59) {
 			return false;
 		}
 
