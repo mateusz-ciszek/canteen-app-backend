@@ -13,9 +13,9 @@ import { DayOffNotFoundError, DayOffRepository, SaveDayOffCommand } from "../hel
 import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";
 import { SaveUserCommand, UserRepository } from "../helper/repository/UserRepository";
 import { SaveWorkerCommand, WorkerNotFoundError, WorkerRepository } from "../helper/repository/WorkerRepository";
-import { DayOffChangeRequestValidator } from "../helper/validate/DayOffChangeRequestValidator";
-import { DayOffRequestValidator } from "../helper/validate/DayOffRequestValidator";
-import { WorkerValidator } from "../helper/validate/WorkerValidator";
+import { DayOffChangeRequestValidator } from "../helper/validate/worker/DayOffChangeRequestValidator";
+import { DayOffRequestValidator } from "../helper/validate/worker/DayOffRequestValidator";
+import { WorkerValidator } from "../helper/validate/worker/WorkerValidator";
 import { WorkerHelper } from '../helper/WorkerHelper';
 import { WorkHoursHelper } from "../helper/WorkHoursHelper";
 import { IWorkerCreateRequest } from "../interface/worker/create/IWorkerCreateRequest";
@@ -98,7 +98,7 @@ export class WorkerController {
 		}
 	
 		const validator = new WorkerValidator();
-		if (!validator.validateIWorkerCreateRequest(request)) {
+		if (!validator.validate(request)) {
 			return res.status(400).json();
 		}
 	
