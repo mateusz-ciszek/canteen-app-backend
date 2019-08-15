@@ -4,7 +4,7 @@ import { IFoodView } from "../interface/menu/list/IFoodView";
 import { IFoodModel } from "../models/food";
 import { IFoodAdditionView } from "../interface/menu/list/IFoodAdditionView";
 import { IFoodAdditionModel } from "../models/foodAddition";
-import { ExtendedConverter } from "../../common/ExtendedConverter";
+import { ExtendedConverter } from "./ExtendedConverter";
 import { IMenuViewActions } from "../interface/menu/list/IMenuViewActions";
 
 export class MenuListModelToMenuListResponseConverter implements ExtendedConverter<IMenuModel, IMenuView, IMenuViewActions> {

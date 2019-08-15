@@ -1,4 +1,4 @@
-import { Converter } from "../../common/Converter";
+import { Converter } from "./Converter";
 import { IFoodModel } from "../models/food";
 import { IFoodDetailsResponse, IFoodDetailsResponseAddition } from "../interface/food/details/IFoodDetailsResponse";
 import { IFoodAdditionModel } from "../models/foodAddition";

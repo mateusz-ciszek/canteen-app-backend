@@ -1,4 +1,4 @@
-import { Converter } from "../../../common/Converter";
+import { Converter } from "../Converter";
 import { IUserModel } from "../../models/user";
 import { IUserView } from "../../interface/common/IUserView";
 

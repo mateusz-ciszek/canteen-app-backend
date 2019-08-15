@@ -1,4 +1,4 @@
-import { Converter } from "../../../common/Converter";
+import { Converter } from "../Converter";
 import { IPriceModel } from "../../models/Price";
 import { IPriceView } from "../../interface/supply/list/IPriceView";
 

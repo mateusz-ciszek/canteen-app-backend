@@ -1,4 +1,4 @@
-import { Converter } from "../../../common/Converter";
+import { Converter } from "../Converter";
 import { ISimpleTime } from "../../interface/common/ISimpleTime";
 
 export class SimpleTimeToDateConverter implements Converter<ISimpleTime, Date> {

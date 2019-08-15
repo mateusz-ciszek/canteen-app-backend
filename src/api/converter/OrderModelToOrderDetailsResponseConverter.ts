@@ -1,4 +1,4 @@
-import { Converter } from "../../common/Converter";
+import { Converter } from "./Converter";
 import { IFoodAdditionView } from "../interface/menu/list/IFoodAdditionView";
 import { IOrderDetailsResponse } from "../interface/order/details/IOrderDetailsResponse";
 import { IOrderFoodAdditionItemView } from "../interface/order/details/IOrderFoodAdditionItemView";

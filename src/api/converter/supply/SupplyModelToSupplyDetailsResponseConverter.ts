@@ -1,4 +1,4 @@
-import { Converter } from "../../../common/Converter";
+import { Converter } from "../Converter";
 import { ISupplyDetailsResponse } from "../../interface/supply/details/ISupplyDetailsResponse";
 import { ISupplyModel } from "../../models/Supply";
 import { CommentModelToCommentViewConverter } from "../common/CommentModelToCommentViewConverter";

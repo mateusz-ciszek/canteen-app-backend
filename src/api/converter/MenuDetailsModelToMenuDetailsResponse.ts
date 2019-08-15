@@ -1,4 +1,4 @@
-import { Converter } from "../../common/Converter";
+import { Converter } from "./Converter";
 import { IMenuModel } from "../models/menu";
 import { IMenuDetailsResponse } from "../interface/menu/details/IMenuDetailsResponse";
 import { IFoodModel } from "../models/food";

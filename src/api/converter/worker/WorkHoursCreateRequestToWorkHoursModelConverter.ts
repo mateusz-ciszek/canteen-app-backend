@@ -1,4 +1,4 @@
-import { Converter } from "../../../common/Converter";
+import { Converter } from "../Converter";
 import { IWorkHoursCreateRequest } from "../../interface/worker/create/IWorkHoursCreateRequest";
 import { IWorkHoursModel, WorkHours } from "../../models/workHours";
 import { SimpleTimeToDateConverter } from "../common/SimpleTimeToDateConverter";

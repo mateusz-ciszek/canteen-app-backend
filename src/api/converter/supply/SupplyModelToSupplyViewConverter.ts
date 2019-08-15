@@ -1,4 +1,4 @@
-import { Converter } from "../../../common/Converter";
+import { Converter } from "../Converter";
 import { ISupplyModel } from "../../models/Supply";
 import { ISupplyView } from "../../interface/supply/list/ISupplyView";
 

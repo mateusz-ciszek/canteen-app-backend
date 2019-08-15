@@ -1,4 +1,4 @@
-import { Converter } from "../../../common/Converter";
+import { Converter } from "../Converter";
 import { IDayOffModel } from "../../models/DayOff";
 import { IDayOffDetails } from "../../interface/worker/details/IDayOffDetails";
 import { UserModelToUserViewConverter } from "../common/UserModelToUserViewConverter";
