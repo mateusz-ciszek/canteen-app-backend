@@ -1,6 +1,6 @@
 import { DayOffState } from "../../interface/DayOffStatus";
 import { IWorkHours } from "../../interface/workHours";
-import { DayOffModelToDayOffRequestConverter } from "../converter/DayOffModelToDayOffRequestConverter";
+import { DayOffModelToDayOffRequestConverter } from "../converter/worker/DayOffModelToDayOffRequestConverter";
 import { WorkerModelToWorkerViewConverter } from "../converter/worker/WorkerModelToWorkerViewConverter";
 import { IDay } from "../interface/worker/month/IDay";
 import { IMonthGetResponse } from "../interface/worker/month/IMonthGetResponse";

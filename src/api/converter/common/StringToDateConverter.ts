@@ -1,4 +1,4 @@
-import { Converter } from "../../../common/Converter";
+import { Converter } from "../Converter";
 import { Validator } from "../../helper/validate/Validator";
 
 export class StringToDateConverter implements Converter<string, Date> {

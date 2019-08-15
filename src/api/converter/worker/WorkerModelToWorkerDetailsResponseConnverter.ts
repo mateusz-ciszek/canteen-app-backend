@@ -1,4 +1,4 @@
-import { ExtendedConverter } from "../../../common/ExtendedConverter";
+import { ExtendedConverter } from "../ExtendedConverter";
 import { IWorkerModel } from "../../models/worker";
 import { IWorkerDetailsResponse } from "../../interface/worker/details/IWorkerDetailsResponse";
 import { IDayOffModel } from "../../models/DayOff";

@@ -1,4 +1,4 @@
-import { Converter } from "../../../common/Converter";
+import { Converter } from "../Converter";
 import { IWorkHoursModel } from "../../models/workHours";
 import { IWorkDayDetails } from "../../interface/worker/details/IWorkDayDetails";
 

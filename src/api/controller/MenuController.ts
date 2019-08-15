@@ -1,6 +1,6 @@
 import { IRequest, Response } from "../../models/Express";
-import { MenuDetailsModelToMenuDetailsResponseConverter } from "../converter/MenuDetailsModelToMenuDetailsResponse";
-import { MenuListModelToMenuListResponseConverter } from "../converter/MenuListModelToMenuListResponseConverter";
+import { MenuDetailsModelToMenuDetailsResponseConverter } from "../converter/menu/MenuDetailsModelToMenuDetailsResponse";
+import { MenuListModelToMenuListResponseConverter } from "../converter/menu/MenuListModelToMenuListResponseConverter";
 import { PermissionUtil } from "../helper/PermissionUtil";
 import { FoodRepository } from "../helper/repository/FoodRepository";
 import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";

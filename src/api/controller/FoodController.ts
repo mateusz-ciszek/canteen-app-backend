@@ -1,5 +1,5 @@
 import { IRequest, Response } from "../../models/Express";
-import { FoodModelToFoodDetailsResponseConverter } from "../converter/FoodModelToFoodDetailsResponseConverter";
+import { FoodModelToFoodDetailsResponseConverter } from "../converter/food/FoodModelToFoodDetailsResponseConverter";
 import { FoodNotFoundError, FoodRepository } from "../helper/repository/FoodRepository";
 import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";
 import { MenuRepository } from "../helper/repository/MenuRepository";

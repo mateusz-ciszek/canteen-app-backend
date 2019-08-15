@@ -1,4 +1,4 @@
-import { Converter } from "../../../common/Converter";
+import { Converter } from "../Converter";
 import { IWorkerModel } from "../../models/worker";
 import { IWorkerView } from "../../interface/worker/month/IWorkerView";
 import { UserModelToUserViewConverter } from "../common/UserModelToUserViewConverter";

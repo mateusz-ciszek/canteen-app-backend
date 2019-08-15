@@ -1,7 +1,7 @@
-import { Converter } from "../../common/Converter";
-import { IFoodModel } from "../models/food";
-import { IFoodDetailsResponse, IFoodDetailsResponseAddition } from "../interface/food/details/IFoodDetailsResponse";
-import { IFoodAdditionModel } from "../models/foodAddition";
+import { Converter } from "../Converter";
+import { IFoodModel } from "../../models/food";
+import { IFoodDetailsResponse, IFoodDetailsResponseAddition } from "../../interface/food/details/IFoodDetailsResponse";
+import { IFoodAdditionModel } from "../../models/foodAddition";
 
 export class FoodModelToFoodDetailsResponseConverter implements Converter<IFoodModel, IFoodDetailsResponse> {
 	convert(input: IFoodModel): IFoodDetailsResponse {
