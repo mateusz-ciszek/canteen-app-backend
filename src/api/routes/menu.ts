@@ -1,9 +1,8 @@
 import express from 'express';
-import { createFood } from '../controller/menu';
+import { MenuController } from '../controller/MenuController';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
 import { PermissionValidator } from '../middleware/PermissionValidator';
-import { MenuController } from '../controller/MenuController';
 
 export const router = express.Router();
 const permissionValidator = new PermissionValidator();
@@ -69,7 +68,7 @@ router.post('/:menuId/food',
 		checkAuth,
 		isAdmin,
 		(req ,res, next) => permissionValidator.checkPermission('P_MENU_FOOD_CREATE')(req, res, next),
-		createFood);
+		(req, res) => controller.createFood(req, res));
 
 /**
  * DELETE - Remove menu with all its contents
