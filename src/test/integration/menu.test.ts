@@ -7,6 +7,7 @@ import { DatabaseTestHelper } from '../testHelpers/databaseHelper';
 import { FoodTestHelper } from '../testHelpers/foodHelper';
 import { MenuTestHelper } from '../testHelpers/menuHelper';
 import { TokenTestHelper } from '../testHelpers/tokenHelper';
+import { IFoodCreateRequest } from '../../api/interface/menu/create/IFoodCreateRequest';
 
 describe('Menu', () => {
 	const dbHelper = new DatabaseTestHelper();
@@ -113,6 +114,12 @@ describe('Menu', () => {
 		describe('#addFood', () => {
 			const foodTestHelper = new FoodTestHelper();
 			let url: string;
+			let payload: IFoodCreateRequest = {
+				name: 'food name',
+				price: 5,
+				description: '',
+				additions: [],
+			};
 
 			const malformedRequest = foodTestHelper.getMalformedCreateFoodRequest();
 
@@ -133,10 +140,20 @@ describe('Menu', () => {
 						.expect(403);
 			});
 
-			it('should get 404 when adding food to non existing menu', async () => {
+			it('should get 400 when adding food to menu with invalid id', async () => {
 				const wrongUrl = `${endpoint}/wrongUserId/food`;
 				return request(app)
 						.post(wrongUrl)
+						.send(payload)
+						.set('Authorization', `Bearer ${adminToken}`)
+						.expect(400);
+			});
+
+			it('should get 404 when adding food to non existing menu', async () => {
+				const wrongUrl = `${endpoint}/${dbHelper.generateObjectId()}/food`;
+				return request(app)
+						.post(wrongUrl)
+						.send(payload)
 						.set('Authorization', `Bearer ${adminToken}`)
 						.expect(404);
 			});
