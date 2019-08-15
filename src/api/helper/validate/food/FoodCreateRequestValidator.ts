@@ -18,6 +18,6 @@ export class FoodCreateRquestValidator extends Validator<IFoodCreateRequest> {
 			return false;
 		}
 
-		return input.additions.some(addition => !this.additionValidator.validate(addition));
+		return !input.additions.some(addition => !this.additionValidator.validate(addition));
 	}
 }

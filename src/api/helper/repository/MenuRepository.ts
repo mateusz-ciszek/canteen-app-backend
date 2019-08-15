@@ -75,6 +75,10 @@ export class MenuRepository {
 			throw err;
 		}
 	}
+
+	async addFood(menuId: string, foodId: string): Promise<void> {
+		await Menu.findByIdAndUpdate(menuId, { $push: { foods: foodId } }).exec();
+	}
 }
 
 export class MenuNotFoundError extends Error {
