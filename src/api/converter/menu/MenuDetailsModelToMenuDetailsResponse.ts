@@ -1,8 +1,8 @@
-import { Converter } from "./Converter";
-import { IMenuModel } from "../models/menu";
-import { IMenuDetailsResponse } from "../interface/menu/details/IMenuDetailsResponse";
-import { IFoodModel } from "../models/food";
-import { ISimpleFoodView } from "../interface/menu/details/IFoodView";
+import { Converter } from "../Converter";
+import { IMenuModel } from "../../models/menu";
+import { IMenuDetailsResponse } from "../../interface/menu/details/IMenuDetailsResponse";
+import { IFoodModel } from "../../models/food";
+import { ISimpleFoodView } from "../../interface/menu/details/IFoodView";
 
 export class MenuDetailsModelToMenuDetailsResponseConverter implements Converter<IMenuModel, IMenuDetailsResponse> {
 	convert(input: IMenuModel): IMenuDetailsResponse {

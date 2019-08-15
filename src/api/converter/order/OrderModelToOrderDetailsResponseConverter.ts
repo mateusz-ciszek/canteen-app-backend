@@ -1,17 +1,17 @@
-import { Converter } from "./Converter";
-import { IFoodAdditionView } from "../interface/menu/list/IFoodAdditionView";
-import { IOrderDetailsResponse } from "../interface/order/details/IOrderDetailsResponse";
-import { IOrderFoodAdditionItemView } from "../interface/order/details/IOrderFoodAdditionItemView";
-import { IOrderFoodItemView } from "../interface/order/details/IOrderFoodItemView";
-import { IOrderStateView } from "../interface/order/details/IOrderStateView";
-import { ISimpleFoodView } from "../interface/order/details/ISimpleFoodView";
-import { IFoodModel } from "../models/food";
-import { IFoodAdditionModel } from "../models/foodAddition";
-import { IOrderModel } from "../models/order";
-import { IOrderItemModel } from "../models/orderItem";
-import { IOrderItemAdditionModel } from "../models/orderItemAddition";
-import { IOrderStateModel } from "../models/orderState";
-import { UserModelToUserViewConverter } from "./common/UserModelToUserViewConverter";
+import { Converter } from "../Converter";
+import { IFoodAdditionView } from "../../interface/menu/list/IFoodAdditionView";
+import { IOrderDetailsResponse } from "../../interface/order/details/IOrderDetailsResponse";
+import { IOrderFoodAdditionItemView } from "../../interface/order/details/IOrderFoodAdditionItemView";
+import { IOrderFoodItemView } from "../../interface/order/details/IOrderFoodItemView";
+import { IOrderStateView } from "../../interface/order/details/IOrderStateView";
+import { ISimpleFoodView } from "../../interface/order/details/ISimpleFoodView";
+import { IFoodModel } from "../../models/food";
+import { IFoodAdditionModel } from "../../models/foodAddition";
+import { IOrderModel } from "../../models/order";
+import { IOrderItemModel } from "../../models/orderItem";
+import { IOrderItemAdditionModel } from "../../models/orderItemAddition";
+import { IOrderStateModel } from "../../models/orderState";
+import { UserModelToUserViewConverter } from "../common/UserModelToUserViewConverter";
 
 export class OrderModelToOrderDetailsResponseConverter implements Converter<IOrderModel, IOrderDetailsResponse> {
 	userConverter = new UserModelToUserViewConverter();
