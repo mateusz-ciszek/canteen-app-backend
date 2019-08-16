@@ -4,7 +4,7 @@ import { IWorkerModel } from "./worker";
 
 export interface IDayOffModel extends Document, IDayOff {
 	worker: IWorkerModel;
-	approvedBy: IWorkerModel;
+	resolvedBy: IWorkerModel;
 }
 
 export const DayOffSchema: Schema = new Schema({

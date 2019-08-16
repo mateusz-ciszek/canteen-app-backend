@@ -9,7 +9,7 @@ import { DayOffHelper } from "../helper/DayOffHelper";
 import { EmailFactory } from "../helper/EmailFactory";
 import { IPasswordFactory } from "../helper/IPasswordFactory";
 import { PasswordFactoryImpl } from "../helper/PasswordFactoryImpl";
-import { DayOffNotFoundError, DayOffRepository, SaveDayOffCommand } from "../helper/repository/DayOffRepository";
+import { DayOffNotFoundError, DayOffRepository, SaveDayOffCommand, DayOffFilter } from "../helper/repository/DayOffRepository";
 import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";
 import { SaveUserCommand, UserRepository } from "../helper/repository/UserRepository";
 import { SaveWorkerCommand, WorkerNotFoundError, WorkerRepository } from "../helper/repository/WorkerRepository";
@@ -141,7 +141,10 @@ export class WorkerController {
 			return res.status(500).json();
 		}
 
-		const dayOffRequests = await this.dayOffRepository.findAllDayOffRequestsByWorkerId(request.workerId);
+		const filter: DayOffFilter = {
+			workerId: request.workerId,
+		};
+		const dayOffRequests = await this.dayOffRepository.find(filter);
 		const converter = new WorkerModelToWorkerDetailsResponseConverter();
 		const response = converter.convert(worker, dayOffRequests);
 	
