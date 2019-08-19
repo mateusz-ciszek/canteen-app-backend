@@ -17,6 +17,7 @@ export class WorkerHelper {
 	private repository = new DayOffRepository();
 	private dateUtil = new DateUtil();
 	private workerConverter = new WorkerViewToWorkerCalendarViewConverter();
+	private dayOffConverter = new DayOffModelToDayOffRequestConverter();
 
 	async calculateMonth(request: IMonthRequest, workers: IWorkerModel[]): Promise<IMonthGetResponse> {
 		const defaultWeek = this.calculateDefaultWeek(workers);
@@ -41,12 +42,11 @@ export class WorkerHelper {
 						.filter(worker => !acceptedDaysOff[worker.id].find(dayOff => this.dateUtil.equal(day, dayOff.date)))
 						.map(worker => this.workerConverter.convert(worker, worker.defaultWorkHours[dayIndex]));
 
-				const requests = await this.getDaysOff(day.getFullYear(), day.getMonth(), day.getDate(), ['UNRESOLVED']);
-				const converter = new DayOffModelToDayOffRequestConverter();
+				const requests = await this.getUnresolvedDaysOff(day.getFullYear(), day.getMonth(), day.getDate());
 
 				const dayDetails: IDay = { 
 					workersPresent,
-					requests: requests.map(model => converter.convert(model)),
+					requests: requests.map(model => this.dayOffConverter.convert(model)),
 				};
 
 				month.weeks[weekIndex][day.toISOString()] = dayDetails;
@@ -76,10 +76,10 @@ export class WorkerHelper {
 		return !(day.startHour.getHours() === day.endHour.getHours() && day.startHour.getMinutes() === day.endHour.getMinutes());
 	}
 
-	private getDaysOff(year: number, month: number, day: number, states?: DayOffState[]): Promise<IDayOffModel[]> {
+	private getUnresolvedDaysOff(year: number, month: number, day: number): Promise<IDayOffModel[]> {
 		const filter: DayOffFilter = {
 			date: this.dateUtil.createDate(year, month, day),
-			states: states,
+			states: ['UNRESOLVED'],
 		};
 
 		return this.repository.find(filter);
