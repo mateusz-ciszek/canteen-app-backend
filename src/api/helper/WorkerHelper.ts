@@ -1,17 +1,23 @@
-import { DayOffState } from "../../interface/DayOffStatus";
 import { IWorkHours } from "../../interface/workHours";
 import { DayOffModelToDayOffRequestConverter } from "../converter/worker/DayOffModelToDayOffRequestConverter";
 import { WorkerModelToWorkerViewConverter } from "../converter/worker/WorkerModelToWorkerViewConverter";
+import { WorkerViewToWorkerCalendarViewConverter } from "../converter/worker/WorkerViewToWorkerCalendarViewConverter";
 import { IDay } from "../interface/worker/month/IDay";
 import { IMonthGetResponse } from "../interface/worker/month/IMonthGetResponse";
 import { IMonthRequest } from "../interface/worker/month/IMonthRequest";
 import { IWorkDayDetails } from "../interface/worker/month/IWorkDayDetails";
-import { IWorkerCalendarView } from "../interface/worker/month/IWorkerCalendarView";
-import { DayOff, IDayOffModel } from "../models/DayOff";
+import { IDayOffModel } from "../models/DayOff";
 import { IWorkerModel } from '../models/worker';
 import { CalendarHelper } from "./CalendarHelper";
+import { DateUtil } from "./DateUtil";
+import { DayOffFilter, DayOffRepository } from "./repository/DayOffRepository";
 
 export class WorkerHelper {
+	private repository = new DayOffRepository();
+	private dateUtil = new DateUtil();
+	private workerConverter = new WorkerViewToWorkerCalendarViewConverter();
+	private dayOffConverter = new DayOffModelToDayOffRequestConverter();
+
 	async calculateMonth(request: IMonthRequest, workers: IWorkerModel[]): Promise<IMonthGetResponse> {
 		const defaultWeek = this.calculateDefaultWeek(workers);
 		const acceptedDaysOff: { [workerId: string]: IDayOffModel[] } = {};
@@ -31,19 +37,15 @@ export class WorkerHelper {
 				const day = week[dayIndex];
 
 				const defaultForDay = defaultWeek[day.getDay()];
-				const workersPresent =  defaultForDay.workers.filter(worker => !acceptedDaysOff[worker.id].find(dayOff => this.equalDates(day, dayOff.date)))
-					.map<IWorkerCalendarView>(worker => ({ // FIXME: Move to a converter
-						id: worker.id,
-						person: worker.person,
-						workHours: worker.defaultWorkHours[dayIndex],
-					}));
+				const workersPresent = defaultForDay.workers
+						.filter(worker => !acceptedDaysOff[worker.id].find(dayOff => this.dateUtil.equal(day, dayOff.date)))
+						.map(worker => this.workerConverter.convert(worker, worker.defaultWorkHours[dayIndex]));
 
-				const requests = await this.getDaysOff(day.getFullYear(), day.getMonth(), day.getDate(), ['UNRESOLVED']);
-				const converter = new DayOffModelToDayOffRequestConverter();
+				const requests = await this.getUnresolvedDaysOff(day.getFullYear(), day.getMonth(), day.getDate());
 
 				const dayDetails: IDay = { 
 					workersPresent,
-					requests: requests.map(model => converter.convert(model)),
+					requests: requests.map(model => this.dayOffConverter.convert(model)),
 				};
 
 				month.weeks[weekIndex][day.toISOString()] = dayDetails;
@@ -73,36 +75,28 @@ export class WorkerHelper {
 		return !(day.startHour.getHours() === day.endHour.getHours() && day.startHour.getMinutes() === day.endHour.getMinutes());
 	}
 
-	private getDaysOff(year: number, month: number, day: number, states?: DayOffState[]): Promise<IDayOffModel[]> {
-		return DayOff.find({
-			date: new Date(year, month, day, 0, 0, 0, 0),
-			state: {
-				$in: states
-			},
-		}).populate({
-			path: 'worker',
-			populate: {
-				path: 'person',
-				select: '_id firstName lastName email',
-			},
-		}).exec();
-	}
+	private getUnresolvedDaysOff(year: number, month: number, day: number): Promise<IDayOffModel[]> {
+		const filter: DayOffFilter = {
+			date: this.dateUtil.createDate(year, month, day),
+			states: ['UNRESOLVED'],
+		};
 
-	private equalDates(date: Date, other: Date): boolean {
-		return date.getFullYear() === other.getFullYear() && date.getMonth() === other.getMonth() && date.getDate() === other.getDate();
+		return this.repository.find(filter);
 	}
 
 	private async getAcceptedDaysOff(year: number, month: number, workerId: string): Promise<IDayOffModel[]> {
-		const startDate = new Date(year, month, 1, 0, 0, 0, 0);
-		const endDate = new Date(year, month + 1, 1, 0, 0, 0, 0);
+		const startDate = this.dateUtil.createDate(year, month, 1);
+		const endDate = this.dateUtil.createDate(year, month + 1, 1);
 
-		return DayOff.find({
-			date: {
-				$gte: startDate,
-				$lt: endDate,
+		const filter: DayOffFilter = {
+			dateRange: {
+				dateFrom: startDate,
+				dateTo: endDate,
 			},
-			worker: workerId,
-			state: 'APPROVED',
-		}).select('date').exec();
+			states: ['APPROVED'],
+			workerId: workerId,
+		};
+
+		return this.repository.find(filter);
 	}
 }

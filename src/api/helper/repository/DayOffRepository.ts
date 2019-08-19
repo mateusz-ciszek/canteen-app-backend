@@ -1,8 +1,9 @@
-import { IWorkerModel } from "../../models/worker";
+import { DocumentQuery } from "mongoose";
+import { DayOffState } from "../../../interface/DayOffStatus";
 import { DayOff, IDayOffModel } from "../../models/DayOff";
+import { IWorkerModel } from "../../models/worker";
 import { MongooseUtil } from "../MongooseUtil";
 import { InvalidObjectIdError } from "./InvalidObjectIdError";
-import { ObjectId } from "bson";
 
 export class DayOffRepository {
 	private mongooseUtil = new MongooseUtil();
@@ -36,8 +37,8 @@ export class DayOffRepository {
 		return dayOff;
 	}
 
-	async findAllDayOffRequestsByWorkerId(id: string): Promise<IDayOffModel[]> {
-		return DayOff.find({ worker: new ObjectId(id) })
+	async find(filter: DayOffFilter): Promise<IDayOffModel[]> {
+		return this.prepareQuery(filter)
 				.populate({
 					path: 'worker resolvedBy',
 					populate: {
@@ -45,6 +46,29 @@ export class DayOffRepository {
 					},
 				})
 				.exec();
+	}
+
+	private prepareQuery(filter: DayOffFilter): DocumentQuery<IDayOffModel[], IDayOffModel, {}> {
+		const query = DayOff.find();
+
+		if (filter.workerId) {
+			query.find({ worker: filter.workerId });
+		}
+		if (filter.states) {
+			query.find({ state: { $in: filter.states } });
+		}
+		if (filter.date) {
+			query.find({ date: filter.date });
+		} else if (filter.dateRange) {
+			if (filter.dateRange.dateFrom) {
+				query.find({ date: { $gt: filter.dateRange.dateFrom } });
+			}
+			if (filter.dateRange.dateTo) {
+				query.find({ date: { $lt: filter.dateRange.dateTo } });
+			}
+		}
+
+		return query;
 	}
 }
 
@@ -57,4 +81,14 @@ export class DayOffNotFoundError extends Error {
 export interface SaveDayOffCommand {
 	worker: IWorkerModel;
 	date: Date;
+}
+
+export interface DayOffFilter {
+	date?: Date;
+	dateRange?: {
+		dateFrom?: Date;
+		dateTo?: Date;
+	}
+	workerId?: string;
+	states?: DayOffState[];
 }
