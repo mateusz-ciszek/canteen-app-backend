@@ -1,10 +1,13 @@
-import express from 'express';
+import { Router } from 'express';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
 import { ConfigController } from '../controller/ConfigController';
 
-export const router = express.Router();
+export const ConfigRouter = Router();
 
 const controller = new ConfigController();
 
-router.get('/', checkAuth, isAdmin, (req, res, next) => controller.getConfig(req, res, next));
+ConfigRouter.get('/',
+		checkAuth,
+		isAdmin,
+		(req, res, next) => controller.getConfig(req, res, next));

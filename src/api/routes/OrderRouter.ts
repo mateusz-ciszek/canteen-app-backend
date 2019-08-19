@@ -1,24 +1,25 @@
-import express from 'express';
+import { Router } from 'express';
+import { OrderController } from '../controller/OrderController';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
 import { PermissionValidator } from '../middleware/PermissionValidator';
-import { OrderController } from '../controller/OrderController';
 
-export const router = express.Router();
+export const OrderRouter = Router();
+
 const permissionValidator = new PermissionValidator();
 const controller = new OrderController();
 
 /**
  * POST - Składanie nowego zamówienia
  */
-router.post('/',
+OrderRouter.post('/',
 		checkAuth,
 		(req, res) => controller.createOrder(req, res));
 
 /**
  * GET - Pobierz wszystkie zamówienia
  */
-router.get('/',
+OrderRouter.get('/',
 		checkAuth,
 		isAdmin,
 		(req, res, next) => permissionValidator.checkPermission('P_ORDER_LIST_VIEW')(req, res, next),
@@ -27,7 +28,7 @@ router.get('/',
 /**
  * Modyfikacja statusu zamówienia
  */
-router.patch('/:id',
+OrderRouter.patch('/:id',
 		checkAuth,
 		isAdmin,
 		(req, res) => controller.updateOrderState(req, res));
@@ -35,7 +36,7 @@ router.patch('/:id',
 /**
  * GET - Download order details
  */
-router.get('/:id', 
+OrderRouter.get('/:id', 
 		checkAuth, 
 		isAdmin, 
 		(req, res, next) => permissionValidator.checkPermission('P_ORDER_DETAILS_VIEW')(req, res, next),
