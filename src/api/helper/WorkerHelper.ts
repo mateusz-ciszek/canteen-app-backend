@@ -1,4 +1,3 @@
-import { DayOffState } from "../../interface/DayOffStatus";
 import { IWorkHours } from "../../interface/workHours";
 import { DayOffModelToDayOffRequestConverter } from "../converter/worker/DayOffModelToDayOffRequestConverter";
 import { WorkerModelToWorkerViewConverter } from "../converter/worker/WorkerModelToWorkerViewConverter";
