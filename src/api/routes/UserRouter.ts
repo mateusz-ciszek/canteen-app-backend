@@ -1,13 +1,14 @@
-import express from 'express';
+import { Router } from 'express';
 import { UserController } from '../controller/UserController';
 
-export const router = express.Router();
+export const UserRouter = Router();
+
 const controller = new UserController();
 
 /**
  * POST - register new user
  */
-router.post('/signup',
+UserRouter.post('/signup',
 		(req, res) => controller.registerUser(req, res));
 
 /**
@@ -15,5 +16,5 @@ router.post('/signup',
  * 
  * @returns token on success
  */
-router.post('/login', 
+UserRouter.post('/login', 
 		(req, res) => controller.loginUser(req, res));

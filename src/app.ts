@@ -1,19 +1,18 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import { ConfigRouter } from './api/routes/ConfigRouter';
+import { FoodRouter } from './api/routes/FoodRouter';
+import { MenuRouter } from './api/routes/MenuRouter';
+import { OrderRouter } from './api/routes/OrderRouter';
+import { SupplyRouter } from './api/routes/SupplyRouter';
+import { UserRouter } from './api/routes/UserRouter';
+import { WorkerRouter } from './api/routes/WorkerRouter';
+import { HttpError } from './models/HttpError';
 import express = require('express');
 import morgan = require('morgan');
 import bodyParser = require('body-parser');
 import mongoose = require('mongoose');
 
 export const app = express();
-
-import { router as ConfigRoutes } from './api/routes/config';
-import { router as usersRoutes } from './api/routes/user';
-import { router as menuRoutes } from './api/routes/menu';
-import { router as foodRoutes } from './api/routes/food';
-import { router as orderRoutes } from './api/routes/order';
-import { router as workerRoutes } from './api/routes/worker';
-import { router as supplyRoutes } from './api/routes/supply';
-import { HttpError } from './models/HttpError';
 
 // Połączenie z bazą danych Mongo Atlas
 mongoose.connect(
@@ -42,13 +41,13 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 // Główne ścieżki API
-app.use('/config', ConfigRoutes);
-app.use('/user', usersRoutes);
-app.use('/menu', menuRoutes);
-app.use('/food', foodRoutes);
-app.use('/order', orderRoutes);
-app.use('/worker', workerRoutes);
-app.use('/supply', supplyRoutes);
+app.use('/config', ConfigRouter);
+app.use('/user', UserRouter);
+app.use('/menu', MenuRouter);
+app.use('/food', FoodRouter);
+app.use('/order', OrderRouter);
+app.use('/worker', WorkerRouter);
+app.use('/supply', SupplyRouter);
 
 /**
  * Obsługa błędów

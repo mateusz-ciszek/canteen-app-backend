@@ -1,10 +1,11 @@
-import express from 'express';
+import { Router } from 'express';
 import { MenuController } from '../controller/MenuController';
 import { checkAuth } from '../middleware/check-auth';
 import { isAdmin } from '../middleware/check-role';
 import { PermissionValidator } from '../middleware/PermissionValidator';
 
-export const router = express.Router();
+export const MenuRouter = Router();
+
 const permissionValidator = new PermissionValidator();
 const controller = new MenuController();
 
@@ -35,13 +36,13 @@ const controller = new MenuController();
  *   }
  * ]
  */
-router.get('/',
+MenuRouter.get('/',
 		(req, res) => controller.getAllMenus(req, res));
 
 /**
  * GET - pobierz config dla modułu menu
  */
-router.get('/config',
+MenuRouter.get('/config',
 		checkAuth,
 		isAdmin,
 		(req, res) => controller.getConfig(req, res));
@@ -49,13 +50,13 @@ router.get('/config',
 /**
  * GET - Pobierz menu o podanym ID
  */
-router.get('/:id',
+MenuRouter.get('/:id',
 		(req, res) => controller.getManuDetails(req, res));
 
 /**
  * POST - Zapytanie dodające nowe menu do bazy
  */
-router.post('/',
+MenuRouter.post('/',
 		checkAuth,
 		isAdmin,
 		(req, res, next) => permissionValidator.checkPermission('P_MENU_CREATE')(req, res, next),
@@ -64,7 +65,7 @@ router.post('/',
 /**
  * POST - Dodaj nowy posiłek do menu
  */
-router.post('/:menuId/food',
+MenuRouter.post('/:menuId/food',
 		checkAuth,
 		isAdmin,
 		(req ,res, next) => permissionValidator.checkPermission('P_MENU_FOOD_CREATE')(req, res, next),
@@ -73,7 +74,7 @@ router.post('/:menuId/food',
 /**
  * DELETE - Remove menu with all its contents
  */
-router.delete('/',
+MenuRouter.delete('/',
 		checkAuth,
 		isAdmin,
 		(req, res, next) => permissionValidator.checkPermission('P_MENU_DELETE')(req, res, next),
@@ -82,7 +83,7 @@ router.delete('/',
 /**
  * PATCH - Update menu name
  */
-router.patch('/:id',
+MenuRouter.patch('/:id',
 		checkAuth,
 		isAdmin,
 		(req, res, next) => permissionValidator.checkPermission('P_MENU_MODIFY')(req, res, next),
