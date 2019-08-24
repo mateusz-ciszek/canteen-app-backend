@@ -1,5 +1,5 @@
-import { IUserModel, User } from "../../models/user";
-import { MongooseUtil } from "../MongooseUtil";
+import { IUserModel, User } from "../models/user";
+import { MongooseUtil } from "../helper/MongooseUtil";
 import { DocumentQuery } from "mongoose";
 
 export class UserRepository {

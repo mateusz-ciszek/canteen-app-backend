@@ -10,7 +10,7 @@ import { IDayOffModel } from "../models/DayOff";
 import { IWorkerModel } from '../models/worker';
 import { CalendarHelper } from "./CalendarHelper";
 import { DateUtil } from "./DateUtil";
-import { DayOffFilter, DayOffRepository } from "./repository/DayOffRepository";
+import { DayOffFilter, DayOffRepository } from "../repository/DayOffRepository";
 
 export class WorkerHelper {
 	private repository = new DayOffRepository();

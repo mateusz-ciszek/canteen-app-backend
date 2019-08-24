@@ -1,5 +1,5 @@
-import { ISimpleTime } from "../../../interface/common/ISimpleTime";
-import { IWorkHoursCreateRequest } from "../../../interface/worker/create/IWorkHoursCreateRequest";
+import { ISimpleTime } from "../../interface/common/ISimpleTime";
+import { IWorkHoursCreateRequest } from "../../interface/worker/create/IWorkHoursCreateRequest";
 import { Validator } from "../Validator";
 
 export class WorkHoursValidator extends Validator<IWorkHoursCreateRequest> {

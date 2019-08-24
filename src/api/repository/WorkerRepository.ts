@@ -1,9 +1,9 @@
 import { UpdateWriteOpResult } from "mongodb";
 import { Error as MongooseError } from 'mongoose';
-import { Permission } from "../../../interface/Permission";
-import { IWorkerModel, Worker } from "../../models/worker";
-import { IWorkHoursModel } from '../../models/workHours';
-import { MongooseUtil } from "../MongooseUtil";
+import { Permission } from "../../interface/Permission";
+import { IWorkerModel, Worker } from "../models/worker";
+import { IWorkHoursModel } from '../models/workHours';
+import { MongooseUtil } from "../helper/MongooseUtil";
 import { InvalidObjectIdError } from "./InvalidObjectIdError";
 
 export class WorkerRepository {

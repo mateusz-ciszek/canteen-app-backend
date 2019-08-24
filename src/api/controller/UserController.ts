@@ -1,8 +1,8 @@
 import { IRequest, Response } from "../../models/Express";
 import { BcryptUtil } from "../helper/BcryptUtil";
 import { JsonWebTokenData, JwtUtil } from "../helper/JwtUtil";
-import { SaveUserCommand, UserRepository } from "../helper/repository/UserRepository";
-import { UserRegisterRequestValidator } from "../helper/validate/user/UserRegisterRequestValidator";
+import { SaveUserCommand, UserRepository } from "../repository/UserRepository";
+import { UserRegisterRequestValidator } from "../validate/user/UserRegisterRequestValidator";
 import { ILoginRequest } from "../interface/user/login/ILoginRequest";
 import { ILoginResponse } from "../interface/user/login/ILoginResponse";
 import { IRegisterUser } from "../interface/user/register/IRegisterUserRequest";

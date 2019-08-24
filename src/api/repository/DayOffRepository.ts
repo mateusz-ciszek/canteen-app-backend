@@ -1,8 +1,8 @@
 import { DocumentQuery } from "mongoose";
-import { DayOffState } from "../../../interface/DayOffStatus";
-import { DayOff, IDayOffModel } from "../../models/DayOff";
-import { IWorkerModel } from "../../models/worker";
-import { MongooseUtil } from "../MongooseUtil";
+import { DayOffState } from "../../interface/DayOffStatus";
+import { DayOff, IDayOffModel } from "../models/DayOff";
+import { IWorkerModel } from "../models/worker";
+import { MongooseUtil } from "../helper/MongooseUtil";
 import { InvalidObjectIdError } from "./InvalidObjectIdError";
 
 export class DayOffRepository {

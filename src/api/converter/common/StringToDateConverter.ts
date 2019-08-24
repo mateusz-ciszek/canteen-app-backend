@@ -1,5 +1,5 @@
 import { Converter } from "../Converter";
-import { Validator } from "../../helper/validate/Validator";
+import { Validator } from "../../validate/Validator";
 
 export class StringToDateConverter implements Converter<string, Date> {
 	private validator = new class extends Validator<any> {

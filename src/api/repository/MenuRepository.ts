@@ -1,6 +1,6 @@
-import { IMenuCreateRequest } from "../../interface/menu/create/IMenuCreateRequest";
-import { IMenuModel, Menu } from "../../models/menu";
-import { MongooseUtil } from "../MongooseUtil";
+import { IMenuCreateRequest } from "../interface/menu/create/IMenuCreateRequest";
+import { IMenuModel, Menu } from "../models/menu";
+import { MongooseUtil } from "../helper/MongooseUtil";
 import { FoodRepository } from "./FoodRepository";
 import { InvalidObjectIdError } from "./InvalidObjectIdError";
 

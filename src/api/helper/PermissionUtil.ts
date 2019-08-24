@@ -1,5 +1,5 @@
 import { Permission } from "../../interface/Permission";
-import { WorkerRepository } from "./repository/WorkerRepository";
+import { WorkerRepository } from "../repository/WorkerRepository";
 import { IWorkerModel } from "../models/worker";
 
 export class PermissionUtil {

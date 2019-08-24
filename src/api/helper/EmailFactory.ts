@@ -1,4 +1,4 @@
-import { UserRepository } from "./repository/UserRepository";
+import { UserRepository } from "../repository/UserRepository";
 
 export class EmailFactory {
 	private userRepository = new UserRepository();

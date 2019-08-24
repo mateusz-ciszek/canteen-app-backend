@@ -1,5 +1,5 @@
 import { Validator } from "../Validator";
-import { IMenuCreateRequest } from "../../../interface/menu/create/IMenuCreateRequest";
+import { IMenuCreateRequest } from "../../interface/menu/create/IMenuCreateRequest";
 import { FoodCreateRquestValidator } from "../food/FoodCreateRequestValidator";
 
 export class MenuCreateRequestValidator extends Validator<IMenuCreateRequest> {

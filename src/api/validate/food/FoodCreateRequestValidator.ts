@@ -1,5 +1,5 @@
 import { Validator } from "../Validator";
-import { IFoodCreateRequest } from "../../../interface/menu/create/IFoodCreateRequest";
+import { IFoodCreateRequest } from "../../interface/menu/create/IFoodCreateRequest";
 import { FoodAdditionCreateRequestValidator } from "./FoodAdditionCreateRequestValidator";
 
 export class FoodCreateRquestValidator extends Validator<IFoodCreateRequest> {

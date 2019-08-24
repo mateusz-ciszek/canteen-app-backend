@@ -1,5 +1,5 @@
 import { Validator } from "../Validator";
-import { IMenuChangeNameRequest } from "../../../interface/menu/changeName/IMenuChangeNameRequest";
+import { IMenuChangeNameRequest } from "../../interface/menu/changeName/IMenuChangeNameRequest";
 
 export class MenuChangeNameRequestValidator extends Validator<IMenuChangeNameRequest> {
 	validate(input: IMenuChangeNameRequest): boolean {

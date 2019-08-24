@@ -1,8 +1,8 @@
 import { IRequest, Response } from "../../models/Express";
 import { FoodModelToFoodDetailsResponseConverter } from "../converter/food/FoodModelToFoodDetailsResponseConverter";
-import { FoodNotFoundError, FoodRepository } from "../helper/repository/FoodRepository";
-import { InvalidObjectIdError } from "../helper/repository/InvalidObjectIdError";
-import { MenuRepository } from "../helper/repository/MenuRepository";
+import { FoodNotFoundError, FoodRepository } from "../repository/FoodRepository";
+import { InvalidObjectIdError } from "../repository/InvalidObjectIdError";
+import { MenuRepository } from "../repository/MenuRepository";
 import { IFoodDeleteRequest } from "../interface/food/delete/IFoodDeleteRequest";
 import { IFoodDetailsRequest } from "../interface/food/details/IFoodDetailsRequest";
 import { IFoodDetailsResponse } from "../interface/food/details/IFoodDetailsResponse";
