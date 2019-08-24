@@ -1,7 +1,7 @@
 import { Validator } from "../Validator";
-import { IOrderStateUpdateRequest } from "../../../interface/order/updateState/IOrderStateUpdateRequest";
-import { MongooseUtil } from "../../MongooseUtil";
-import { OrderStateUtil } from "../../OrderStateUtil";
+import { IOrderStateUpdateRequest } from "../../interface/order/updateState/IOrderStateUpdateRequest";
+import { MongooseUtil } from "../../helper/MongooseUtil";
+import { OrderStateUtil } from "../../helper/OrderStateUtil";
 
 export class OrderStateUpdateRequestValidator extends Validator<IOrderStateUpdateRequest> {
 	mongooseUtil = new MongooseUtil();

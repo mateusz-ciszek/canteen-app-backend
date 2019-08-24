@@ -1,4 +1,4 @@
-import { IWorkerCreateRequest } from "../../../interface/worker/create/IWorkerCreateRequest";
+import { IWorkerCreateRequest } from "../../interface/worker/create/IWorkerCreateRequest";
 import { Validator } from "../Validator";
 import { WorkHoursValidator } from "./WorkHoursValidator";
 

@@ -1,6 +1,6 @@
 import 'mocha';
 import { expect } from 'chai';
-import { WorkerValidator } from '../../api/helper/validate/worker/WorkerValidator';
+import { WorkerValidator } from '../../api/validate/worker/WorkerValidator';
 import { IWorkerCreateRequest } from '../../api/interface/worker/create/IWorkerCreateRequest';
 
 describe('WorkerValidator', () => {

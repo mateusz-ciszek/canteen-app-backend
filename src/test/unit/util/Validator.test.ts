@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import 'mocha';
 import { MongooseUtil } from '../../../api/helper/MongooseUtil';
-import { Validator } from '../../../api/helper/validate/Validator';
+import { Validator } from '../../../api/validate/Validator';
 
 // DummyVAlidator created only for testing non-abstract methods of Validator
 class DummyValidator extends Validator<any> {

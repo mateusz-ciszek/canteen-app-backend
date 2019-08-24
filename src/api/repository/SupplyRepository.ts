@@ -1,9 +1,9 @@
-import { ISupply } from "../../../interface/Supply";
-import { ISupplyModel, Supply } from "../../models/Supply";
+import { ISupply } from "../../interface/Supply";
+import { ISupplyModel, Supply } from "../models/Supply";
 import { DocumentQuery, Error } from "mongoose";
-import { ISupplyListFilter } from "../../interface/supply/list/ISupplyListFilter";
-import { SupplyStateEnum } from "../../../interface/SupplyState";
-import { IUserModel } from "../../models/user";
+import { ISupplyListFilter } from "../interface/supply/list/ISupplyListFilter";
+import { SupplyStateEnum } from "../../interface/SupplyState";
+import { IUserModel } from "../models/user";
 
 export class SupplyRepository {
 	save(model: ISupply): Promise<ISupplyModel> {

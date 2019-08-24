@@ -1,4 +1,4 @@
-import { IWorkerDayOffRequest } from "../../../interface/worker/dayOff/create/IWorkerDayOffRequest";
+import { IWorkerDayOffRequest } from "../../interface/worker/dayOff/create/IWorkerDayOffRequest";
 import { Validator } from "../Validator";
 
 export class DayOffRequestValidator extends Validator<IWorkerDayOffRequest> {

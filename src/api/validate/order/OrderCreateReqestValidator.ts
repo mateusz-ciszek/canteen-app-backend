@@ -1,7 +1,7 @@
 import { Validator } from "../Validator";
-import { IOrderCreateRequest } from "../../../interface/order/create/IOrderCreateRequest";
-import { IOrderItemCreateRequest } from "../../../interface/order/create/IOrderItemCreateRequest";
-import { IOrderItemAdditionCreateRequest } from "../../../interface/order/create/IOrderItemAdditionCreateRequest";
+import { IOrderCreateRequest } from "../../interface/order/create/IOrderCreateRequest";
+import { IOrderItemCreateRequest } from "../../interface/order/create/IOrderItemCreateRequest";
+import { IOrderItemAdditionCreateRequest } from "../../interface/order/create/IOrderItemAdditionCreateRequest";
 
 export class OrderCreateRequestValidator extends Validator<IOrderCreateRequest> {
 	validate(input: IOrderCreateRequest): boolean {

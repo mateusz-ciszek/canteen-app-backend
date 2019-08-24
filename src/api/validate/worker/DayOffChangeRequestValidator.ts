@@ -1,4 +1,4 @@
-import { IDayOffChangeStatusRequest } from "../../../interface/worker/dayOff/changeState/IDayOffChangeStatusRequest";
+import { IDayOffChangeStatusRequest } from "../../interface/worker/dayOff/changeState/IDayOffChangeStatusRequest";
 import { Validator } from "../Validator";
 
 export class DayOffChangeRequestValidator extends Validator<IDayOffChangeStatusRequest> {

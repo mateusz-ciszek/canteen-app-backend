@@ -1,5 +1,5 @@
-import { MongooseUtil } from "../MongooseUtil";
-import { ISimpleTime } from "../../interface/common/ISimpleTime";
+import { MongooseUtil } from "../helper/MongooseUtil";
+import { ISimpleTime } from "../interface/common/ISimpleTime";
 
 export abstract class Validator<T extends any> {
 	private mognooseUtil = new MongooseUtil();

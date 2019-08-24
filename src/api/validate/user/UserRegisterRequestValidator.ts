@@ -1,4 +1,4 @@
-import { IRegisterUser } from "../../../interface/user/register/IRegisterUserRequest";
+import { IRegisterUser } from "../../interface/user/register/IRegisterUserRequest";
 import { Validator } from "../Validator";
 
 export class UserRegisterRequestValidator extends Validator<IRegisterUser> {
