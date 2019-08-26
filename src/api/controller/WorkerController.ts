@@ -5,17 +5,10 @@ import { WorkerModelToWorkerDetailsResponseConverter } from "../converter/worker
 import { WorkerModelToWorkerListItemConverter } from "../converter/worker/WorkerModelToWorkerListItemConverter";
 import { WorkHoursCreateRequestToWorkHoursModelConverter } from "../converter/worker/WorkHoursCreateRequestToWorkHoursModelConverter";
 import { BcryptUtil } from "../helper/BcryptUtil";
-import { DayOffHelper } from "../helper/DayOffHelper";
+import { DayOffUtil } from "../helper/DayOffUtil";
 import { EmailFactory } from "../helper/EmailFactory";
 import { IPasswordFactory } from "../helper/IPasswordFactory";
 import { PasswordFactoryImpl } from "../helper/PasswordFactoryImpl";
-import { DayOffNotFoundError, DayOffRepository, SaveDayOffCommand, DayOffFilter } from "../repository/DayOffRepository";
-import { InvalidObjectIdError } from "../repository/InvalidObjectIdError";
-import { SaveUserCommand, UserRepository } from "../repository/UserRepository";
-import { SaveWorkerCommand, WorkerNotFoundError, WorkerRepository } from "../repository/WorkerRepository";
-import { DayOffChangeRequestValidator } from "../validate/worker/DayOffChangeRequestValidator";
-import { DayOffRequestValidator } from "../validate/worker/DayOffRequestValidator";
-import { WorkerValidator } from "../validate/worker/WorkerValidator";
 import { WorkerHelper } from '../helper/WorkerHelper';
 import { WorkHoursHelper } from "../helper/WorkHoursHelper";
 import { IWorkerCreateRequest } from "../interface/worker/create/IWorkerCreateRequest";
@@ -32,14 +25,23 @@ import { IWorkerGetPermissions } from "../interface/worker/permissions/get/IWork
 import { IWorkerUpdatePermissions } from "../interface/worker/permissions/update/IWorkerUpdatePermissions";
 import { IDayOffModel } from "../models/DayOff";
 import { IWorkerModel } from "../models/worker";
+import { DayOffNotFoundError, DayOffRepositoryImpl } from "../repository/DayOffRepositoryImpl";
+import { DayOffFilter, IDayOffRepository, SaveDayOffCommand } from "../repository/IDayOffRepository";
+import { InvalidObjectIdError } from "../repository/InvalidObjectIdError";
+import { SaveUserCommand, UserRepository } from "../repository/UserRepository";
+import { SaveWorkerCommand, WorkerNotFoundError, WorkerRepository } from "../repository/WorkerRepository";
+import { DayOffChangeRequestValidator } from "../validate/worker/DayOffChangeRequestValidator";
+import { DayOffRequestValidator } from "../validate/worker/DayOffRequestValidator";
+import { WorkerValidator } from "../validate/worker/WorkerValidator";
 
 export class WorkerController {
 	private repository = new WorkerRepository();
 	private bcrypt = new BcryptUtil();
 	private workerHelper = new WorkerHelper();
 	private userRepository = new UserRepository();
-	private dayOffRepository = new DayOffRepository();
+	private dayOffRepository: IDayOffRepository = new DayOffRepositoryImpl();
 	private passwordFactory: IPasswordFactory = new PasswordFactoryImpl();
+	private dayOffUtil = new DayOffUtil(this.dayOffRepository);
 
 	async getPermissions(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
 		const request: IWorkerGetPermissions = req.params;
@@ -183,8 +185,7 @@ export class WorkerController {
 		
 		const dateConverter = new StringToDateConverter();
 		let dates = request.dates.map(date => dateConverter.convert(date));
-		const helper = new DayOffHelper();
-		dates = await helper.removeAlreadyRequestedDates(dates, worker._id);
+		dates = await this.dayOffUtil.filterOutExistingDates(dates, worker._id);
 	
 		for (const date of dates) {
 			const command: SaveDayOffCommand = { worker, date };

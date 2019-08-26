@@ -1,5 +1,5 @@
 import { DatabaseTestHelper } from './databaseHelper';
-import { IOrderCreateRequest } from '../../api/interface/order/create/IOrderCreateRequest';
+import { IOrderCreateRequest } from '../../../api/interface/order/create/IOrderCreateRequest';
 
 export class OrderTestHelper {
 	private dbHelper: DatabaseTestHelper;

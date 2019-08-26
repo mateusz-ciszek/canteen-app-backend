@@ -1,4 +1,4 @@
-import { IFoodCreateRequest } from '../../api/interface/menu/create/IFoodCreateRequest';
+import { IFoodCreateRequest } from '../../../api/interface/menu/create/IFoodCreateRequest';
 
 export class FoodTestHelper {
 	public getMalformedCreateFoodRequest(): IFoodCreateRequest {

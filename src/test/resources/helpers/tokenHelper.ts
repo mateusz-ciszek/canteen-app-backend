@@ -1,4 +1,4 @@
-import { JsonWebTokenData, JwtUtil } from '../../api/helper/JwtUtil';
+import { JsonWebTokenData, JwtUtil } from '../../../api/helper/JwtUtil';
 import { DatabaseTestHelper } from './databaseHelper';
 
 export class TokenTestHelper {

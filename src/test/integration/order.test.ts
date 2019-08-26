@@ -2,9 +2,9 @@ import 'mocha';
 import request from 'supertest';
 import { app } from '../../app';
 import { expect } from 'chai';
-import { DatabaseTestHelper } from '../testHelpers/databaseHelper';
-import { TokenTestHelper } from '../testHelpers/tokenHelper';
-import { OrderTestHelper } from '../testHelpers/orderHelper';
+import { DatabaseTestHelper } from '../resources/helpers/databaseHelper';
+import { TokenTestHelper } from '../resources/helpers/tokenHelper';
+import { OrderTestHelper } from '../resources/helpers/orderHelper';
 
 describe('Order', () => {
 	const dbHelper = new DatabaseTestHelper();

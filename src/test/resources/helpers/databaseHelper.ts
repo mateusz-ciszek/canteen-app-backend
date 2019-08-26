@@ -1,18 +1,18 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import { ObjectId } from 'bson';
-import { User } from '../../api/models/user';
-import { Food } from '../../api/models/food';
-import { Menu } from '../../api/models/menu';
-import { FoodAddition } from '../../api/models/foodAddition';
-import { Order } from '../../api/models/order';
-import { OrderItem } from '../../api/models/orderItem';
-import { OrderItemAddition } from '../../api/models/orderItemAddition';
-import { OrderState } from '../../api/models/orderState';
-import { Worker } from '../../api/models/worker';
-import { WorkHours } from '../../api/models/workHours';
-import { DayOff } from '../../api/models/DayOff';
-import { Permission } from '../../interface/Permission';
+import { User } from '../../../api/models/user';
+import { Food } from '../../../api/models/food';
+import { Menu } from '../../../api/models/menu';
+import { FoodAddition } from '../../../api/models/foodAddition';
+import { Order } from '../../../api/models/order';
+import { OrderItem } from '../../../api/models/orderItem';
+import { OrderItemAddition } from '../../../api/models/orderItemAddition';
+import { OrderState } from '../../../api/models/orderState';
+import { Worker } from '../../../api/models/worker';
+import { WorkHours } from '../../../api/models/workHours';
+import { DayOff } from '../../../api/models/DayOff';
+import { Permission } from '../../../interface/Permission';
 
 export class DatabaseTestHelper {
 	private id: ObjectId | null = null;

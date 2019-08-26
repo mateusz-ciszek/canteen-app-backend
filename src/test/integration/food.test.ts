@@ -2,8 +2,8 @@ import 'mocha';
 import request from 'supertest';
 import { expect } from 'chai';
 import { app } from '../../app';
-import { DatabaseTestHelper } from '../testHelpers/databaseHelper';
-import { TokenTestHelper } from '../testHelpers/tokenHelper';
+import { DatabaseTestHelper } from '../resources/helpers/databaseHelper';
+import { TokenTestHelper } from '../resources/helpers/tokenHelper';
 import { IFoodDeleteRequest } from '../../api/interface/food/delete/IFoodDeleteRequest';
 
 describe('Food', () => {
