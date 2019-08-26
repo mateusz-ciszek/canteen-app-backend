@@ -8,12 +8,13 @@ import { IMonthRequest } from "../interface/worker/month/IMonthRequest";
 import { IWorkDayDetails } from "../interface/worker/month/IWorkDayDetails";
 import { IDayOffModel } from "../models/DayOff";
 import { IWorkerModel } from '../models/worker';
+import { DayOffRepositoryImpl } from "../repository/DayOffRepositoryImpl";
+import { DayOffFilter, IDayOffRepository } from "../repository/IDayOffRepository";
 import { CalendarHelper } from "./CalendarHelper";
 import { DateUtil } from "./DateUtil";
-import { DayOffFilter, DayOffRepository } from "../repository/DayOffRepository";
 
 export class WorkerHelper {
-	private repository = new DayOffRepository();
+	private repository: IDayOffRepository = new DayOffRepositoryImpl();
 	private dateUtil = new DateUtil();
 	private workerConverter = new WorkerViewToWorkerCalendarViewConverter();
 	private dayOffConverter = new DayOffModelToDayOffRequestConverter();

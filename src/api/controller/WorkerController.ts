@@ -25,7 +25,8 @@ import { IWorkerGetPermissions } from "../interface/worker/permissions/get/IWork
 import { IWorkerUpdatePermissions } from "../interface/worker/permissions/update/IWorkerUpdatePermissions";
 import { IDayOffModel } from "../models/DayOff";
 import { IWorkerModel } from "../models/worker";
-import { DayOffFilter, DayOffNotFoundError, DayOffRepository, SaveDayOffCommand } from "../repository/DayOffRepository";
+import { DayOffNotFoundError, DayOffRepositoryImpl } from "../repository/DayOffRepositoryImpl";
+import { DayOffFilter, IDayOffRepository, SaveDayOffCommand } from "../repository/IDayOffRepository";
 import { InvalidObjectIdError } from "../repository/InvalidObjectIdError";
 import { SaveUserCommand, UserRepository } from "../repository/UserRepository";
 import { SaveWorkerCommand, WorkerNotFoundError, WorkerRepository } from "../repository/WorkerRepository";
@@ -38,7 +39,7 @@ export class WorkerController {
 	private bcrypt = new BcryptUtil();
 	private workerHelper = new WorkerHelper();
 	private userRepository = new UserRepository();
-	private dayOffRepository = new DayOffRepository();
+	private dayOffRepository: IDayOffRepository = new DayOffRepositoryImpl();
 	private passwordFactory: IPasswordFactory = new PasswordFactoryImpl();
 	private dayOffUtil = new DayOffUtil(this.dayOffRepository);
 

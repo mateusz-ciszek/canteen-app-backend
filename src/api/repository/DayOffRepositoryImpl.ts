@@ -1,11 +1,10 @@
 import { DocumentQuery } from "mongoose";
-import { DayOffState } from "../../interface/DayOffStatus";
-import { DayOff, IDayOffModel } from "../models/DayOff";
-import { IWorkerModel } from "../models/worker";
 import { MongooseUtil } from "../helper/MongooseUtil";
+import { DayOff, IDayOffModel } from "../models/DayOff";
+import { DayOffFilter, IDayOffRepository, SaveDayOffCommand } from "./IDayOffRepository";
 import { InvalidObjectIdError } from "./InvalidObjectIdError";
 
-export class DayOffRepository {
+export class DayOffRepositoryImpl implements IDayOffRepository {
 	private mongooseUtil = new MongooseUtil();
 
 	async save(command: SaveDayOffCommand): Promise<string> {
@@ -76,19 +75,4 @@ export class DayOffNotFoundError extends Error {
 	constructor(id: string) {
 		super(`Day off with ID: ${id} was not found`);
 	}
-}
-
-export interface SaveDayOffCommand {
-	worker: IWorkerModel;
-	date: Date;
-}
-
-export interface DayOffFilter {
-	dates?: Date[];
-	dateRange?: {
-		dateFrom?: Date;
-		dateTo?: Date;
-	}
-	workerId?: string;
-	states?: DayOffState[];
 }

@@ -1,8 +1,8 @@
-import { DayOffRepository, DayOffFilter } from "../repository/DayOffRepository";
+import { DayOffFilter, IDayOffRepository } from "../repository/IDayOffRepository";
 
 export class DayOffUtil {
 
-	constructor(private repository: DayOffRepository) { }
+	constructor(private repository: IDayOffRepository) { }
 
 	async filterOutExistingDates(requestedDates: Date[], workerId: string): Promise<Date[]> {
 		const filter: DayOffFilter = {
