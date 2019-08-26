@@ -57,8 +57,8 @@ export class DayOffRepository {
 		if (filter.states) {
 			query.find({ state: { $in: filter.states } });
 		}
-		if (filter.date) {
-			query.find({ date: filter.date });
+		if (filter.dates) {
+			query.find({ date: { $in: filter.dates } });
 		} else if (filter.dateRange) {
 			if (filter.dateRange.dateFrom) {
 				query.find({ date: { $gt: filter.dateRange.dateFrom } });
@@ -84,7 +84,7 @@ export interface SaveDayOffCommand {
 }
 
 export interface DayOffFilter {
-	date?: Date;
+	dates?: Date[];
 	dateRange?: {
 		dateFrom?: Date;
 		dateTo?: Date;

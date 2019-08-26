@@ -77,7 +77,7 @@ export class WorkerHelper {
 
 	private getUnresolvedDaysOff(year: number, month: number, day: number): Promise<IDayOffModel[]> {
 		const filter: DayOffFilter = {
-			date: this.dateUtil.createDate(year, month, day),
+			dates: [this.dateUtil.createDate(year, month, day)],
 			states: ['UNRESOLVED'],
 		};
 
