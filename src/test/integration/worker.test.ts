@@ -2,8 +2,8 @@ import request from 'supertest';
 import { app } from '../../app';
 import { expect } from 'chai';
 import { IWorkerCreateRequest } from '../../api/interface/worker/create/IWorkerCreateRequest';
-import { DatabaseTestHelper } from '../testHelpers/databaseHelper';
-import { TokenTestHelper } from '../testHelpers/tokenHelper';
+import { DatabaseTestHelper } from '../resources/helpers/databaseHelper';
+import { TokenTestHelper } from '../resources/helpers/tokenHelper';
 import { IWorkerDayOffRequest } from '../../api/interface/worker/dayOff/create/IWorkerDayOffRequest';
 
 describe('Worker', () => {

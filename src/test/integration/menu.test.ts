@@ -3,10 +3,10 @@ import 'mocha';
 import request from 'supertest';
 import { IMenuDeleteRequest } from '../../api/interface/menu/delete/IMenuDeleteRequest';
 import { app } from '../../app';
-import { DatabaseTestHelper } from '../testHelpers/databaseHelper';
-import { FoodTestHelper } from '../testHelpers/foodHelper';
-import { MenuTestHelper } from '../testHelpers/menuHelper';
-import { TokenTestHelper } from '../testHelpers/tokenHelper';
+import { DatabaseTestHelper } from '../resources/helpers/databaseHelper';
+import { FoodTestHelper } from '../resources/helpers/foodHelper';
+import { MenuTestHelper } from '../resources/helpers/menuHelper';
+import { TokenTestHelper } from '../resources/helpers/tokenHelper';
 import { IFoodCreateRequest } from '../../api/interface/menu/create/IFoodCreateRequest';
 
 describe('Menu', () => {

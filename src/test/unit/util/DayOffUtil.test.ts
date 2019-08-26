@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { DayOffUtil } from '../../../api/helper/DayOffUtil';
-import { DatabaseTestHelper } from '../../testHelpers/databaseHelper';
-import { DayOffRepositoryMock } from '../../testHelpers/mocks/DayOffRepositoryMock';
+import { DatabaseTestHelper } from '../../resources/helpers/databaseHelper';
+import { DayOffRepositoryMock } from '../../resources/mocks/DayOffRepositoryMock';
 
 describe('DayOffUtil', async () => {
 	const workerId: string = '';

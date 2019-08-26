@@ -1,6 +1,6 @@
 import { IDayOffModel } from "../../../api/models/DayOff";
 import { DayOffFilter, IDayOffRepository, SaveDayOffCommand } from "../../../api/repository/IDayOffRepository";
-import { DatabaseTestHelper } from "../databaseHelper";
+import { DatabaseTestHelper } from "../helpers/databaseHelper";
 
 export class DayOffRepositoryMock implements IDayOffRepository {
 
@@ -10,7 +10,7 @@ export class DayOffRepositoryMock implements IDayOffRepository {
 		this.DATE_IN_DATABASE = new Date(dbHelper.DAY_OFF.DATE);
 	}
 
-	save(command: SaveDayOffCommand): Promise<string> {
+	async save(command: SaveDayOffCommand): Promise<string> {
 		throw new Error("Method not implemented.");
 	}
 	

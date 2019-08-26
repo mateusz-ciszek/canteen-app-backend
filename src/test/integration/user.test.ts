@@ -3,7 +3,7 @@ import request from 'supertest';
 import { expect } from 'chai';
 import { app } from '../../app';
 import { decode } from 'jsonwebtoken';
-import { DatabaseTestHelper } from '../testHelpers/databaseHelper';
+import { DatabaseTestHelper } from '../resources/helpers/databaseHelper';
 
 describe('User', () => {
 	const dbHelper = new DatabaseTestHelper();
