@@ -15,7 +15,7 @@ WorkerRouter.use(checkAuth,
 
 WorkerRouter.get('',
 		(req, res, next) => permissionValidator.checkPermission('P_WORKER_LIST_VIEW')(req, res, next),
-		(req, res, next) => controller.getWorkersList(req, res, next));
+		(req, res) => controller.getWorkersList(req, res));
 
 WorkerRouter.post('',
 		(req, res, next) => permissionValidator.checkPermission('P_WORKER_CREATE')(req, res, next),
@@ -33,11 +33,11 @@ WorkerRouter.patch('/dayoff',
 
 WorkerRouter.get('/:workerId/permissions',
 		(req, res, next) => permissionValidator.checkPermission('P_WORKER_PERMISSIONS_EDIT')(req, res, next),
-		(req, res, next) => controller.getPermissions(req, res, next));
+		(req, res) => controller.getPermissions(req, res));
 
 WorkerRouter.post('/:workerId/permissions',
 		(req, res, next) => permissionValidator.checkPermission('P_WORKER_PERMISSIONS_EDIT')(req, res, next),
-		(req, res, next) => controller.updatePermissions(req, res, next));
+		(req, res) => controller.updatePermissions(req, res));
 
 WorkerRouter.get('/:workerId',
 		(req, res, next) => permissionValidator.checkPermission('P_WORKER_DETAILS_VIEW')(req, res, next),

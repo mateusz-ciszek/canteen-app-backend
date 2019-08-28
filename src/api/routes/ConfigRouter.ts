@@ -10,4 +10,4 @@ const controller = new ConfigController();
 ConfigRouter.get('/',
 		checkAuth,
 		isAdmin,
-		(req, res, next) => controller.getConfig(req, res, next));
+		(req, res) => controller.getConfig(req, res));

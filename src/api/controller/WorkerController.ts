@@ -43,7 +43,7 @@ export class WorkerController {
 	private passwordFactory: IPasswordFactory = new PasswordFactoryImpl();
 	private dayOffUtil = new DayOffUtil(this.dayOffRepository);
 
-	async getPermissions(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	async getPermissions(req: IRequest, res: Response): Promise<Response> {
 		const request: IWorkerGetPermissions = req.params;
 		let worker: IWorkerModel;
 
@@ -62,7 +62,7 @@ export class WorkerController {
 		return res.status(200).json(worker.permissions);
 	}
 
-	async updatePermissions(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	async updatePermissions(req: IRequest, res: Response): Promise<Response> {
 		const request: IWorkerUpdatePermissions = { ...req.body, ...req.params };
 		
 		if (!request.workerId || !request.permissions) {
@@ -84,7 +84,7 @@ export class WorkerController {
 		return res.status(200).json();
 	}
 
-	async getWorkersList(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	async getWorkersList(req: IRequest, res: Response): Promise<Response> {
 		const allWorkers: IWorkerModel[] = await this.repository.getAllWorkers();
 		const converter = new WorkerModelToWorkerListItemConverter();
 		const response: IWorkerListResponse = { workers: allWorkers.map(worker => converter.convert(worker)) };

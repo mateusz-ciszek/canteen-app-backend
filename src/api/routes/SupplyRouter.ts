@@ -15,18 +15,18 @@ SupplyRouter.use(checkAuth,
 
 SupplyRouter.post('',
 		(req, res, next) => permissionValidator.checkPermission('P_SUPPLY_CREATE')(req, res, next),
-		(req, res, next) => controller.newSupplyRequest(req, res, next));
+		(req, res) => controller.newSupplyRequest(req, res));
 
 SupplyRouter.post('/list',
 		(req, res, next) => permissionValidator.checkPermission('P_SUPPLY_LIST_VIEW')(req, res, next),
-		(req, res, next) => controller.getSupplyList(req, res, next));
+		(req, res) => controller.getSupplyList(req, res));
 
 SupplyRouter.get('/:supplyId',
 		(req, res, next) => permissionValidator.checkPermission('P_SUPPLY_DETAILS_VIEW')(req, res, next),
-		(req, res, next) => controller.getDetails(req, res, next));
+		(req, res) => controller.getDetails(req, res));
 
 SupplyRouter.post('/comment/:supplyId',
-		(req, res, next) => controller.addComment(req, res, next));
+		(req, res) => controller.addComment(req, res));
 
 SupplyRouter.patch('',
-		(req, res, next) => controller.updateSupplyRequest(req, res, next));
+		(req, res) => controller.updateSupplyRequest(req, res));
