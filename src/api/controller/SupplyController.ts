@@ -22,7 +22,7 @@ const DEFAULT_PAGE_SIZE = 10;
 export class SupplyController {
 	private repository = new SupplyRepository();
 
-	async newSupplyRequest(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	async newSupplyRequest(req: IRequest, res: Response): Promise<Response> {
 		const request: ISupplyCreateRequest = req.body;
 
 		const user = await User.findById(req.context!.userId).exec();
@@ -43,7 +43,7 @@ export class SupplyController {
 		return res.status(201).json();
 	}
 
-	async getSupplyList(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	async getSupplyList(req: IRequest, res: Response): Promise<Response> {
 		
 		const request: ISupplyListRequest = {
 			page: req.body.page || 0,
@@ -67,7 +67,7 @@ export class SupplyController {
 		return res.status(200).json(response);
 	}
 
-	async getDetails(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	async getDetails(req: IRequest, res: Response): Promise<Response> {
 		const request: ISupplyDetailsRequest = req.params;
 		let supply: ISupplyModel;
 
@@ -88,7 +88,7 @@ export class SupplyController {
 		return res.status(200).json(response);
 	}
 
-	async addComment(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	async addComment(req: IRequest, res: Response): Promise<Response> {
 		const request: ICommentAddRequest = { ...req.body, ...req.params };
 		const user = await User.findById(req.context!.userId);
 		const supply = await this.repository.queryDocument(request.supplyId);
@@ -105,7 +105,7 @@ export class SupplyController {
 		return res.status(200).json();
 	}
 
-	async updateSupplyRequest(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	async updateSupplyRequest(req: IRequest, res: Response): Promise<Response> {
 		const request: ISupplyUpdateRequest = req.body;
 		const user = await User.findById(req.context!.userId);
 

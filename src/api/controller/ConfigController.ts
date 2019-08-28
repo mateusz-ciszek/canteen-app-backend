@@ -6,7 +6,7 @@ import { IConfigGetResponse } from "../interface/config/IConfigGetResponse";
 export class ConfigController {
 	private util = new PermissionUtil();
 
-	async getConfig(req: IRequest, res: Response, next: NextFunction): Promise<Response> {
+	async getConfig(req: IRequest, res: Response): Promise<Response> {
 		const workerId = req.context!.workerId!;
 		const response: IConfigGetResponse = {
 			moduleAccessPermissions: {
