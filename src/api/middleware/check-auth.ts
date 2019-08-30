@@ -9,6 +9,7 @@ export function checkAuth(req: IRequest, res: Response, next: NextFunction): any
 
 	try {
 		const token = req.headers.authorization!.split(' ')[1];
+		// TODO: check if succesfully decoded token
 		userId = jwtUtil.decodeToken(token).userId;
 	} catch(error) {
 		return res.status(401).json();

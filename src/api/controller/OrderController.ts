@@ -1,21 +1,21 @@
+import { OrderStateEnum } from "../../interface/orderState";
 import { IRequest, Response } from "../../models/Express";
-import { IOrderCreateRequest } from "../interface/order/create/IOrderCreateRequest";
-import { OrderCreateRequestValidator } from "../validate/order/OrderCreateReqestValidator";
-import { OrderRepository, OrderNotFoundError } from "../repository/OrderRepository";
-import { OrderListFilter } from "../interface/order/list/OrderListFilter";
-import { IOrderModel } from "../models/order";
 import { OrderModelToOrderListResponseConverter } from "../converter/order/OrderListModelToOrderListResponseConverter";
+import { OrderModelToOrderDetailsResponseConverter } from "../converter/order/OrderModelToOrderDetailsResponseConverter";
+import { OrderStateUtil } from "../helper/OrderStateUtil";
+import { IOrderCreateRequest } from "../interface/order/create/IOrderCreateRequest";
+import { IOrderDetailsRequest } from "../interface/order/details/IOrderDetailsRequest";
+import { IOrderDetailsResponse } from "../interface/order/details/IOrderDetailsResponse";
 import { IOrderListItemView } from "../interface/order/list/IOrderListItemView";
 import { IOrderListResponse } from "../interface/order/list/IOrderListResponse";
+import { OrderListFilter } from "../interface/order/list/OrderListFilter";
 import { IOrderStateUpdateRequest } from "../interface/order/updateState/IOrderStateUpdateRequest";
-import { OrderStateUpdateRequestValidator } from "../validate/order/OrderStateUpdateRequestValidator";
-import { IOrderDetailsRequest } from "../interface/order/details/IOrderDetailsRequest";
-import { InvalidObjectIdError } from "../repository/InvalidObjectIdError";
-import { OrderModelToOrderDetailsResponseConverter } from "../converter/order/OrderModelToOrderDetailsResponseConverter";
-import { IOrderDetailsResponse } from "../interface/order/details/IOrderDetailsResponse";
-import { OrderStateUtil } from "../helper/OrderStateUtil";
+import { IOrderModel } from "../models/order";
 import { IOrderStateModel, OrderState } from "../models/orderState";
-import { OrderStateEnum } from "../../interface/orderState";
+import { InvalidObjectIdError } from "../repository/InvalidObjectIdError";
+import { OrderNotFoundError, OrderRepository } from "../repository/OrderRepository";
+import { OrderCreateRequestValidator } from "../validate/order/OrderCreateReqestValidator";
+import { OrderStateUpdateRequestValidator } from "../validate/order/OrderStateUpdateRequestValidator";
 
 export class OrderController {
 	private repository = new OrderRepository();
@@ -28,7 +28,7 @@ export class OrderController {
 		}
 	
 		try {
-			this.repository.save(request, req.context!.userId);
+			await this.repository.save(request, req.context!.userId);
 		} catch (err) {
 			return res.status(500).json();
 		}
