@@ -1,20 +1,21 @@
-import { IOrderModel, Order } from "../models/order";
-import { OrderStateEnum } from "../../interface/orderState";
 import { Error as MongooseError } from 'mongoose';
-import { InvalidObjectIdError } from "./InvalidObjectIdError";
+import { OrderStateEnum } from "../../interface/orderState";
 import { IPriceCalculator } from "../helper/IPriceCalculator";
+import { MongooseUtil } from "../helper/MongooseUtil";
+import { OrderStateFactory } from "../helper/OrderStateFactory";
 import { PriceCalculatorImpl } from "../helper/PriceCalculatorImpl";
 import { IOrderCreateRequest } from "../interface/order/create/IOrderCreateRequest";
-import { IOrderItemModel, OrderItem } from "../models/orderItem";
 import { IOrderItemAdditionCreateRequest } from "../interface/order/create/IOrderItemAdditionCreateRequest";
 import { IOrderItemCreateRequest } from "../interface/order/create/IOrderItemCreateRequest";
-import { IOrderItemAdditionModel, OrderItemAddition } from "../models/orderItemAddition";
-import { OrderStateFactory } from "../helper/OrderStateFactory";
-import { MongooseUtil } from "../helper/MongooseUtil";
-import { Food } from "../models/food";
 import { FoodAddition } from "../models/foodAddition";
+import { IOrderModel, Order } from "../models/order";
+import { IOrderItemModel, OrderItem } from "../models/orderItem";
+import { IOrderItemAdditionModel, OrderItemAddition } from "../models/orderItemAddition";
+import { FoodRepository } from "./FoodRepository";
+import { InvalidObjectIdError } from "./InvalidObjectIdError";
 
 export class OrderRepository {
+	private foodRepository = new FoodRepository();
 	private priceCalc: IPriceCalculator = new PriceCalculatorImpl();
 	private stateFactory: OrderStateFactory = new OrderStateFactory();
 	private mongooseUtil: MongooseUtil = new MongooseUtil();
@@ -84,7 +85,7 @@ export class OrderRepository {
 				comment: request.comment,
 				currentState: orderState,
 				createdDate: new Date(),
-			});
+			}).save();
 		} catch (err) {
 			throw new OrderSaveError(err);
 		}
@@ -95,16 +96,14 @@ export class OrderRepository {
 		for (const item of items) {
 			const savedAdditions = await this.saveAdditions(item.additions);
 			const additionsPrice = this.priceCalc.calculateItemPrice(savedAdditions);
-
-			// TODO use food repositry
-			const food = await Food.findById(item._id).exec();
+			const food = await this.foodRepository.getFoodById(item._id);
 
 			const savedItem = await new OrderItem({
 				_id: this.mongooseUtil.generateObjectId(),
 				food: item._id,
 				quantity: item.quantity,
 				additions: savedAdditions.map(item => item._id),
-				price: food!.price * item.quantity + additionsPrice,
+				price: food.price * item.quantity + additionsPrice,
 			}).save();
 			saved.push(savedItem);
 		}
